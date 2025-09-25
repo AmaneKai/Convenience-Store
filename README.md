@@ -57,7 +57,7 @@ The system allows users to manage a catalog of products, simulate customer inter
 
 ### Project Structure
 ```
-convenience-store/
+konbini/
 ├── src/
 │   ├── models/              # Product, Customer, Transaction classes
 │   ├── controllers/         # Business logic and MVC controllers
