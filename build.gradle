@@ -40,5 +40,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'konbini.App'
+    mainClass = 'com.konbini.Main'
 }
