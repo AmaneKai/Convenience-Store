@@ -5,7 +5,6 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/9.0.0/userguide/building_java_projects.html in the Gradle documentation.
  * This project uses @Incubating APIs which are subject to change.
  */
-
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
@@ -16,18 +15,29 @@ repositories {
     mavenCentral()
 }
 
+run {
+    standardInput = System.in
+    jvmArgs = ['-Djava.awt.headless=true']
+}
+
 dependencies {
     // This dependency is used by the application.
     implementation libs.guava
+    
+    // JUnit dependencies - fixed configuration
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.2'
 }
 
-testing {
-    suites {
-        // Configure the built-in test suite
-        test {
-            // Use JUnit Jupiter test framework
-            useJUnitJupiter('5.12.1')
-        }
+// Configure the test task with more detailed logging
+test {
+    useJUnitPlatform()
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
     }
 }
 
