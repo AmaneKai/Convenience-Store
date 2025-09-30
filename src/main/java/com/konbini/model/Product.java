@@ -15,6 +15,8 @@ public class Product implements Serializable {
     private String brand;
     private String variant;
     private LocalDate expirationDate;
+    private static final int DEFAULT_LOW_STOCK_THRESHOLD = 5;
+    private int lowStockThreshold = DEFAULT_LOW_STOCK_THRESHOLD;
 
     public Product(String name, double price, int quantity, String category, String brand, String variant, LocalDate expirationDate) {
         this.id = IdGenerator.getInstance().generateId("product");
@@ -95,8 +97,21 @@ public class Product implements Serializable {
         return expirationDate.isBefore(LocalDate.now());
     }
 
+    public int getLowStockThreshold() {
+        return lowStockThreshold;
+    }
+
+    public void setLowStockThreshold(int threshold) {
+        if (threshold < 0) {
+            throw new IllegalArgumentException
+            ("Low stock threshold cannot be negative");
+        }
+
+        this.lowStockThreshold  = threshold;
+    }
+
     public boolean isLowStock() {
-        return quantity < 5;
+        return quantity < lowStockThreshold;
     }
 
     public void decreaseQuantity(int amount) {
