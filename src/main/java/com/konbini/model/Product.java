@@ -18,7 +18,8 @@ public class Product implements Serializable {
     private static final int DEFAULT_LOW_STOCK_THRESHOLD = 5;
     private int lowStockThreshold = DEFAULT_LOW_STOCK_THRESHOLD;
 
-    public Product(String name, double price, int quantity, String category, String brand, String variant, LocalDate expirationDate) {
+    public Product(String name, double price, int quantity, String category, 
+        String brand, String variant, LocalDate expirationDate) {
         this.id = IdGenerator.getInstance().generateId("product");
         this.name = name;
         this.price = price;

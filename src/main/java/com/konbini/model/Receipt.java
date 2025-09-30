@@ -1,6 +1,7 @@
 package com.konbini.model;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class Receipt {
     private final Transaction transaction;
@@ -40,12 +41,20 @@ public class Receipt {
         
         receipt.append(String.format("Subtotal: ₱%.2f\n", 
             transaction.getSubtotal()));
-        receipt.append(String.format("Tax (VAT): ₱%.2f\n", 
-            transaction.getTax()));
+        receipt.append(String.format("%s: ₱%.2f\n", 
+            transaction.getTaxName(), transaction.getTax()));
         
         if (transaction.getDiscount() > 0) {
             receipt.append(String.format("Discount: ₱%.2f\n", 
                 transaction.getDiscount()));
+            
+            // Add applied discounts details
+            List<String> appliedDiscounts = transaction.getAppliedDiscounts();
+            if (appliedDiscounts != null && !appliedDiscounts.isEmpty()) {
+                for (String discount : appliedDiscounts) {
+                    receipt.append(String.format("  - %s\n", discount));
+                }
+            }
         }
         
         receipt.append(String.format("Total: ₱%.2f\n\n", 

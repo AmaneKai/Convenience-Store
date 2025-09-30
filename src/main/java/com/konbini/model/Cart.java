@@ -7,15 +7,15 @@ import java.util.Optional;
 
 public class Cart implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     private final List<CartItem> items;
     private final Customer customer;
-    
+
     public Cart(Customer customer) {
         this.customer = customer;
         this.items = new ArrayList<>();
     }
-    
+
     public List<CartItem> getItems() {
         return new ArrayList<>(items);
     }
@@ -26,8 +26,9 @@ public class Cart implements Serializable {
 
     public void addItem(Product product, int quantity) {
         Optional<CartItem> existingItem = items.stream()
-            .filter(item -> item.getProduct().getId().equals(product.getId()))
-            .findFirst();
+                .filter(item -> item.getProduct().getId()
+                .equals(product.getId()))
+                .findFirst();
 
         if (existingItem.isPresent()) {
             existingItem.get().increaseQuantity(quantity);
@@ -43,9 +44,9 @@ public class Cart implements Serializable {
 
     public void updateItemQuantity(String productId, int newQuantity) {
         items.stream()
-            .filter(item -> item.getProduct().getId().equals(productId))
-            .findFirst()
-            .ifPresent(item -> item.setQuantity(newQuantity));
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .ifPresent(item -> item.setQuantity(newQuantity));
     }
 
     public void clear() {

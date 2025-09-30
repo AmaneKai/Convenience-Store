@@ -115,8 +115,13 @@ public class FileProductRepository implements ProductRepository {
             loadedProducts.forEach(product -> products
                 .put(product.getId(), product));
             return true;
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Product class definition not found: " +
+            e.getMessage());
+            return false;
+        } catch (ClassNotFoundException e) {
+            System.err.println("Product class definiton not found: " +
+                e.getMessage());
             return false;
         }
     }

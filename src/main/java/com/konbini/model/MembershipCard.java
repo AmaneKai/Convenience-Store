@@ -50,7 +50,7 @@ public class MembershipCard implements Serializable {
 
     public LocalDate getExpiryDate() {
         return expiryDate;
-    }
+   }
 
     public boolean isExpired() {
         return expiryDate.isBefore(LocalDate.now());

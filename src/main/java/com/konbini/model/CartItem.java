@@ -10,11 +10,13 @@ public class CartItem implements Serializable {
     
     public CartItem(Product product, int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive");
+            throw new IllegalArgumentException
+            ("Quantity must be positive");
         }
         
         if (quantity > product.getQuantity()) {
-            throw new IllegalArgumentException("Cannot add more items than available in stock");
+            throw new IllegalArgumentException
+            ("Cannot add more items than available in stock");
         }
         
         this.product = product;
