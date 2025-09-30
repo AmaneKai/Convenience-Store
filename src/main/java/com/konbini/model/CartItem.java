@@ -49,7 +49,7 @@ public class CartItem implements Serializable {
             ("Amount must be positive");
         }
 
-        if (this.quantity - amount <= 0) {
+        if (this.quantity + amount <= 0) {
             throw new IllegalArgumentException
             ("Cannot add more items than available in stock");
         }
