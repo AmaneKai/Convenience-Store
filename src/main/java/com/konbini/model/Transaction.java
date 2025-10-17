@@ -156,6 +156,7 @@ public class Transaction implements Serializable {
          * @return The current Builder instance for chaining.
          * @deprecated This method is marked for deprecation as using TaxStrategy is preferred.
          */
+        @Deprecated
         public Builder withTax(double taxRate) {
             this.tax = subtotal * taxRate;
             this.total = subtotal + tax - discount;
@@ -169,6 +170,7 @@ public class Transaction implements Serializable {
          * @return The current Builder instance for chaining.
          * @deprecated This logic is better handled by a dedicated DiscountStrategy.
          */
+        @Deprecated
         public Builder withSeniorDiscount(double discountRate) {
             if (customer.isSeniorCitizen()) {
                 double seniorDiscount = subtotal * discountRate;
@@ -187,6 +189,7 @@ public class Transaction implements Serializable {
          * @return The current Builder instance for chaining.
          * @deprecated This logic is better handled by a dedicated PointsRedemptionStrategy.
          */
+        @Deprecated
         public Builder withPointsRedemption(int points) {
             if (customer.hasMembershipCard() && customer
                 .getMembershipCard().getPoints() >= points) {
