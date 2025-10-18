@@ -93,7 +93,7 @@ public class Transaction implements Serializable {
                 Product product = cartItem.getProduct();
                 int quantity = cartItem.getQuantity();
 
-                // Decrease product quantity in the inventory model
+                // Restore this line for test compatibility
                 product.decreaseQuantity(quantity);
 
                 // Add a new item instance to the transaction record
@@ -104,8 +104,7 @@ public class Transaction implements Serializable {
             this.subtotal = cart.getSubtotal();
             this.total = subtotal; // Initial total before tax/discount
         }
-
-        /**
+       /**
          * Applies a tax strategy to calculate tax based on the subtotal.
          * Updates the tax amount, tax name, and recalculates the total.
          *
@@ -119,7 +118,6 @@ public class Transaction implements Serializable {
             this.total = subtotal + tax - discount;
             return this;
         }
-
         /**
          * Applies an applicable discount strategy.
          * Updates the discount amount, records the discount name, processes
@@ -127,27 +125,26 @@ public class Transaction implements Serializable {
          *
          * @param discountStrategy The DiscountStrategy to attempt to apply.
          * @return The current Builder instance for chaining.
-         */
+        */
         public Builder addDiscountStrategy(DiscountStrategy discountStrategy) {
             if (discountStrategy.isApplicable(customer)) {
                 discountStrategies.add(discountStrategy);
-                double strategyDiscount = discountStrategy
-                    .calculateDiscount(subtotal);
+                double strategyDiscount = discountStrategy.calculateDiscount(subtotal);
                 this.discount += strategyDiscount;
                 this.appliedDiscounts.add(discountStrategy.getName());
 
-                // If it's a points redemption strategy, process the redemption
+                // If it's a points redemption strategy, process the redemption and update points redeemed
                 if (discountStrategy instanceof PointsRedemptionStrategy) {
                     PointsRedemptionStrategy prs = (PointsRedemptionStrategy) discountStrategy;
                     prs.processRedemption(customer);
-                    // Assuming the PointsRedemptionStrategy handles updating the builder's pointsRedeemed field implicitly or externally
+                    // Update pointsRedeemed field - FIX: Call getPointsToRedeem() instead of getPointsRedeemed()
+                    this.pointsRedeemed = prs.getPointsToRedeem();
                 }
 
                 this.total = subtotal + tax - discount;
             }
             return this;
         }
-
         /**
          * Applies a tax rate directly to the subtotal.
          * Note: This method is a simplified alternative to using a TaxStrategy.
@@ -255,6 +252,7 @@ public class Transaction implements Serializable {
         public Transaction build() {
             return new Transaction(this);
         }
+        
     }
 
     /**

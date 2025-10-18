@@ -38,6 +38,11 @@ public class CartItem implements Serializable {
             ("Cannot add more items than available in stock");
         }
 
+        if (product.isExpired()) {
+            throw new IllegalArgumentException
+            ("Cannot add expired product: " + product.getName());
+        }
+
         this.product = product;
         this.quantity = quantity;
     }

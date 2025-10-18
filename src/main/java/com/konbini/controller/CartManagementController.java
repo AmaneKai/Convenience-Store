@@ -208,8 +208,7 @@ public class CartManagementController {
      */
     private void updateCartItemQuantity() {
         if (currentCart == null) {
-            view.displayErrorMessage
-                ("No active cart. Please create a cart first.");
+            view.displayErrorMessage("No active cart. Please create a cart first.");
             return;
         }
 
@@ -218,22 +217,31 @@ public class CartManagementController {
             return;
         }
 
-        try {
-            view.displayCart(currentCart);
-            String productId = view.getStringInput
-                ("Enter product ID to update quantity: ");
-            int newQuantity = view.getIntInput("Enter new quantity: ");
-
-            cartController.updateCartItemQuantity
-                (currentCart, productId, newQuantity);
-            view.displaySuccessMessage("Item quantity updated successfully.");
-            view.displayCart(currentCart);
-        } catch (Exception e) {
-            view.displayErrorMessage("Failed to update item quantity: "
-                + e.getMessage());
+        view.displayCart(currentCart);
+        String productId = view.getStringInput("Enter product ID to update quantity: ");
+        
+        // Validate product exists in cart
+        boolean productExists = currentCart.getItems().stream()
+                .anyMatch(item -> item.getProduct().getId().equals(productId));
+        
+        if (!productExists) {
+            view.displayErrorMessage("Product not found in cart.");
+            return;
+        }
+        
+        boolean validInput = false;
+        while (!validInput) {
+            try {
+                int newQuantity = view.getIntInput("Enter new quantity: ");
+                cartController.updateCartItemQuantity(currentCart, productId, newQuantity);
+                validInput = true;
+                view.displaySuccessMessage("Item quantity updated successfully.");
+                view.displayCart(currentCart);
+            } catch (Exception e) {
+                view.displayErrorMessage("Failed to update item quantity: " + e.getMessage());
+            }
         }
     }
-
     /**
      * Clears all items from the active cart.
      */
@@ -324,18 +332,25 @@ public class CartManagementController {
         view.displayInfoMessage("Customer has " + availablePoints
             + " points available for redemption.");
 
-        int pointsToRedeem = view.getIntInput
-            ("Enter points to redeem (0 for none): ");
-
-        if (pointsToRedeem > availablePoints) {
-            view.displayErrorMessage
-                ("Cannot redeem more points than available.");
-            // Re-prompt user until a valid input is given (or 0 is chosen)
-            return view.getIntInput
+         int pointsToRedeem;
+        boolean validInput = false;
+        
+        do {
+            pointsToRedeem = view.getIntInput
                 ("Enter points to redeem (0-" + availablePoints + "): ");
-        }
-
-        return pointsToRedeem;
+            
+            if (pointsToRedeem < 0) {
+                view.displayErrorMessage
+                    ("Points to redeem cannot be negative.");
+            } else if (pointsToRedeem > availablePoints) {
+                view.displayErrorMessage
+                    ("Cannot redeem more points than available.");
+            } else {
+                validInput = true;
+            }
+        } while (!validInput);
+         
+            return pointsToRedeem;
     }
 
     /**

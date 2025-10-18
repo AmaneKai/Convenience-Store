@@ -58,35 +58,31 @@ public class TransactionServiceImpl implements TransactionService {
         if (cart.isEmpty()) {
             throw new IllegalArgumentException("Cart is empty");
         }
-
-        // Validate and update inventory
+        
+        // Validate inventory first without updating it
         for (CartItem item : cart.getItems()) {
             Product product = item.getProduct();
-
+            
             if (product.getQuantity() < item.getQuantity()) {
                 throw new IllegalArgumentException("Insufficient quantity for product: " + product.getName());
             }
-
+            
             if (product.isExpired()) {
                 throw new IllegalArgumentException("Product is expired: " + product.getName());
             }
-
-            // Update product quantity (this logic is duplicated here and in Transaction.Builder to handle persistence)
-            product.decreaseQuantity(item.getQuantity());
-            productRepository.updateProduct(product);
         }
-
+        
         // Create transaction builder with tax strategy
         Transaction.Builder transactionBuilder = new Transaction.Builder(cart.getCustomer(), cart)
             .withTaxStrategy(new VATTaxStrategy());
-
+        
         // Apply senior discount if applicable
         transactionBuilder.addDiscountStrategy(new SeniorDiscountStrategy());
-
+        
         // Apply points redemption if applicable
         if (pointsToRedeem > 0) {
             PointsRedemptionStrategy pointsStrategy = new PointsRedemptionStrategy(pointsToRedeem);
-
+            
             if (pointsStrategy.isApplicable(cart.getCustomer())) {
                 transactionBuilder.addDiscountStrategy(pointsStrategy);
                 // Note: The builder's addDiscountStrategy handles the redemption calculation,
@@ -100,22 +96,23 @@ public class TransactionServiceImpl implements TransactionService {
                 // pointsStrategy.processRedemption(cart.getCustomer()); 
             }
         }
-
+        
         // Calculate points earned
         transactionBuilder.withPointsEarned();
-
+        
         // Process payment
         transactionBuilder.withPayment(paymentAmount);
-
+        
+        // REMOVED: We don't need to reduce inventory here since it's now happening in Transaction.Builder constructor
+        
         // Build the transaction
         Transaction transaction = transactionBuilder.build();
-
+        
         // Save the transaction
         transactionRepository.addTransaction(transaction);
-
+        
         return transaction;
     }
-
     /**
      * Generates a formatted string representation of the transaction suitable for printing as a receipt.
      * Delegates the formatting to the Receipt class.

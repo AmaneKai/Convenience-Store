@@ -71,4 +71,13 @@ public class PointsRedemptionStrategy implements DiscountStrategy {
             customer.getMembershipCard().deductPoints(pointsToRedeem);
         }
     }
+
+    /**
+     * Gets the number of points being redeemed.
+     * 
+     * @return The number of points to redeem.
+     */
+    public int getPointsToRedeem() {
+        return pointsToRedeem;  // Use the correct field name
+    }
 }

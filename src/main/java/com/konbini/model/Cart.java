@@ -91,12 +91,25 @@ public class Cart implements Serializable {
      * @param newQuantity The new total quantity for the item.
      */
     public void updateItemQuantity(String productId, int newQuantity) {
-        items.stream()
+        Optional<CartItem> itemOptional = items.stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst()
-                .ifPresent(item -> item.setQuantity(newQuantity));
-    }
+                .findFirst();
+        
+        if (itemOptional.isPresent()) {
+            CartItem item = itemOptional.get();
+            
+            try {
+                item.setQuantity(newQuantity);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException
+                    ("Cannot update quantity: " + e.getMessage());
+            }
+        } else {
+            throw new IllegalArgumentException
+                ("Product not found in cart: " + productId);
+        }
 
+    }
     /**
      * Clears all items from the cart, leaving the cart empty but still
      * associated with the customer.
