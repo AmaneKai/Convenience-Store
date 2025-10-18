@@ -38,6 +38,10 @@ public class Customer implements Serializable {
      * @param isSeniorCitizen The initial senior citizen status of the customer.
      */
     public Customer(String name, boolean isSeniorCitizen) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException
+                ("Customer name cannot be null or empty");
+        }
         this.id = IdGenerator.getInstance().generateId("customer");
         this.name = name;
         this.isSeniorCitizen = isSeniorCitizen;
@@ -86,6 +90,10 @@ public class Customer implements Serializable {
      * @param membershipCard The MembershipCard object to associate with the customer.
      */
     public void setMembershipCard(MembershipCard membershipCard) {
+        if (membershipCard == null) {
+            throw new IllegalArgumentException
+            ("Membership card cannot be null");
+        }
         this.membershipCard = membershipCard;
     }
 

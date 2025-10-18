@@ -60,6 +60,22 @@ public class Cart implements Serializable {
      * @param quantity The number of units to add.
      */
     public void addItem(Product product, int quantity) {
+
+        if (product == null) {
+            throw new IllegalArgumentException
+                ("Product cannot be null");
+        }
+
+        if (quantity <= 0) {
+            throw new IllegalArgumentException
+                ("Quantity must be greater than 0");
+        }
+        
+        if (product.isExpired()) {
+            throw new IllegalArgumentException
+                ("Cannot add expired product to cart");
+        }
+
         Optional<CartItem> existingItem = items.stream()
                 .filter(item -> item.getProduct().getId()
                 .equals(product.getId()))
@@ -79,7 +95,13 @@ public class Cart implements Serializable {
      * @param productId The ID of the product to remove.
      */
     public void removeItem(String productId) {
-        items.removeIf(item -> item.getProduct().getId().equals(productId));
+        boolean removed = items.removeIf(item -> item
+            .getProduct().getId().equals(productId));
+    
+        if (!removed) {
+            throw new IllegalArgumentException
+                ("Product not found in cart: " + productId);
+        }
     }
 
     /**
@@ -91,6 +113,11 @@ public class Cart implements Serializable {
      * @param newQuantity The new total quantity for the item.
      */
     public void updateItemQuantity(String productId, int newQuantity) {
+        if (newQuantity <= 0) {
+            throw new IllegalArgumentException
+                ("Quantity must be greater than 0");
+        }
+
         Optional<CartItem> itemOptional = items.stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst();

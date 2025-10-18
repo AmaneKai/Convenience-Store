@@ -66,6 +66,19 @@ public class Product implements Serializable {
      */
     public Product(String name, double price, int quantity, String category, 
         String brand, String variant, LocalDate expirationDate) {
+
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Product name cannot be null or empty");
+        }
+
+        if (price <= 0) {
+            throw new IllegalArgumentException("Product price must be greater than 0");
+        }
+
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Product quantity cannot be negative");
+        }
+
         this.id = IdGenerator.getInstance().generateId("product");
         this.name = name;
         this.price = price;
@@ -265,6 +278,11 @@ public class Product implements Serializable {
      * @throws IllegalArgumentException if the decrease amount exceeds the available quantity.
      */
     public void decreaseQuantity(int amount) {
+
+        if (amount < 0)  {
+            throw new IllegalArgumentException("Cannot decrease by negative amount");
+        }
+
         if (amount > quantity) {
             throw new IllegalArgumentException
             ("Cannot decrease more than available quantity");

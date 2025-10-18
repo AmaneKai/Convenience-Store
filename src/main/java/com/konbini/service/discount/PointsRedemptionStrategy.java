@@ -1,6 +1,8 @@
 package com.konbini.service.discount;
 
 import com.konbini.model.Customer;
+import com.konbini.model.MembershipCard;
+
 
 /**
  * Concrete implementation of the DiscountStrategy for loyalty point redemption.
@@ -55,9 +57,18 @@ public class PointsRedemptionStrategy implements DiscountStrategy {
      * @return True if the customer can redeem the specified points, false otherwise.
      */
     @Override
-    public boolean isApplicable(Customer customer) {
-        return customer.hasMembershipCard() &&
-               customer.getMembershipCard().getPoints() >= pointsToRedeem;
+    public boolean isApplicable(Customer customer) {    
+        if (pointsToRedeem <= 0) {
+            return false;
+        }
+    
+        if (!customer.hasMembershipCard()) {
+            return false;
+        }
+
+        MembershipCard card = customer.getMembershipCard();
+
+        return card.getPoints() >= pointsToRedeem && !card.isExpired();
     }
 
     /**

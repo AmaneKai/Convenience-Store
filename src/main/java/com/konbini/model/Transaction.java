@@ -84,6 +84,17 @@ public class Transaction implements Serializable {
          * @param cart The Cart containing the items.
          */
         public Builder(Customer customer, Cart cart) {
+
+            if (customer == null) {
+                throw new IllegalArgumentException("Customer cannot be null");
+            }
+            if (cart == null) {
+                throw new IllegalArgumentException("Cart cannot be null");
+            }
+            if (cart.isEmpty()) {
+                throw new IllegalArgumentException("Cart cannot be empty");
+            }
+            
             this.id = IdGenerator.getInstance().generateId("transaction");
             this.customer = customer;
             this.items = new ArrayList<>();
@@ -250,6 +261,13 @@ public class Transaction implements Serializable {
          * @return A new, fully calculated Transaction instance.
          */
         public Transaction build() {
+            if (amountPaid < total) {
+                throw new IllegalArgumentException("Payment amount is less than total");
+            }
+            if (amountPaid <= 0) {
+                throw new IllegalArgumentException("Payment amount must be greater than 0");
+            }
+             
             return new Transaction(this);
         }
         

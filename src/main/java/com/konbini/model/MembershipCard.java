@@ -86,6 +86,18 @@ public class MembershipCard implements Serializable {
      * @param pointsToAdd The number of points to add.
      */
     public void addPoints(int pointsToAdd) {
+        if (isExpired()) {
+            throw new IllegalStateException("Cannot add points to an expired membership card");
+        }
+
+        if (pointsToAdd < 0) {
+            throw new IllegalArgumentException("Points to add must be positive");
+        }
+
+        if (pointsToAdd == 0) {
+            return;
+        }
+         
         this.points += pointsToAdd;
     }
 
