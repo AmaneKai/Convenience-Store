@@ -68,6 +68,11 @@ public class MembershipCard implements Serializable {
      * @param cardNumber The new card number to set.
      */
     public void setCardNumber(String cardNumber) {
+
+        if (!cardNumber.matches("^[0-9]+$")) {
+            throw new IllegalArgumentException("Card number must be numeric");
+        }
+
         this.cardNumber = cardNumber;
     }
 

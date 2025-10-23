@@ -38,10 +38,17 @@ public class Customer implements Serializable {
      * @param isSeniorCitizen The initial senior citizen status of the customer.
      */
     public Customer(String name, boolean isSeniorCitizen) {
+
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException
                 ("Customer name cannot be null or empty");
         }
+
+        if (!name.matches("^[a-zA-Z\\s]+$")) {
+            throw new IllegalArgumentException
+                ("Name must contain only letters and spaces");
+        }
+
         this.id = IdGenerator.getInstance().generateId("customer");
         this.name = name;
         this.isSeniorCitizen = isSeniorCitizen;
@@ -72,6 +79,16 @@ public class Customer implements Serializable {
      * @param name The new name to set.
      */
     public void setName(String name) {
+
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException
+                ("Customer name cannot be null or empty");
+        }
+
+        if (!name.matches("^[a-zA-Z\\s]+$")) {
+            throw new IllegalArgumentException("Name must contain only letters and spaces");
+        }
+
         this.name = name;
     }
 

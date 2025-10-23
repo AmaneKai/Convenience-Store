@@ -149,6 +149,12 @@ public class Product implements Serializable {
      * @param quantity The new quantity to set.
      */
     public void setQuantity(int quantity) {
+
+        if (quantity < 0) {
+            throw new IllegalArgumentException
+                ("Quantity cannot be negative");
+        }
+
         this.quantity = quantity;
     }
 
