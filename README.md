@@ -8,6 +8,7 @@ A comprehensive retail store management system built with Java, featuring object
 - [Project Overview](#project-overview)
 - [About the Simulation](#about-the-simulation)
 - [Getting Started](#getting-started)
+- [Building and Running](#building-and-running)
 - [Project Structure](#project-structure)
 - [Implementation Requirements](#implementation-requirements)
 - [Features](#features)
@@ -48,6 +49,7 @@ The system allows users to manage a catalog of products, simulate customer inter
 - Java Development Kit (JDK) 8 or higher
 - Java compiler (`javac`) and runtime (`java`) available in command line
 - JavaFX library (for GUI implementation)
+- Gradle 7.0+ (optional, for easier building)
 
 ### Installation
 1. Clone or extract the project files
@@ -55,27 +57,165 @@ The system allows users to manage a catalog of products, simulate customer inter
 3. Ensure all source files are present in the correct package structure
 4. Include JavaFX libraries if not bundled with JDK
 
-### Project Structure
+## Building and Running
+
+### Using Gradle
+
+#### On Mac/Linux:
+```bash
+# Navigate to the project root directory
+cd Convenience-Store
+
+# Run the application with Gradle
+./gradlew run -q --console=plain
+
+# If permission issues occur, make the Gradle wrapper executable
+chmod +x gradlew
 ```
-konbini/
-├── src/
-│   ├── models/              # Product, Customer, Transaction classes
-│   ├── controllers/         # Business logic and MVC controllers
-│   ├── views/               # GUI components and interfaces
-│   └── utils/               # Helper classes and utilities
-├── data/
-│   ├── inventory.txt        # Product inventory data
-│   ├── transactions.txt     # Transaction records
-│   └── customers.txt        # Customer data
-├── docs/
-│   ├── UML_Diagrams.pdf     # Class diagrams
-│   ├── javadoc/             # Generated documentation
-│   └── test_scripts.txt     # Testing documentation
-├── resources/
-│   └── images/              # Product images and UI assets
-├── README.md
-├── .gitignore
-└── Declaration_of_Original_Work.pdf
+
+#### On Windows:
+```cmd
+:: Navigate to the project root directory
+cd Convenience-Store
+
+:: Run the application with Gradle
+gradlew.bat run -q --console=plain
+```
+
+### Manual Build
+
+#### On Mac/Linux:
+```bash
+# Navigate to the java source directory
+cd src/main/java/
+
+# Compile the application
+javac -cp . com/konbini/Main.java
+
+# Run the application
+java -cp . com.konbini.Main
+```
+
+#### On Windows:
+```cmd
+:: Navigate to the java source directory
+cd src\main\java\
+
+:: Compile the application
+javac -cp . com\konbini\Main.java
+
+:: Run the application
+java -cp . com.konbini.Main
+```
+
+### Creating a JAR File
+
+#### On Mac/Linux:
+```bash
+# Build JAR file with Gradle
+./gradlew jar
+
+# Run the JAR file
+java -jar build/libs/convenience-store.jar
+```
+
+#### On Windows:
+```cmd
+:: Build JAR file with Gradle
+gradlew.bat jar
+
+:: Run the JAR file
+java -jar build\libs\convenience-store.jar
+```
+
+## Project Structure
+
+```
+Convenience-Store/
+├── build.gradle                          # Gradle build configuration
+├── data/                                 # Data storage directory
+│   └── id_counters.dat                   # ID sequence counters
+├── deliverables/                         # Deliverables directory
+├── gradle/                               # Gradle configuration
+│   ├── libs.versions.toml                # Dependency version catalog
+│   └── wrapper/                          # Gradle wrapper files
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradle.properties                     # Gradle properties
+├── gradlew                               # Gradle wrapper script (Unix)
+├── gradlew.bat                           # Gradle wrapper script (Windows)
+├── README.md                             # Project documentation
+├── settings.gradle                       # Gradle settings
+├── specs/                                # Project specifications
+│   └── CCPROG3 MCO Specifications - Convenience Store Simulation.pdf
+└── src/                                  # Source code
+    └── main/
+        └── java/
+            └── com/
+                └── konbini/              # Root package
+                    ├── controller/       # MVC Controllers
+                    │   ├── CartController.java
+                    │   ├── CartManagementController.java
+                    │   ├── CustomerController.java
+                    │   ├── CustomerManagementController.java
+                    │   ├── DataManagementController.java
+                    │   ├── MainController.java
+                    │   ├── ProductController.java
+                    │   ├── ProductManagementController.java
+                    │   ├── TransactionController.java
+                    │   └── TransactionManagementController.java
+                    ├── dto/              # Data Transfer Objects
+                    │   ├── CartDTO.java
+                    │   ├── CustomerDTO.java
+                    │   ├── ProductDTO.java
+                    │   ├── TransactionDTO.java
+                    │   └── TransactionItemDTO.java
+                    ├── Main.java         # Application entry point
+                    ├── model/            # Domain models
+                    │   ├── Cart.java
+                    │   ├── CartItem.java
+                    │   ├── Customer.java
+                    │   ├── MembershipCard.java
+                    │   ├── Product.java
+                    │   ├── ProductCategory.java
+                    │   ├── ProductSubcategory.java
+                    │   ├── Receipt.java
+                    │   ├── Transaction.java
+                    │   └── repository/   # Data access layer
+                    │       ├── CustomerRepository.java
+                    │       ├── ProductRepository.java
+                    │       ├── TransactionRepository.java
+                    │       └── impl/     # Repository implementations
+                    │           ├── FileCustomerRepository.java
+                    │           ├── FileProductRepository.java
+                    │           └── FileTransactionRepository.java
+                    ├── service/          # Business logic layer
+                    │   ├── CustomerService.java
+                    │   ├── ProductService.java
+                    │   ├── TransactionService.java
+                    │   ├── discount/     # Discount strategies
+                    │   │   ├── DiscountStrategy.java
+                    │   │   ├── PointsRedemptionStrategy.java
+                    │   │   └── SeniorDiscountStrategy.java
+                    │   ├── impl/         # Service implementations
+                    │   │   ├── CustomerServiceImpl.java
+                    │   │   ├── ProductServiceImpl.java
+                    │   │   └── TransactionServiceImpl.java
+                    │   └── tax/          # Tax calculation strategies
+                    │       ├── TaxStrategy.java
+                    │       └── VATTaxStrategy.java
+                    ├── util/             # Utility classes
+                    │   ├── FileUtil.java
+                    │   └── IdGenerator.java
+                    └── view/             # UI components
+                        ├── BaseView.java
+                        ├── CartView.java
+                        ├── ConsoleStoreView.java
+                        ├── CustomerView.java
+                        ├── MainView.java
+                        ├── ProductView.java
+                        ├── StoreView.java
+                        └── TransactionView.java
 ```
 
 ## Implementation Requirements
@@ -253,22 +393,24 @@ Follow **Conventional Commits** standard:
 ## Deliverables Checklist
 
 ### Both MCO1 & MCO2
-- [ ] UML Class Diagrams (PDF/PNG)
-- [ ] Source code with internal documentation
-- [ ] Javadoc-generated external documentation
+- [x] UML Class Diagrams (PDF/PNG)
+- [x] Source code with internal documentation
+- [x] Javadoc-generated external documentation
 - [ ] Test scripts following specified format
-- [ ] Signed declaration of original work
-- [ ] Project backup to personal email
+- [x] Signed declaration of original work
+- [x] Project backup to personal email
 
 ### MCO1 Additional
-- [ ] Video demonstration of console application
-- [ ] Basic object-based implementation
+- [x] Video demonstration of console application
+- [x] Basic object-based implementation
 
 ### MCO2 Additional
 - [ ] Complete GUI with mouse controls
-- [ ] MVC design pattern implementation
-- [ ] File handling for data persistence
+- [x] MVC design pattern implementation
+- [x] File handling for data persistence
 - [ ] Live demonstration capability
+- [ ] Employee/Admin Login Menu
+- [ ] Multiple Modes of Payments
 
 ---
 
