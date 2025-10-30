@@ -48,6 +48,8 @@ public class Transaction implements Serializable {
     private final List<String> appliedDiscounts;
     /** The name of the tax applied (e.g., "VAT"). */
     private final String taxName;
+    
+    private PaymentMethod paymentMethod;
 
     /**
      * Builder class for constructing an immutable Transaction object.
@@ -61,6 +63,7 @@ public class Transaction implements Serializable {
         private final LocalDateTime timestamp;
         private final double subtotal;
 
+        private PaymentMethod paymentMethod;
         private double tax = 0;
         private double discount = 0;
         private double total = 0;
@@ -255,6 +258,11 @@ public class Transaction implements Serializable {
             return this;
         }
 
+        public Builder withPaymentMethod(PaymentMethod method) {
+            this.paymentMethod = method;
+            return this;
+        }
+
         /**
          * Constructs the final immutable Transaction object.
          *
@@ -267,8 +275,10 @@ public class Transaction implements Serializable {
             if (amountPaid <= 0) {
                 throw new IllegalArgumentException("Payment amount must be greater than 0");
             }
-             
-            return new Transaction(this);
+            
+            Transaction transaction = new Transaction(this);
+            transaction.paymentMethod = this.paymentMethod;
+            return transaction;
         }
         
     }
@@ -405,5 +415,9 @@ public class Transaction implements Serializable {
      */
     public int getPointsRedeemed() {
         return pointsRedeemed;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
     }
 }

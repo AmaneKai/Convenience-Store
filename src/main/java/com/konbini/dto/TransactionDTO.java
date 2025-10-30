@@ -2,6 +2,7 @@ package com.konbini.dto;
 
 import com.konbini.model.CartItem;
 import com.konbini.model.Customer;
+import com.konbini.model.PaymentMethod;
 import com.konbini.model.Product;
 import com.konbini.model.Transaction;
 
@@ -78,6 +79,8 @@ public class TransactionDTO {
      */
     private List<TransactionItemDTO> items = new ArrayList<>();
 
+    private PaymentMethod paymentMethod;
+
     /**
      * Empty constructor for serialization purposes (e.g., JSON mappers).
      */
@@ -108,6 +111,7 @@ public class TransactionDTO {
         this.change = transaction.getChange();
         this.pointsEarned = transaction.getPointsEarned();
         this.pointsRedeemed = transaction.getPointsRedeemed();
+        this.paymentMethod = transaction.getPaymentMethod();
 
         for (CartItem item : transaction.getItems()) {
             // Convert CartItem to its corresponding DTO
@@ -381,6 +385,14 @@ public class TransactionDTO {
      */
     public void setItems(List<TransactionItemDTO> items) {
         this.items = items;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     /**
