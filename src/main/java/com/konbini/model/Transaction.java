@@ -1,14 +1,14 @@
 package com.konbini.model;
 
-import com.konbini.service.discount.DiscountStrategy;
-import com.konbini.service.discount.PointsRedemptionStrategy;
-import com.konbini.service.tax.TaxStrategy;
-import com.konbini.util.IdGenerator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import com.konbini.service.discount.DiscountStrategy;
+import com.konbini.service.discount.PointsRedemptionStrategy;
+import com.konbini.service.tax.TaxStrategy;
+import com.konbini.util.IdGenerator;
 
 /**
  * Represents a final, immutable record of a completed sales transaction.
@@ -417,6 +417,12 @@ public class Transaction implements Serializable {
         return pointsRedeemed;
     }
 
+    /**
+     * Retrieves the payment method used for this transaction.
+     * 
+     * @return The PaymentMethod used to complete the transaction,
+     *         which indicates how the customer paid (e.g., CASH, CREDIT_CARD, DEBIT_CARD).
+     */
     public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }

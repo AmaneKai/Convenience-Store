@@ -1,14 +1,13 @@
 package com.konbini.dto;
 
-import com.konbini.model.CartItem;
-import com.konbini.model.Customer;
-import com.konbini.model.PaymentMethod;
-import com.konbini.model.Product;
-import com.konbini.model.Transaction;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.konbini.model.CartItem;
+import com.konbini.model.Customer;
+import com.konbini.model.PaymentMethod;
+import com.konbini.model.Transaction;
 
 /**
  * Data Transfer Object for Transaction.
@@ -387,14 +386,23 @@ public class TransactionDTO {
         this.items = items;
     }
 
+    /**
+     * Gets the payment method used for the transaction.
+     * 
+     * @return The PaymentMethod used in this transaction.
+     */
     public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
 
+    /**
+     * Sets the payment method for the transaction.
+     * 
+     * @param paymentMethod The PaymentMethod to set for this transaction.
+     */
     public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
-
     /**
      * Provides a string representation of the TransactionDTO for logging and debugging.
      *
