@@ -1,116 +1,151 @@
 package com.konbini.view.swing;
 
-import com.konbini.dto.*;
-import com.konbini.model.*;
-import com.konbini.view.StoreView;
-
-import javax.swing.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
+import com.konbini.controller.CartManagementController;
+import com.konbini.controller.CustomerManagementController;
+import com.konbini.controller.DataManagementController;
+import com.konbini.controller.ProductManagementController;
+import com.konbini.controller.TransactionManagementController;
+import com.konbini.dto.CartDTO;
+import com.konbini.dto.CustomerDTO;
+import com.konbini.dto.ProductDTO;
+import com.konbini.dto.TransactionDTO;
+import com.konbini.model.Cart;
+import com.konbini.model.Customer;
+import com.konbini.model.Product;
+import com.konbini.model.ProductCategory;
+import com.konbini.model.ProductSubcategory;
+import com.konbini.model.Transaction;
+import com.konbini.view.StoreView;
+
 /**
- * Swing-based implementation of the StoreView interface.
- * This class serves as the main GUI coordinator, delegating to specialized
- * panel components for different functional areas (Products, Customers, Cart, Transactions).
- * 
- * Architecture:
- * - Uses CardLayout to switch between different main screens
- * - Delegates display logic to specialized panel classes
- * - Handles user input through modal dialogs
- * - Thread-safe updates using SwingUtilities.invokeLater()
+ * Swing-based GUI implementation - fully event-driven.
  */
 public class SwingStoreView implements StoreView {
     private JFrame mainFrame;
     private JPanel mainPanel;
     private java.awt.CardLayout cardLayout;
     
-    // Specialized panel components
     private MainMenuPanel mainMenuPanel;
     private ProductPanel productPanel;
     private CustomerPanel customerPanel;
     private CartPanel cartPanel;
     private TransactionPanel transactionPanel;
     
-    // Card names for CardLayout
+    private ProductManagementController productManagementController;
+    private CustomerManagementController customerManagementController;
+    private CartManagementController cartManagementController;
+    private TransactionManagementController transactionManagementController;
+    private DataManagementController dataManagementController;
+    
     private static final String MAIN_MENU_CARD = "MainMenu";
     private static final String PRODUCT_CARD = "Product";
     private static final String CUSTOMER_CARD = "Customer";
     private static final String CART_CARD = "Cart";
     private static final String TRANSACTION_CARD = "Transaction";
     
-    /**
-     * Constructs the SwingStoreView and initializes all GUI components.
-     */
     public SwingStoreView() {
         initializeGUI();
     }
     
     /**
-     * Initializes the main frame and all panel components.
+     * Must be called BEFORE showing the GUI to inject controllers.
      */
+    public void setControllers(
+            ProductManagementController productManagementController,
+            CustomerManagementController customerManagementController,
+            CartManagementController cartManagementController,
+            TransactionManagementController transactionManagementController,
+            DataManagementController dataManagementController) {
+        this.productManagementController = productManagementController;
+        this.customerManagementController = customerManagementController;
+        this.cartManagementController = cartManagementController;
+        this.transactionManagementController = transactionManagementController;
+        this.dataManagementController = dataManagementController;
+        
+        // NOW create panels with actual controllers
+        createPanelsWithControllers();
+    }
+    
     private void initializeGUI() {
-        // Set look and feel to system default
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            // Fall back to default if system L&F fails
+            // ignore
         }
         
         mainFrame = new JFrame("Konbini Store - Point of Sale System");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1024, 768);
         
-        // Initialize CardLayout for switching between screens
         cardLayout = new java.awt.CardLayout();
         mainPanel = new JPanel(cardLayout);
         
-        // Initialize all specialized panels
-        initializePanels();
+        mainFrame.add(mainPanel);
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setVisible(true);
+    }
+    
+    /**
+     * Create all panels with controllers - called AFTER controllers are set.
+     */
+    private void createPanelsWithControllers() {
+        // Remove old panels if they exist
+        mainPanel.removeAll();
         
-        // Add panels to CardLayout
+        // Create panels with controllers
+        mainMenuPanel = new MainMenuPanel(
+            this::navigateToScreen,
+            () -> System.exit(0),
+            productManagementController,
+            customerManagementController,
+            cartManagementController,
+            transactionManagementController,
+            dataManagementController
+        );
+        
+        productPanel = new ProductPanel(productManagementController, this::navigateToMainMenu);
+        customerPanel = new CustomerPanel(this::navigateToMainMenu);
+        cartPanel = new CartPanel(this::navigateToMainMenu);
+        transactionPanel = new TransactionPanel(this::navigateToMainMenu);
+        
+        // Add to CardLayout
         mainPanel.add(mainMenuPanel, MAIN_MENU_CARD);
         mainPanel.add(productPanel, PRODUCT_CARD);
         mainPanel.add(customerPanel, CUSTOMER_CARD);
         mainPanel.add(cartPanel, CART_CARD);
         mainPanel.add(transactionPanel, TRANSACTION_CARD);
         
-        mainFrame.add(mainPanel);
-        mainFrame.setLocationRelativeTo(null); // Center on screen
-        mainFrame.setVisible(true);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+        
+        // Show main menu
+        navigateToScreen(MAIN_MENU_CARD);
     }
     
-    /**
-     * Initializes all specialized panel components with navigation callbacks.
-     */
-    private void initializePanels() {
-        mainMenuPanel = new MainMenuPanel(this::navigateToScreen);
-        productPanel = new ProductPanel(this::navigateToMainMenu);
-        customerPanel = new CustomerPanel(this::navigateToMainMenu);
-        cartPanel = new CartPanel(this::navigateToMainMenu);
-        transactionPanel = new TransactionPanel(this::navigateToMainMenu);
-    }
-    
-    /**
-     * Navigates to a specific screen by name.
-     */
     private void navigateToScreen(String screenName) {
         SwingUtilities.invokeLater(() -> cardLayout.show(mainPanel, screenName));
     }
     
-    /**
-     * Returns to the main menu.
-     */
     private void navigateToMainMenu() {
         navigateToScreen(MAIN_MENU_CARD);
     }
     
-    // ==================== MainView Methods ====================
+    // ==================== Display Methods ====================
     
     @Override
     public void displayWelcomeMessage() {
-        SwingUtilities.invokeLater(() -> 
-            mainMenuPanel.showWelcomeMessage()
-        );
+        SwingUtilities.invokeLater(() -> mainMenuPanel.showWelcomeMessage());
     }
     
     @Override
@@ -120,10 +155,8 @@ public class SwingStoreView implements StoreView {
     
     @Override
     public int getMainMenuChoice() {
-        return mainMenuPanel.getMenuChoice();
+        return -1;
     }
-    
-    // ==================== ProductView Methods ====================
     
     @Override
     public void displayProductMenu() {
@@ -132,42 +165,32 @@ public class SwingStoreView implements StoreView {
     
     @Override
     public int getProductMenuChoice() {
-        return productPanel.getMenuChoice();
+        return -1;
     }
     
     @Override
     public void displayProducts(List<Product> products) {
         List<ProductDTO> dtos = ProductDTO.fromModelList(products);
-        SwingUtilities.invokeLater(() -> 
-            productPanel.displayProducts(dtos)
-        );
+        SwingUtilities.invokeLater(() -> productPanel.displayProducts(dtos));
     }
     
     @Override
     public void displayProduct(Product product) {
         ProductDTO dto = ProductDTO.fromModel(product);
-        SwingUtilities.invokeLater(() -> 
-            productPanel.displayProduct(dto)
-        );
+        SwingUtilities.invokeLater(() -> productPanel.displayProduct(dto));
     }
     
     @Override
     public void displayLowStockProducts(List<Product> products) {
         List<ProductDTO> dtos = ProductDTO.fromModelList(products);
-        SwingUtilities.invokeLater(() -> 
-            productPanel.displayLowStockProducts(dtos)
-        );
+        SwingUtilities.invokeLater(() -> productPanel.displayLowStockProducts(dtos));
     }
     
     @Override
     public void displayExpiredProducts(List<Product> products) {
         List<ProductDTO> dtos = ProductDTO.fromModelList(products);
-        SwingUtilities.invokeLater(() -> 
-            productPanel.displayExpiredProducts(dtos)
-        );
+        SwingUtilities.invokeLater(() -> productPanel.displayExpiredProducts(dtos));
     }
-    
-    // ==================== CustomerView Methods ====================
     
     @Override
     public void displayCustomerMenu() {
@@ -176,7 +199,7 @@ public class SwingStoreView implements StoreView {
     
     @Override
     public int getCustomerMenuChoice() {
-        return customerPanel.getMenuChoice();
+        return -1;
     }
     
     @Override
@@ -184,20 +207,14 @@ public class SwingStoreView implements StoreView {
         List<CustomerDTO> dtos = customers.stream()
             .map(CustomerDTO::fromModel)
             .collect(java.util.stream.Collectors.toList());
-        SwingUtilities.invokeLater(() -> 
-            customerPanel.displayCustomers(dtos)
-        );
+        SwingUtilities.invokeLater(() -> customerPanel.displayCustomers(dtos));
     }
     
     @Override
     public void displayCustomer(Customer customer) {
         CustomerDTO dto = CustomerDTO.fromModel(customer);
-        SwingUtilities.invokeLater(() -> 
-            customerPanel.displayCustomer(dto)
-        );
+        SwingUtilities.invokeLater(() -> customerPanel.displayCustomer(dto));
     }
-    
-    // ==================== CartView Methods ====================
     
     @Override
     public void displayCartMenu() {
@@ -206,18 +223,14 @@ public class SwingStoreView implements StoreView {
     
     @Override
     public int getCartMenuChoice() {
-        return cartPanel.getMenuChoice();
+        return -1;
     }
     
     @Override
     public void displayCart(Cart cart) {
         CartDTO dto = CartDTO.fromModel(cart);
-        SwingUtilities.invokeLater(() -> 
-            cartPanel.displayCart(dto)
-        );
+        SwingUtilities.invokeLater(() -> cartPanel.displayCart(dto));
     }
-    
-    // ==================== TransactionView Methods ====================
     
     @Override
     public void displayTransactionMenu() {
@@ -226,7 +239,7 @@ public class SwingStoreView implements StoreView {
     
     @Override
     public int getTransactionMenuChoice() {
-        return transactionPanel.getMenuChoice();
+        return -1;
     }
     
     @Override
@@ -234,17 +247,13 @@ public class SwingStoreView implements StoreView {
         List<TransactionDTO> dtos = transactions.stream()
             .map(TransactionDTO::fromModel)
             .collect(java.util.stream.Collectors.toList());
-        SwingUtilities.invokeLater(() -> 
-            transactionPanel.displayTransactions(dtos)
-        );
+        SwingUtilities.invokeLater(() -> transactionPanel.displayTransactions(dtos));
     }
     
     @Override
     public void displayTransaction(Transaction transaction) {
         TransactionDTO dto = TransactionDTO.fromModel(transaction);
-        SwingUtilities.invokeLater(() -> 
-            transactionPanel.displayTransaction(dto)
-        );
+        SwingUtilities.invokeLater(() -> transactionPanel.displayTransaction(dto));
     }
     
     @Override
@@ -255,59 +264,39 @@ public class SwingStoreView implements StoreView {
             textArea.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new java.awt.Dimension(500, 600));
-            JOptionPane.showMessageDialog(mainFrame, scrollPane, 
-                "Transaction Receipt", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, scrollPane, "Receipt", JOptionPane.INFORMATION_MESSAGE);
         });
     }
     
     @Override
     public void displayTotalSales(double totalSales) {
-        SwingUtilities.invokeLater(() -> 
-            transactionPanel.displayTotalSales(totalSales)
-        );
+        SwingUtilities.invokeLater(() -> transactionPanel.displayTotalSales(totalSales));
     }
     
     @Override
     public void displayTotalSalesByDate(LocalDate date, double totalSales) {
-        SwingUtilities.invokeLater(() -> 
-            transactionPanel.displayTotalSalesByDate(date, totalSales)
-        );
+        SwingUtilities.invokeLater(() -> transactionPanel.displayTotalSalesByDate(date, totalSales));
     }
     
     @Override
     public void displayTotalSalesByDateRange(LocalDate startDate, LocalDate endDate, double totalSales) {
-        SwingUtilities.invokeLater(() -> 
-            transactionPanel.displayTotalSalesByDateRange(startDate, endDate, totalSales)
-        );
+        SwingUtilities.invokeLater(() -> transactionPanel.displayTotalSalesByDateRange(startDate, endDate, totalSales));
     }
-    
-    // ==================== Message Display Methods ====================
     
     @Override
     public void displayErrorMessage(String message) {
-        SwingUtilities.invokeLater(() -> 
-            JOptionPane.showMessageDialog(mainFrame, message, 
-                "Error", JOptionPane.ERROR_MESSAGE)
-        );
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(mainFrame, message, "Error", JOptionPane.ERROR_MESSAGE));
     }
     
     @Override
     public void displaySuccessMessage(String message) {
-        SwingUtilities.invokeLater(() -> 
-            JOptionPane.showMessageDialog(mainFrame, message, 
-                "Success", JOptionPane.INFORMATION_MESSAGE)
-        );
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(mainFrame, message, "Success", JOptionPane.INFORMATION_MESSAGE));
     }
     
     @Override
     public void displayInfoMessage(String message) {
-        SwingUtilities.invokeLater(() -> 
-            JOptionPane.showMessageDialog(mainFrame, message, 
-                "Information", JOptionPane.INFORMATION_MESSAGE)
-        );
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(mainFrame, message, "Info", JOptionPane.INFORMATION_MESSAGE));
     }
-    
-    // ==================== Input Methods ====================
     
     @Override
     public String getStringInput(String prompt) {
@@ -318,7 +307,7 @@ public class SwingStoreView implements StoreView {
     public int getIntInput(String prompt) {
         while (true) {
             String input = getStringInput(prompt);
-            if (input == null) return 0; // User cancelled
+            if (input == null) return 0;
             try {
                 return Integer.parseInt(input.trim());
             } catch (NumberFormatException e) {
@@ -331,7 +320,7 @@ public class SwingStoreView implements StoreView {
     public double getDoubleInput(String prompt) {
         while (true) {
             String input = getStringInput(prompt);
-            if (input == null) return 0.0; // User cancelled
+            if (input == null) return 0.0;
             try {
                 return Double.parseDouble(input.trim());
             } catch (NumberFormatException e) {
@@ -342,8 +331,7 @@ public class SwingStoreView implements StoreView {
     
     @Override
     public boolean getBooleanInput(String prompt) {
-        int result = JOptionPane.showConfirmDialog(mainFrame, prompt, 
-            "Confirm", JOptionPane.YES_NO_OPTION);
+        int result = JOptionPane.showConfirmDialog(mainFrame, prompt, "Confirm", JOptionPane.YES_NO_OPTION);
         return result == JOptionPane.YES_OPTION;
     }
     
@@ -351,11 +339,11 @@ public class SwingStoreView implements StoreView {
     public LocalDate getDateInput(String prompt) {
         while (true) {
             String input = getStringInput(prompt + " (YYYY-MM-DD)");
-            if (input == null) return LocalDate.now(); // User cancelled
+            if (input == null) return LocalDate.now();
             try {
                 return LocalDate.parse(input.trim());
             } catch (Exception e) {
-                displayErrorMessage("Please enter a valid date in YYYY-MM-DD format.");
+                displayErrorMessage("Please enter a valid date (YYYY-MM-DD).");
             }
         }
     }
@@ -364,13 +352,7 @@ public class SwingStoreView implements StoreView {
     public ProductCategory getCategoryInput() {
         ProductCategory[] categories = ProductCategory.values();
         ProductCategory selected = (ProductCategory) JOptionPane.showInputDialog(
-            mainFrame,
-            "Select a product category:",
-            "Product Category",
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            categories,
-            categories[0]
+            mainFrame, "Select category:", "Category", JOptionPane.QUESTION_MESSAGE, null, categories, categories[0]
         );
         return selected != null ? selected : categories[0];
     }
@@ -379,23 +361,12 @@ public class SwingStoreView implements StoreView {
     public ProductSubcategory getSubcategoryInput(ProductCategory category) {
         ProductSubcategory[] subcategories = ProductSubcategory.getSubcategoriesFor(category);
         if (subcategories.length == 0) return null;
-        
         ProductSubcategory selected = (ProductSubcategory) JOptionPane.showInputDialog(
-            mainFrame,
-            "Select a subcategory:",
-            "Product Subcategory",
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            subcategories,
-            subcategories[0]
+            mainFrame, "Select subcategory:", "Subcategory", JOptionPane.QUESTION_MESSAGE, null, subcategories, subcategories[0]
         );
         return selected;
     }
     
-    /**
-     * Gets the main JFrame for this view.
-     * Useful for creating child dialogs.
-     */
     public JFrame getMainFrame() {
         return mainFrame;
     }

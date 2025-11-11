@@ -4,9 +4,11 @@ import com.konbini.view.StoreView;
 
 /**
  * The central controller of the Konbini Store application.
- * This class is responsible for initializing the application, managing the main
- * application loop, displaying the main menu, and delegating control to
- * specialized management controllers based on user selection.
+ * FULLY EVENT-DRIVEN for Swing GUI - no blocking loops.
+ * 
+ * This class is responsible for initializing the application and handling
+ * navigation between screens. All user interactions are event-driven through
+ * button clicks in the GUI.
  */
 public class MainController {
     /**
@@ -24,8 +26,7 @@ public class MainController {
     /**
      * Controller for viewing and searching historical transactions.
      */
-    private final TransactionManagementController
-        transactionManagementController;
+    private final TransactionManagementController transactionManagementController;
     /**
      * Controller for handling persistence (save/load) and data initialization.
      */
@@ -37,7 +38,7 @@ public class MainController {
 
     /**
      * Constructs the MainController, injecting all necessary specialized controllers
-     * and the main StoreView dependency. This follows the Dependency Injection pattern.
+     * and the main StoreView dependency.
      *
      * @param view The user interface component for interaction.
      * @param customerManagementController The controller for customer operations.
@@ -46,7 +47,6 @@ public class MainController {
      * @param dataManagementController The controller for data save/load operations.
      * @param productManagementController The controller for product operations.
      */
-
     public MainController(
             StoreView view,
             CustomerManagementController customerManagementController,
@@ -63,48 +63,13 @@ public class MainController {
     }
 
     /**
-     * Starts the main application loop. It displays the welcome message and then
-     * continuously presents the main menu, delegating control to the
-     * appropriate controller based on the user's choice until the application is exited.
+     * Starts the application by displaying the main menu and welcome message.
+     * For Swing GUI, this simply displays the UI - no blocking loops.
+     * All navigation is now event-driven through button clicks.
      */
     public void start() {
         view.displayWelcomeMessage();
-        boolean running = true;
-
-        while (running) {
-            view.displayMainMenu();
-            int choice = view.getMainMenuChoice();
-
-            switch (choice) {
-                case 1:
-                    productManagementController.handleProductManagement();
-                    break;
-                case 2:
-                    customerManagementController.handleCustomerManagement();
-                    break;
-                case 3:
-                    cartManagementController.handleCartManagement();
-                    break;
-                case 4:
-                    transactionManagementController
-                        .handleTransactionManagement();
-                    break;
-                case 5:
-                    dataManagementController.handleSaveData();
-                    break;
-                case 6:
-                    dataManagementController.handleLoadData();
-                    break;
-                case 0:
-                    running = false;
-                    view.displayInfoMessage
-                        ("Thank you for using Konbini Store. Goodbye!");
-                    break;
-                default:
-                    view.displayErrorMessage
-                        ("Invalid choice. Please try again.");
-            }
-        }
+        view.displayMainMenu();
     }
 
     /**
