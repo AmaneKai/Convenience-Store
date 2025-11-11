@@ -105,7 +105,7 @@ public class MainMenuPanel extends JPanel {
         btn.setPreferredSize(new Dimension(300, 60));
         btn.setFocusPainted(false);
         btn.setBackground(new Color(52, 152, 219));
-        btn.setForeground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 btn.setBackground(btn.getBackground().darker());
@@ -124,7 +124,7 @@ public class MainMenuPanel extends JPanel {
         btn.setPreferredSize(new Dimension(300, 60));
         btn.setFocusPainted(false);
         btn.setBackground(new Color(231, 76, 60));
-        btn.setForeground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 btn.setBackground(btn.getBackground().darker());

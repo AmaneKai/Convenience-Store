@@ -84,7 +84,7 @@ public class SwingStoreView implements StoreView {
             // ignore
         }
         
-        mainFrame = new JFrame("Konbini Store - Point of Sale System");
+        mainFrame = new JFrame("コンビニ");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1024, 768);
         
@@ -95,7 +95,7 @@ public class SwingStoreView implements StoreView {
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
     }
-    
+   
     /**
      * Create all panels with controllers - called AFTER controllers are set.
      */
@@ -115,9 +115,9 @@ public class SwingStoreView implements StoreView {
         );
         
         productPanel = new ProductPanel(productManagementController, this::navigateToMainMenu);
-        customerPanel = new CustomerPanel(this::navigateToMainMenu);
-        cartPanel = new CartPanel(this::navigateToMainMenu);
-        transactionPanel = new TransactionPanel(this::navigateToMainMenu);
+        customerPanel = new CustomerPanel(customerManagementController, this::navigateToMainMenu);
+        cartPanel = new CartPanel(cartManagementController, this::navigateToMainMenu);
+        transactionPanel = new TransactionPanel(transactionManagementController, this::navigateToMainMenu);
         
         // Add to CardLayout
         mainPanel.add(mainMenuPanel, MAIN_MENU_CARD);

@@ -1,234 +1,138 @@
 package com.konbini.view.swing;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+
+import com.konbini.controller.CartManagementController;
 import com.konbini.dto.CartDTO;
 import com.konbini.dto.TransactionItemDTO;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.util.List;
-
-/**
- * Panel for managing shopping cart operations and checkout process.
- * Displays cart items in a table with customer information and totals.
- */
 public class CartPanel extends JPanel {
     private Runnable backCallback;
-    private int selectedChoice = -1;
-    private final Object choiceLock = new Object();
+    private CartManagementController controller;
     
-    // UI Components
     private JTable cartTable;
     private DefaultTableModel tableModel;
     private JLabel customerInfoLabel;
     private JLabel subtotalLabel;
-    private JPanel infoPanel;
     
-    // Table columns
-    private static final String[] COLUMN_NAMES = {
-        "Product ID", "Product Name", "Price", "Quantity", "Total"
-    };
+    private static final String[] COLUMN_NAMES = {"Product ID", "Product Name", "Price", "Quantity", "Total"};
     
-    /**
-     * Constructs the cart panel with a back navigation callback.
-     */
-    public CartPanel(Runnable backCallback) {
+    public CartPanel(CartManagementController controller, Runnable backCallback) {
+        this.controller = controller;
         this.backCallback = backCallback;
         initializeUI();
     }
     
-    /**
-     * Initializes the UI components.
-     */
     private void initializeUI() {
         setLayout(new BorderLayout());
         
         // Header
-        JPanel headerPanel = createHeaderPanel("Shopping Cart & Checkout");
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(new Color(41, 128, 185));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        JLabel titleLabel = new JLabel("Shopping Cart & Checkout");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel, BorderLayout.WEST);
+        JButton backBtn = new JButton("← Back");
+        backBtn.addActionListener(e -> backCallback.run());
+        headerPanel.add(backBtn, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
         
-        // Center - Split into info panel and table
+        // Center - Info and Table
         JPanel centerPanel = new JPanel(new BorderLayout());
         
-        // Info panel at top
-        infoPanel = createInfoPanel();
-        centerPanel.add(infoPanel, BorderLayout.NORTH);
-        
-        // Table in center
-        tableModel = new DefaultTableModel(COLUMN_NAMES, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        cartTable = new JTable(tableModel);
-        cartTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        cartTable.getTableHeader().setReorderingAllowed(false);
-        
-        // Column widths
-        cartTable.getColumnModel().getColumn(0).setPreferredWidth(100); // Product ID
-        cartTable.getColumnModel().getColumn(1).setPreferredWidth(300); // Name
-        cartTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Price
-        cartTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Quantity
-        cartTable.getColumnModel().getColumn(4).setPreferredWidth(120); // Total
-        
-        JScrollPane scrollPane = new JScrollPane(cartTable);
-        centerPanel.add(scrollPane, BorderLayout.CENTER);
-        
-        add(centerPanel, BorderLayout.CENTER);
-        
-        // Bottom - Action buttons
-        add(createButtonPanel(), BorderLayout.SOUTH);
-    }
-    
-    /**
-     * Creates the info panel showing customer and cart summary.
-     */
-    private JPanel createInfoPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(new Color(236, 240, 241));
-        panel.setBorder(BorderFactory.createCompoundBorder(
+        // Info panel
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(new Color(236, 240, 241));
+        infoPanel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createEmptyBorder(10, 10, 10, 10),
             BorderFactory.createLineBorder(Color.GRAY)
         ));
         
         customerInfoLabel = new JLabel("No active cart");
         customerInfoLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        panel.add(customerInfoLabel);
-        
-        panel.add(Box.createVerticalStrut(10));
+        infoPanel.add(customerInfoLabel);
+        infoPanel.add(Box.createVerticalStrut(10));
         
         subtotalLabel = new JLabel("Subtotal: ₱0.00");
         subtotalLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        panel.add(subtotalLabel);
+        infoPanel.add(subtotalLabel);
         
-        return panel;
-    }
-    
-    /**
-     * Creates the header panel.
-     */
-    private JPanel createHeaderPanel(String title) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(41, 128, 185));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        centerPanel.add(infoPanel, BorderLayout.NORTH);
         
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);
-        panel.add(titleLabel, BorderLayout.WEST);
-        
-        JButton backButton = new JButton("← Back to Main Menu");
-        backButton.setFocusPainted(false);
-        backButton.addActionListener(e -> backCallback.run());
-        panel.add(backButton, BorderLayout.EAST);
-        
-        return panel;
-    }
-    
-    /**
-     * Creates the button panel.
-     */
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        panel.setBackground(new Color(236, 240, 241));
-        
-        String[] buttonLabels = {
-            "Create Cart", "View Cart", "Add Item",
-            "Remove Item", "Update Quantity", "Clear Cart",
-            "Checkout", "Back"
+        // Table
+        tableModel = new DefaultTableModel(COLUMN_NAMES, 0) {
+            public boolean isCellEditable(int row, int col) { return false; }
         };
+        cartTable = new JTable(tableModel);
+        cartTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        cartTable.getTableHeader().setReorderingAllowed(false);
+        JScrollPane scrollPane = new JScrollPane(cartTable);
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
         
-        for (int i = 0; i < buttonLabels.length; i++) {
-            final int choice = i + 1;
-            JButton btn = new JButton(buttonLabels[i]);
-            btn.setPreferredSize(new Dimension(180, 40));
-            
-            // Special styling for checkout button
-            if (i == 6) {
-                btn.setBackground(new Color(39, 174, 96));
-                btn.setForeground(Color.WHITE);
-                btn.setFont(new Font("Arial", Font.BOLD, 14));
-            }
-            
-            btn.addActionListener(e -> handleMenuChoice(choice == 8 ? 0 : choice));
-            panel.add(btn);
-        }
+        add(centerPanel, BorderLayout.CENTER);
         
-        return panel;
+        // Bottom - Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(new Color(236, 240, 241));
+        buttonPanel.add(createButton("Create Cart", () -> controller.handleCreateCart()));
+        buttonPanel.add(createButton("View Cart", () -> controller.handleViewCart()));
+        buttonPanel.add(createButton("Add Item", () -> controller.handleAddItem()));
+        buttonPanel.add(createButton("Remove Item", () -> controller.handleRemoveItem()));
+        buttonPanel.add(createButton("Update Qty", () -> controller.handleUpdateQuantity()));
+        buttonPanel.add(createButton("Clear Cart", () -> controller.handleClearCart()));
+        
+        JButton checkoutBtn = createButton("CHECKOUT", () -> controller.handleCheckout());
+        checkoutBtn.setBackground(new Color(39, 174, 96));
+        checkoutBtn.setForeground(Color.WHITE);
+        buttonPanel.add(checkoutBtn);
+        
+        add(buttonPanel, BorderLayout.SOUTH);
     }
     
-    /**
-     * Handles menu choice selection.
-     */
-    private void handleMenuChoice(int choice) {
-        synchronized (choiceLock) {
-            selectedChoice = choice;
-            choiceLock.notifyAll();
-        }
+    private JButton createButton(String text, Runnable action) {
+        JButton btn = new JButton(text);
+        btn.setPreferredSize(new Dimension(120, 40));
+        btn.addActionListener(e -> action.run());
+        return btn;
     }
     
-    /**
-     * Gets the user's menu choice.
-     */
-    public int getMenuChoice() {
-        synchronized (choiceLock) {
-            while (selectedChoice == -1) {
-                try {
-                    choiceLock.wait();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return 0;
-                }
-            }
-            int choice = selectedChoice;
-            selectedChoice = -1;
-            return choice;
-        }
-    }
-    
-    /**
-     * Displays the cart with all items and customer information.
-     */
     public void displayCart(CartDTO cart) {
-        // Update customer info
         StringBuilder customerInfo = new StringBuilder();
         customerInfo.append("Customer: ").append(cart.getCustomerName());
         customerInfo.append(" (ID: ").append(cart.getCustomerId()).append(")");
-        
-        if (cart.isCustomerIsSeniorCitizen()) {
-            customerInfo.append(" [SENIOR CITIZEN]");
-        }
-        if (cart.isCustomerHasMembershipCard()) {
-            customerInfo.append(" [MEMBER - ").append(cart.getCustomerPoints()).append(" pts]");
-        }
+        if (cart.isCustomerIsSeniorCitizen()) customerInfo.append(" [SENIOR]");
+        if (cart.isCustomerHasMembershipCard()) customerInfo.append(" [MEMBER: ").append(cart.getCustomerPoints()).append(" pts]");
         
         customerInfoLabel.setText(customerInfo.toString());
-        
-        // Update subtotal
         subtotalLabel.setText(String.format("Subtotal: ₱%.2f", cart.getSubtotal()));
         
-        // Clear and populate table
         tableModel.setRowCount(0);
-        
         for (TransactionItemDTO item : cart.getItems()) {
-            Object[] row = {
+            tableModel.addRow(new Object[]{
                 item.getProductId(),
                 item.getProductName(),
-                String.format("₱%.2f", item.getUnitPrice()),
+                "₱" + String.format("%.2f", item.getUnitPrice()),
                 item.getQuantity(),
-                String.format("₱%.2f", item.getTotalPrice())
-            };
-            tableModel.addRow(row);
-        }
-        
-        // Show empty message if cart is empty
-        if (cart.getItems().isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Cart is empty. Add items to proceed with checkout.",
-                "Empty Cart",
-                JOptionPane.INFORMATION_MESSAGE);
+                "₱" + String.format("%.2f", item.getTotalPrice())
+            });
         }
     }
 }
