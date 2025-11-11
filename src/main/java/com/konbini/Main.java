@@ -7,8 +7,16 @@ import com.konbini.service.*;
 import com.konbini.service.impl.*;
 import com.konbini.view.*;
 
-public class Main {
+import javafx.application.Application;
+import javafx.stage.Stage;
+
+public class Main extends Application{
     public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
         // Initialize repositories
         ProductRepository productRepository = new FileProductRepository
             ("products.dat");
@@ -26,9 +34,6 @@ public class Main {
             new TransactionServiceImpl
                 (transactionRepository, productRepository);
         
-        // Initialize view
-        StoreView view = new ConsoleStoreView();
-        
         // Initialize base controllers
         ProductController productController = new ProductController
             (productService);
@@ -41,33 +46,43 @@ public class Main {
         
         // Initialize management controllers
         ProductManagementController productManagementController = 
-            new ProductManagementController(view, productController);
+            new ProductManagementController(productController);
         
-        CustomerManagementController customerManagementController = 
-            new CustomerManagementController(view, customerController);
+        // CustomerManagementController customerManagementController = 
+        //     new CustomerManagementController(customerController);
         
-        CartManagementController cartManagementController = 
-            new CartManagementController(view, productController, 
-            customerController, cartController, transactionController);
+        // CartManagementController cartManagementController = 
+        //     new CartManagementController(productController, 
+        //     customerController, cartController, transactionController);
         
-        TransactionManagementController transactionManagementController = 
-            new TransactionManagementController(view, customerController, 
-                transactionController);
+        // TransactionManagementController transactionManagementController = 
+        //     new TransactionManagementController(customerController, 
+        //         transactionController);
         
         DataManagementController dataManagementController = 
-            new DataManagementController(view, productController, 
+            new DataManagementController(productController, 
                 customerController, transactionController, 
                 productManagementController);
         
         // Initialize main controller
-        MainController mainController = new MainController(
-                view,
-                customerManagementController,
-                cartManagementController,
-                transactionManagementController,
-                dataManagementController,
-                productManagementController
+        // MainController mainController = new MainController(
+        //         customerManagementController,
+        //         cartManagementController,
+        //         transactionManagementController,
+        //         dataManagementController,
+        //         productManagementController
+        // );
+
+        // Initialize store view
+        JavaFXStoreView view = new JavaFXStoreView(
+            productManagementController,
+            customerManagementController,
+            cartManagementController,
+            transactionManagementController,
+            dataManagementController
         );
+
+        view.show(primaryStage);
         
         // Load or initialize data
         boolean productsLoaded = productController.loadData();
@@ -95,7 +110,5 @@ public class Main {
         if (needSampleData) {
             mainController.initializeSampleData();
         }
-        
-        mainController.start();
     }
 }
