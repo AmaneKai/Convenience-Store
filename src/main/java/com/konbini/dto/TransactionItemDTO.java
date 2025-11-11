@@ -199,6 +199,13 @@ public class TransactionItemDTO {
         this.subtotal = subtotal;
     }
 
+    public double getUnitPrice() {
+        return productPrice;
+    }
+    public double getTotalPrice() {
+        return subtotal;
+    }
+
     /**
      * Provides a string representation of the TransactionItemDTO for logging and debugging.
      *

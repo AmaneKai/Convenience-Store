@@ -394,14 +394,17 @@ public class TransactionDTO {
     public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
-
-    /**
-     * Sets the payment method for the transaction.
-     * 
-     * @param paymentMethod The PaymentMethod to set for this transaction.
-     */
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
+    public java.time.LocalDate getDate() {
+        return timestamp != null ? timestamp.toLocalDate() : null;
+    }
+    public java.time.LocalDateTime getDatetime() {
+        return timestamp;
+    }
+    public double getPaymentAmount() {
+        return amountPaid;
+    }
+    public double getTotalAmount() {
+        return total;
     }
     /**
      * Provides a string representation of the TransactionDTO for logging and debugging.

@@ -6,17 +6,10 @@ import com.konbini.model.repository.impl.*;
 import com.konbini.service.*;
 import com.konbini.service.impl.*;
 import com.konbini.view.*;
+import com.konbini.view.swing.*;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-
-public class Main extends Application{
+public class Main {
     public static void main(String[] args) {
-        launch(args);
-    }
-
-    @Override
-    public void start(Stage primaryStage) throws Exception{
         // Initialize repositories
         ProductRepository productRepository = new FileProductRepository
             ("products.dat");
@@ -34,6 +27,9 @@ public class Main extends Application{
             new TransactionServiceImpl
                 (transactionRepository, productRepository);
         
+        // Initialize view
+        StoreView view = new SwingStoreView();
+        
         // Initialize base controllers
         ProductController productController = new ProductController
             (productService);
@@ -46,43 +42,33 @@ public class Main extends Application{
         
         // Initialize management controllers
         ProductManagementController productManagementController = 
-            new ProductManagementController(productController);
+            new ProductManagementController(view, productController);
         
-        // CustomerManagementController customerManagementController = 
-        //     new CustomerManagementController(customerController);
+        CustomerManagementController customerManagementController = 
+            new CustomerManagementController(view, customerController);
         
-        // CartManagementController cartManagementController = 
-        //     new CartManagementController(productController, 
-        //     customerController, cartController, transactionController);
+        CartManagementController cartManagementController = 
+            new CartManagementController(view, productController, 
+            customerController, cartController, transactionController);
         
-        // TransactionManagementController transactionManagementController = 
-        //     new TransactionManagementController(customerController, 
-        //         transactionController);
+        TransactionManagementController transactionManagementController = 
+            new TransactionManagementController(view, customerController, 
+                transactionController);
         
         DataManagementController dataManagementController = 
-            new DataManagementController(productController, 
+            new DataManagementController(view, productController, 
                 customerController, transactionController, 
                 productManagementController);
         
         // Initialize main controller
-        // MainController mainController = new MainController(
-        //         customerManagementController,
-        //         cartManagementController,
-        //         transactionManagementController,
-        //         dataManagementController,
-        //         productManagementController
-        // );
-
-        // Initialize store view
-        JavaFXStoreView view = new JavaFXStoreView(
-            productManagementController,
-            customerManagementController,
-            cartManagementController,
-            transactionManagementController,
-            dataManagementController
+        MainController mainController = new MainController(
+                view,
+                customerManagementController,
+                cartManagementController,
+                transactionManagementController,
+                dataManagementController,
+                productManagementController
         );
-
-        view.show(primaryStage);
         
         // Load or initialize data
         boolean productsLoaded = productController.loadData();
@@ -110,5 +96,7 @@ public class Main extends Application{
         if (needSampleData) {
             mainController.initializeSampleData();
         }
+        
+        mainController.start();
     }
 }

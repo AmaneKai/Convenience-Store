@@ -3,10 +3,10 @@ package com.konbini.controller;
 import com.konbini.model.Product;
 import com.konbini.model.ProductCategory;
 import com.konbini.model.ProductSubcategory;
-import com.konbini.dto.ProductDTO;
+import com.konbini.view.ProductView;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller class dedicated to handling the user interface flow for all
@@ -15,6 +15,11 @@ import java.util.List;
  * underlying ProductController.
  */
 public class ProductManagementController {
+    /**
+     * The view component responsible for displaying product-related menus,
+     * lists, and handling user input.
+     */
+    private final ProductView view;
     /**
      * The controller responsible for the core business logic and persistence
      * of product data.
@@ -25,9 +30,12 @@ public class ProductManagementController {
      * Constructs the ProductManagementController, injecting the required view
      * and product controller dependencies.
      *
+     * @param view The user interface component for product management.
      * @param productController The core controller for product data and logic.
      */
-    public ProductManagementController(ProductController productController) {
+    public ProductManagementController(ProductView view,
+        ProductController productController) {
+        this.view = view;
         this.productController = productController;
     }
 
@@ -35,76 +43,71 @@ public class ProductManagementController {
      * Runs the main loop for product management, displaying the inventory menu
      * and executing methods based on user selection until the user chooses to exit.
      */
-    // public void handleProductManagement() {
-    //     boolean backToMain = false;
+    public void handleProductManagement() {
+        boolean backToMain = false;
 
-    //     while (!backToMain) {
-    //         view.displayProductMenu();
-            
-    //         int choice = view.getProductMenuChoice();
+        while (!backToMain) {
+            view.displayProductMenu();
+            int choice = view.getProductMenuChoice();
 
-    //         switch (choice) {
-    //             case 1: // View all products
-    //                 view.displayProducts(productController.getAllProducts());
-    //                 break;
-    //             case 2: // View products by category
-    //                 try {
-    //                     view.displayInfoMessage("Select a product category:");
-    //                     view.displayProducts(productController
-    //                         .getProductsByCategory(view.getCategoryInput()));
-    //                 } catch (Exception e) {
-    //                     view.displayErrorMessage(e.getMessage());
-    //                 }
-    //                 break;
-    //             case 3: // View products by subcategory
-    //                 try {
-    //                     view.displayInfoMessage
-    //                         ("Select a product category first:");
-    //                     view.displayProducts
-    //                         (productController.getProductsBySubcategory(view
-    //                         .getSubcategoryInput(view.getCategoryInput())));
-    //                 } catch (Exception e) {
-    //                     view.displayErrorMessage(e.getMessage());
-    //                 }
-    //                 break;
-    //             case 4: // Search products by name
-    //                 String searchTerm = view.getStringInput
-    //                     ("Enter product name to search: ");
-    //                 view.displayProducts
-    //                     (productController.searchProductsByName(searchTerm));
-    //                 break;
-    //             case 5: // View low stock products
-    //                 view.displayLowStockProducts
-    //                     (productController.getLowStockProducts());
-    //                 break;
-    //             case 6: // View expired products
-    //                 view.displayExpiredProducts
-    //                     (productController.getExpiredProducts());
-    //                 break;
-    //             case 7: // Add new product
-    //                 handleAddProduct();
-    //                 break;
-    //             case 8: // Update existing product
-    //                 handleUpdateProduct();
-    //                 break;
-    //             case 9: // Remove product
-    //                 handleRemoveProduct();
-    //                 break;
-    //             case 10: // Restock product
-    //                 handleRestockProduct();
-    //                 break;
-    //             case 0:
-    //                 backToMain = true;
-    //                 break;
-    //             default:
-    //                 view.displayErrorMessage
-    //                     ("Invalid choice. Please try again.");
-    //         }
-    //     }
-    // }
-    public List<ProductDTO> handleGetAllProducts(){
-        List<Product> products = productController.getAllProducts();
-        return ProductDTO.fromModelList(products);
+            switch (choice) {
+                case 1: // View all products
+                    view.displayProducts(productController.getAllProducts());
+                    break;
+                case 2: // View products by category
+                    try {
+                        view.displayInfoMessage("Select a product category:");
+                        view.displayProducts(productController
+                            .getProductsByCategory(view.getCategoryInput()));
+                    } catch (Exception e) {
+                        view.displayErrorMessage(e.getMessage());
+                    }
+                    break;
+                case 3: // View products by subcategory
+                    try {
+                        view.displayInfoMessage
+                            ("Select a product category first:");
+                        view.displayProducts
+                            (productController.getProductsBySubcategory(view
+                            .getSubcategoryInput(view.getCategoryInput())));
+                    } catch (Exception e) {
+                        view.displayErrorMessage(e.getMessage());
+                    }
+                    break;
+                case 4: // Search products by name
+                    String searchTerm = view.getStringInput
+                        ("Enter product name to search: ");
+                    view.displayProducts
+                        (productController.searchProductsByName(searchTerm));
+                    break;
+                case 5: // View low stock products
+                    view.displayLowStockProducts
+                        (productController.getLowStockProducts());
+                    break;
+                case 6: // View expired products
+                    view.displayExpiredProducts
+                        (productController.getExpiredProducts());
+                    break;
+                case 7: // Add new product
+                    handleAddProduct();
+                    break;
+                case 8: // Update existing product
+                    handleUpdateProduct();
+                    break;
+                case 9: // Remove product
+                    handleRemoveProduct();
+                    break;
+                case 10: // Restock product
+                    handleRestockProduct();
+                    break;
+                case 0:
+                    backToMain = true;
+                    break;
+                default:
+                    view.displayErrorMessage
+                        ("Invalid choice. Please try again.");
+            }
+        }
     }
 
     /**
@@ -112,23 +115,26 @@ public class ProductManagementController {
      * It gathers all necessary product details from the view and calls the
      * product controller to persist the new product.
      */
-    public boolean handleAddProduct(
-        String name,
-        double price, 
-        int quantity,
-        ProductCategory category,
-        String brand,
-        ProductSubcategory subcategory,
-        LocalDate expirationDate
-        ) {
-        
-        try{
-            productController.addProduct(name, price, quantity, category, brand, subcategory, expirationDate);
-            return true;
-        }
+    public void handleAddProduct() {
+        try {
+            String name = view.getStringInput("Enter product name: ");
+            double price = view.getDoubleInput("Enter product price: ");
+            int quantity = view.getIntInput("Enter product quantity: ");
+            view.displayInfoMessage("Select a product category:");
+            ProductCategory category = view.getCategoryInput();
+            String brand = view.getStringInput("Enter product brand: ");
+            view.displayInfoMessage("Select a product subcategory:");
+            ProductSubcategory subcategory = view
+                .getSubcategoryInput(category);
+            LocalDate expirationDate = view.getDateInput
+            ("Enter product expiration date (leave empty if not applicable): ");
 
-        catch(Exception e){
-            return false;
+            productController.addProduct(name, price, quantity, category,
+                brand, subcategory, expirationDate);
+            view.displaySuccessMessage("Product added successfully.");
+        } catch (Exception e) {
+            view.displayErrorMessage("Failed to add product: "
+                + e.getMessage());
         }
     }
 
@@ -136,116 +142,116 @@ public class ProductManagementController {
      * Guides the user through selecting and updating an existing product's details.
      * It prompts for the product ID and then for new values for its properties.
      */
-    // public void handleUpdateProduct() {
-    //     try {
-    //         // Display products for selection
-    //         view.displayProducts(productController.getAllProducts());
+    public void handleUpdateProduct() {
+        try {
+            // Display products for selection
+            view.displayProducts(productController.getAllProducts());
 
-    //         // Get product ID
-    //         String productId = view.getStringInput
-    //             ("Enter product ID to update: ");
-    //         Optional<Product> optionalProduct = productController
-    //             .getProductById(productId);
+            // Get product ID
+            String productId = view.getStringInput
+                ("Enter product ID to update: ");
+            Optional<Product> optionalProduct = productController
+                .getProductById(productId);
 
-    //         if (optionalProduct.isPresent()) {
-    //             Product product = optionalProduct.get();
-    //             view.displayProduct(product);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                view.displayProduct(product);
 
-    //             // Get updated values
-    //             String name = view.getStringInput
-    //                 ("Enter new product name (leave empty to keep current): ");
-    //             name = name.isEmpty() ? product.getName() : name;
+                // Get updated values
+                String name = view.getStringInput
+                    ("Enter new product name (leave empty to keep current): ");
+                name = name.isEmpty() ? product.getName() : name;
 
-    //             double price = view.getDoubleInput
-    //                 ("Enter new product price (current: "
-    //                 + product.getPrice() + "): ");
+                double price = view.getDoubleInput
+                    ("Enter new product price (current: "
+                    + product.getPrice() + "): ");
 
-    //             int quantity = view.getIntInput
-    //                 ("Enter new product quantity (current: "
-    //                 + product.getQuantity() + "): ");
+                int quantity = view.getIntInput
+                    ("Enter new product quantity (current: "
+                    + product.getQuantity() + "): ");
 
-    //             view.displayInfoMessage
-    //                 ("Select a new product category (current: "
-    //                     + product.getCategory() + "):");
+                view.displayInfoMessage
+                    ("Select a new product category (current: "
+                        + product.getCategory() + "):");
 
-    //             ProductCategory category = view.getCategoryInput();
+                ProductCategory category = view.getCategoryInput();
 
-    //             String brand = view.getStringInput
-    //                 ("Enter new product brand (leave empty to keep current): ");
+                String brand = view.getStringInput
+                    ("Enter new product brand (leave empty to keep current): ");
 
-    //             brand = brand.isEmpty() ? product.getBrand() : brand;
+                brand = brand.isEmpty() ? product.getBrand() : brand;
 
-    //             view.displayInfoMessage
-    //             ("Select a new product subcategory (current: "
-    //                 + product.getVariant() + "):");
+                view.displayInfoMessage
+                ("Select a new product subcategory (current: "
+                    + product.getVariant() + "):");
 
-    //             ProductSubcategory subcategory = view
-    //             .getSubcategoryInput(category);
+                ProductSubcategory subcategory = view
+                .getSubcategoryInput(category);
 
-    //             LocalDate expirationDate = view.getDateInput
-    //                 ("Enter new expiration date (leave empty to keep current): ");
+                LocalDate expirationDate = view.getDateInput
+                    ("Enter new expiration date (leave empty to keep current): ");
 
-    //             productController.updateProduct(productId, name, price,
-    //                 quantity, category, brand, subcategory, expirationDate);
+                productController.updateProduct(productId, name, price,
+                    quantity, category, brand, subcategory, expirationDate);
 
-    //             view.displaySuccessMessage("Product updated successfully.");
-    //         } else {
-    //             view.displayErrorMessage("Product not found.");
-    //         }
-    //     } catch (Exception e) {
-    //         view.displayErrorMessage("Failed to update product: "
-    //             + e.getMessage());
-    //     }
-    // }
+                view.displaySuccessMessage("Product updated successfully.");
+            } else {
+                view.displayErrorMessage("Product not found.");
+            }
+        } catch (Exception e) {
+            view.displayErrorMessage("Failed to update product: "
+                + e.getMessage());
+        }
+    }
 
     /**
      * Guides the user through selecting a product ID and confirming its removal
      * from the inventory.
      */
-    // public void handleRemoveProduct() {
-    //     try {
-    //         // Display products for selection
-    //         view.displayProducts(productController.getAllProducts());
+    public void handleRemoveProduct() {
+        try {
+            // Display products for selection
+            view.displayProducts(productController.getAllProducts());
 
-    //         // Get product ID
-    //         String productId = view.getStringInput
-    //             ("Enter product ID to remove: ");
+            // Get product ID
+            String productId = view.getStringInput
+                ("Enter product ID to remove: ");
 
-    //         // Confirm removal
-    //         if (view.getBooleanInput
-    //             ("Are you sure you want to remove this product?")) {
-    //             productController.removeProduct(productId);
-    //             view.displaySuccessMessage("Product removed successfully.");
-    //         } else {
-    //             view.displayInfoMessage("Product removal cancelled.");
-    //         }
-    //     } catch (Exception e) {
-    //         view.displayErrorMessage("Failed to remove product: "
-    //             + e.getMessage());
-    //     }
-    // }
+            // Confirm removal
+            if (view.getBooleanInput
+                ("Are you sure you want to remove this product?")) {
+                productController.removeProduct(productId);
+                view.displaySuccessMessage("Product removed successfully.");
+            } else {
+                view.displayInfoMessage("Product removal cancelled.");
+            }
+        } catch (Exception e) {
+            view.displayErrorMessage("Failed to remove product: "
+                + e.getMessage());
+        }
+    }
 
     /**
      * Guides the user through selecting a product ID and specifying a quantity
      * to add to the existing stock (restock operation).
      */
-    // public void handleRestockProduct() {
-    //     try {
-    //         // Display products for selection
-    //         view.displayProducts(productController.getAllProducts());
+    public void handleRestockProduct() {
+        try {
+            // Display products for selection
+            view.displayProducts(productController.getAllProducts());
 
-    //         // Get product ID and quantity
-    //         String productId = view
-    //             .getStringInput("Enter product ID to restock: ");
-    //         int quantity = view.getIntInput("Enter quantity to add: ");
+            // Get product ID and quantity
+            String productId = view
+                .getStringInput("Enter product ID to restock: ");
+            int quantity = view.getIntInput("Enter quantity to add: ");
 
-    //         productController.restockProduct(productId, quantity);
-    //         view.displaySuccessMessage("Product restocked successfully.");
-    //     } catch (Exception e) {
-    //         view.displayErrorMessage("Failed to restock product: "
-    //             + e.getMessage());
-    //     }
-    // }
+            productController.restockProduct(productId, quantity);
+            view.displaySuccessMessage("Product restocked successfully.");
+        } catch (Exception e) {
+            view.displayErrorMessage("Failed to restock product: "
+                + e.getMessage());
+        }
+    }
 
     /**
      * Initializes a predefined set of sample products across different categories
@@ -289,11 +295,11 @@ public class ProductManagementController {
             productController.addProduct("Antacid", 60.0, 25, ProductCategory.MEDICATION, "Kremil-S", ProductSubcategory.PAIN_RELIEF, LocalDate.now().plusYears(2));
             productController.addProduct("Antihistamine", 80.0, 15, ProductCategory.MEDICATION, "Claritin", ProductSubcategory.ALLERGY, LocalDate.now().plusYears(2));
 
-            // view.displaySuccessMessage
-            //     ("Sample products initialized successfully.");
+            view.displaySuccessMessage
+                ("Sample products initialized successfully.");
         } catch (Exception e) {
-            // view.displayErrorMessage
-            //     ("Failed to initialize sample products: " + e.getMessage());
+            view.displayErrorMessage
+                ("Failed to initialize sample products: " + e.getMessage());
         }
     }
 }

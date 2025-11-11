@@ -94,6 +94,18 @@ public enum ProductSubcategory {
     }
 
     /**
+    * Gets all subcategories belonging to a specific category.
+    * @param category The parent ProductCategory to filter by.
+    * @return An array of ProductSubcategory values for that category.
+    */
+
+    public static ProductSubcategory[] getSubcategoriesFor(ProductCategory category) {
+        return java.util.Arrays.stream(ProductSubcategory.values())
+        .filter(sub -> sub.getCategory() == category)
+        .toArray(ProductSubcategory[]::new);
+    }
+
+    /**
      * Retrieves the user-friendly display name of the product subcategory.
      *
      * @return The display name string.

@@ -256,6 +256,18 @@ public class CustomerDTO {
     }
 
     /**
+     * Gets the card's internal ID.
+    * @return The internal card ID (or null if no card).
+    */
+    public String getCardId() {
+        if (hasMembershipCard && cardNumber != null) {
+            // Return the internal ID - if not available, return card number as fallback
+            return cardNumber; // Or create a separate cardId field if needed
+        }
+        return null;
+    }
+    
+    /**
      * Provides a string representation of the CustomerDTO for logging and debugging.
      *
      * @return A string containing key customer and card summary data.
