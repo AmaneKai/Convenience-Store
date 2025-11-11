@@ -1,12 +1,15 @@
 package com.konbini.view;
 
-import com.konbini.model.Customer;
-
 import java.util.List;
+
+import com.konbini.dto.CustomerDTO;
 
 /**
  * Defines the user interface contract specifically for managing and displaying customer information.
  * It extends BaseView to inherit fundamental display and input capabilities.
+ * 
+ * IMPORTANT: This interface uses CustomerDTO exclusively - no model imports.
+ * Controllers are responsible for converting Customer models to CustomerDTOs.
  */
 public interface CustomerView extends BaseView {
     /**
@@ -27,14 +30,14 @@ public interface CustomerView extends BaseView {
      * Displays a formatted list of multiple customers.
      * This typically includes key summary details like ID and name.
      *
-     * @param customers The list of Customer objects to be displayed.
+     * @param customers The list of CustomerDTO objects to be displayed.
      */
-    void displayCustomers(List<Customer> customers);
+    void displayCustomers(List<CustomerDTO> customers);
 
     /**
      * Displays the full, detailed information for a single customer, including membership status and points.
      *
-     * @param customer The Customer object whose details are to be displayed.
+     * @param customer The CustomerDTO object whose details are to be displayed.
      */
-    void displayCustomer(Customer customer);
+    void displayCustomer(CustomerDTO customer);
 }

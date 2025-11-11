@@ -2,7 +2,10 @@ package com.konbini.controller;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.konbini.dto.CustomerDTO;
+import com.konbini.dto.TransactionDTO;
 import com.konbini.model.Transaction;
 import com.konbini.view.StoreView;
 
@@ -26,7 +29,7 @@ public class TransactionManagementController {
     
     public void handleViewAllTransactions() {
         try {
-            view.displayTransactions(transactionController.getAllTransactions());
+            view.displayTransactions(TransactionDTO.fromModelList(transactionController.getAllTransactions()));
         } catch (Exception e) {
             view.displayErrorMessage("Failed to view transactions: " + e.getMessage());
         }
@@ -34,13 +37,13 @@ public class TransactionManagementController {
     
     public void handleViewTransactionDetails() {
         try {
-            view.displayTransactions(transactionController.getAllTransactions());
+            view.displayTransactions(TransactionDTO.fromModelList(transactionController.getAllTransactions()));
             String transactionId = view.getStringInput("Enter transaction ID: ");
             if (transactionId == null || transactionId.trim().isEmpty()) return;
             
             Optional<Transaction> transaction = transactionController.getTransactionById(transactionId);
             if (transaction.isPresent()) {
-                view.displayTransaction(transaction.get());
+                view.displayTransaction(TransactionDTO.fromModel(transaction.get()));
             } else {
                 view.displayErrorMessage("Transaction not found.");
             }
@@ -51,11 +54,11 @@ public class TransactionManagementController {
     
     public void handleViewCustomerTransactions() {
         try {
-            view.displayCustomers(customerController.getAllCustomers());
+            view.displayCustomers(customerController.getAllCustomers().stream().map(CustomerDTO::fromModel).collect(Collectors.toList()));
             String customerId = view.getStringInput("Enter customer ID: ");
             if (customerId == null || customerId.trim().isEmpty()) return;
             
-            view.displayTransactions(transactionController.getTransactionsByCustomerId(customerId));
+            view.displayTransactions(TransactionDTO.fromModelList(transactionController.getTransactionsByCustomerId(customerId)));
         } catch (Exception e) {
             view.displayErrorMessage("Failed: " + e.getMessage());
         }
@@ -65,7 +68,7 @@ public class TransactionManagementController {
         try {
             LocalDate date = view.getDateInput("Enter date: ");
             if (date != null) {
-                view.displayTransactions(transactionController.getTransactionsByDate(date));
+                view.displayTransactions(TransactionDTO.fromModelList(transactionController.getTransactionsByDate(date)));
             }
         } catch (Exception e) {
             view.displayErrorMessage("Failed: " + e.getMessage());
@@ -85,7 +88,7 @@ public class TransactionManagementController {
                 return;
             }
             
-            view.displayTransactions(transactionController.getTransactionsByDateRange(startDate, endDate));
+            view.displayTransactions(TransactionDTO.fromModelList(transactionController.getTransactionsByDateRange(startDate, endDate)));
         } catch (Exception e) {
             view.displayErrorMessage("Failed: " + e.getMessage());
         }

@@ -1,9 +1,14 @@
 package com.konbini.view;
 
-import com.konbini.model.*;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import com.konbini.dto.CartDTO;
+import com.konbini.dto.CustomerDTO;
+import com.konbini.dto.ProductDTO;
+import com.konbini.dto.TransactionDTO;
+import com.konbini.model.ProductCategory;
+import com.konbini.model.ProductSubcategory;
 
 /**
  * The master user interface contract for the entire Konbini Store application.
@@ -12,6 +17,11 @@ import java.util.List;
  * CustomerView, CartView, TransactionView) and consolidates all necessary methods
  * for displaying data, menus, and capturing user input across the application's
  * core functional modules.
+ * </p>
+ * <p>
+ * IMPORTANT: This interface uses ONLY DTOs for data display - no domain model imports.
+ * Controllers are responsible for converting models to DTOs before passing to views.
+ * This keeps views truly decoupled from business logic (pure MVC).
  * </p>
  */
 public interface StoreView extends MainView, ProductView, CustomerView, CartView, TransactionView {
@@ -97,72 +107,72 @@ public interface StoreView extends MainView, ProductView, CustomerView, CartView
     /**
      * Displays a formatted list of multiple products.
      *
-     * @param products The list of Product objects to be displayed.
+     * @param products The list of ProductDTO objects to be displayed.
      */
-    void displayProducts(List<Product> products);
+    void displayProducts(List<ProductDTO> products);
     
     /**
      * Displays the full, detailed information for a single product.
 
      *
-     * @param product The Product object whose details are to be displayed.
+     * @param product The ProductDTO object whose details are to be displayed.
      */
-    void displayProduct(Product product);
+    void displayProduct(ProductDTO product);
     
     /**
      * Displays a formatted list containing only products that are currently flagged as having low stock.
      *
-     * @param products The list of low stock Product objects.
+     * @param products The list of low stock ProductDTO objects.
      */
-    void displayLowStockProducts(List<Product> products);
+    void displayLowStockProducts(List<ProductDTO> products);
     
     /**
      * Displays a formatted list containing only products that have passed their expiration date.
      *
-     * @param products The list of expired Product objects.
+     * @param products The list of expired ProductDTO objects.
      */
-    void displayExpiredProducts(List<Product> products);
+    void displayExpiredProducts(List<ProductDTO> products);
     
     // --- Data Display Methods (Customer) ---
     
     /**
      * Displays a formatted list of multiple customers.
      *
-     * @param customers The list of Customer objects to be displayed.
+     * @param customers The list of CustomerDTO objects to be displayed.
      */
-    void displayCustomers(List<Customer> customers);
+    void displayCustomers(List<CustomerDTO> customers);
     
     /**
      * Displays the full, detailed information for a single customer.
      *
-     * @param customer The Customer object whose details are to be displayed.
+     * @param customer The CustomerDTO object whose details are to be displayed.
      */
-    void displayCustomer(Customer customer);
+    void displayCustomer(CustomerDTO customer);
     
     // --- Data Display Methods (Cart) ---
     
     /**
      * Displays the current contents and summary of the shopping cart.
      *
-     * @param cart The Cart object to display.
+     * @param cart The CartDTO object to display.
      */
-    void displayCart(Cart cart);
+    void displayCart(CartDTO cart);
     
     // --- Data Display Methods (Transaction) ---
     
     /**
      * Displays a formatted list of multiple transactions.
      *
-     * @param transactions The list of Transaction objects to display.
+     * @param transactions The list of TransactionDTO objects to display.
      */
-    void displayTransactions(List<Transaction> transactions);
+    void displayTransactions(List<TransactionDTO> transactions);
     
     /**
      * Displays the full, detailed summary of a single transaction.
      *
-     * @param transaction The Transaction object to display.
+     * @param transaction The TransactionDTO object to display.
      */
-    void displayTransaction(Transaction transaction);
+    void displayTransaction(TransactionDTO transaction);
     
     /**
      * Displays a pre-formatted receipt string, typically immediately after a successful checkout.
