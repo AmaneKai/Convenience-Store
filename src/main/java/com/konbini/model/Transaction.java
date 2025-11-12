@@ -25,7 +25,7 @@ public class Transaction implements Serializable {
     /** The customer who made the purchase. */
     private final Customer customer;
     /** The finalized list of items purchased. */
-    private final List<CartItem> items;
+    private final transient List<CartItem> items;
     /** The date and time the transaction was completed. */
     private final LocalDateTime timestamp;
     /** The sum of all item prices before any tax or discount. */
@@ -45,7 +45,7 @@ public class Transaction implements Serializable {
     /** The number of loyalty points redeemed by the customer in this transaction. */
     private final int pointsRedeemed;
     /** A list of names describing the discounts that were applied. */
-    private final List<String> appliedDiscounts;
+    private final transient List<String> appliedDiscounts;
     /** The name of the tax applied (e.g., "VAT"). */
     private final String taxName;
     
