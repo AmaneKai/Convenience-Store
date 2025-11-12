@@ -1,17 +1,14 @@
 package com.konbini.view;
 
-import java.util.List;
-
-import com.konbini.dto.ProductDTO;
+import com.konbini.model.Product;
 import com.konbini.model.ProductCategory;
 import com.konbini.model.ProductSubcategory;
+
+import java.util.List;
 
 /**
  * Defines the user interface contract specifically for managing and displaying product inventory information.
  * It extends BaseView to inherit fundamental display and input capabilities.
- * 
- * IMPORTANT: This interface uses ProductDTO exclusively - no model imports.
- * Controllers are responsible for converting Product models to ProductDTOs.
  */
 public interface ProductView extends BaseView {
     /**
@@ -32,30 +29,30 @@ public interface ProductView extends BaseView {
      * Displays a formatted list of multiple products.
      * This typically includes key summary details like ID, name, price, and quantity.
      *
-     * @param products The list of ProductDTO objects to be displayed.
+     * @param products The list of Product objects to be displayed.
      */
-    void displayProducts(List<ProductDTO> products);
+    void displayProducts(List<Product> products);
 
     /**
      * Displays the full, detailed information for a single product.
      *
-     * @param product The ProductDTO object whose details are to be displayed.
+     * @param product The Product object whose details are to be displayed.
      */
-    void displayProduct(ProductDTO product);
+    void displayProduct(Product product);
 
     /**
      * Displays a formatted list containing only products that are currently flagged as having low stock.
      *
-     * @param products The list of low stock ProductDTO objects.
+     * @param products The list of low stock Product objects.
      */
-    void displayLowStockProducts(List<ProductDTO> products);
+    void displayLowStockProducts(List<Product> products);
 
     /**
      * Displays a formatted list containing only products that have passed their expiration date.
      *
-     * @param products The list of expired ProductDTO objects.
+     * @param products The list of expired Product objects.
      */
-    void displayExpiredProducts(List<ProductDTO> products);
+    void displayExpiredProducts(List<Product> products);
 
     /**
      * Prompts the user to select a product category from a presented list.

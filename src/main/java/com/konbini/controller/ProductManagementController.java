@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import com.konbini.dto.ProductDTO;
 import com.konbini.model.Product;
 import com.konbini.model.ProductCategory;
 import com.konbini.model.ProductSubcategory;
@@ -21,7 +20,7 @@ import com.konbini.view.ProductView;
  * 
  * INTERFACE COMPLIANCE:
  * - View receives Model objects (per StoreView interface)
- * - View converts Model â†’ DTO internally before showing to panels
+ * - View converts Model → DTO internally before showing to panels
  * - Business logic delegated to ProductController
  */
 public class ProductManagementController {
@@ -41,7 +40,7 @@ public class ProductManagementController {
      */
     public void handleViewAllProducts() {
         List<Product> products = productController.getAllProducts();
-        view.displayProducts(ProductDTO.fromModelList(products));
+        view.displayProducts(products);
     }
 
     /**
@@ -52,7 +51,7 @@ public class ProductManagementController {
             view.displayInfoMessage("Select a product category:");
             ProductCategory category = view.getCategoryInput();
             List<Product> products = productController.getProductsByCategory(category);
-            view.displayProducts(ProductDTO.fromModelList(products));
+            view.displayProducts(products);
         } catch (Exception e) {
             view.displayErrorMessage(e.getMessage());
         }
@@ -67,7 +66,7 @@ public class ProductManagementController {
             ProductCategory category = view.getCategoryInput();
             ProductSubcategory subcategory = view.getSubcategoryInput(category);
             List<Product> products = productController.getProductsBySubcategory(subcategory);
-            view.displayProducts(ProductDTO.fromModelList(products));
+            view.displayProducts(products);
         } catch (Exception e) {
             view.displayErrorMessage(e.getMessage());
         }
@@ -80,7 +79,7 @@ public class ProductManagementController {
         String searchTerm = view.getStringInput("Enter product name to search: ");
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             List<Product> products = productController.searchProductsByName(searchTerm);
-            view.displayProducts(ProductDTO.fromModelList(products));
+            view.displayProducts(products);
         }
     }
 
@@ -89,7 +88,7 @@ public class ProductManagementController {
      */
     public void handleViewLowStock() {
         List<Product> products = productController.getLowStockProducts();
-        view.displayLowStockProducts(ProductDTO.fromModelList(products));
+        view.displayLowStockProducts(products);
     }
 
     /**
@@ -97,7 +96,7 @@ public class ProductManagementController {
      */
     public void handleViewExpired() {
         List<Product> products = productController.getExpiredProducts();
-        view.displayExpiredProducts(ProductDTO.fromModelList(products));
+        view.displayExpiredProducts(products);
     }
 
     /**
@@ -152,7 +151,7 @@ public class ProductManagementController {
 
             if (optionalProduct.isPresent()) {
                 Product product = optionalProduct.get();
-                view.displayProduct(ProductDTO.fromModel(product));
+                view.displayProduct(product);
 
                 // Get updated values
                 String name = view.getStringInput("Enter new product name (leave empty to keep current): ");

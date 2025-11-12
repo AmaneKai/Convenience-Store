@@ -20,8 +20,12 @@ import com.konbini.dto.CartDTO;
 import com.konbini.dto.CustomerDTO;
 import com.konbini.dto.ProductDTO;
 import com.konbini.dto.TransactionDTO;
+import com.konbini.model.Cart;
+import com.konbini.model.Customer;
+import com.konbini.model.Product;
 import com.konbini.model.ProductCategory;
 import com.konbini.model.ProductSubcategory;
+import com.konbini.model.Transaction;
 import com.konbini.view.StoreView;
 
 /**
@@ -165,23 +169,27 @@ public class SwingStoreView implements StoreView {
     }
     
     @Override
-    public void displayProducts(List<ProductDTO> products) {
-        SwingUtilities.invokeLater(() -> productPanel.displayProducts(products));
+    public void displayProducts(List<Product> products) {
+        List<ProductDTO> dtos = ProductDTO.fromModelList(products);
+        SwingUtilities.invokeLater(() -> productPanel.displayProducts(dtos));
     }
     
     @Override
-    public void displayProduct(ProductDTO product) {
-        SwingUtilities.invokeLater(() -> productPanel.displayProduct(product));
+    public void displayProduct(Product product) {
+        ProductDTO dto = ProductDTO.fromModel(product);
+        SwingUtilities.invokeLater(() -> productPanel.displayProduct(dto));
     }
     
     @Override
-    public void displayLowStockProducts(List<ProductDTO> products) {
-        SwingUtilities.invokeLater(() -> productPanel.displayLowStockProducts(products));
+    public void displayLowStockProducts(List<Product> products) {
+        List<ProductDTO> dtos = ProductDTO.fromModelList(products);
+        SwingUtilities.invokeLater(() -> productPanel.displayLowStockProducts(dtos));
     }
     
     @Override
-    public void displayExpiredProducts(List<ProductDTO> products) {
-        SwingUtilities.invokeLater(() -> productPanel.displayExpiredProducts(products));
+    public void displayExpiredProducts(List<Product> products) {
+        List<ProductDTO> dtos = ProductDTO.fromModelList(products);
+        SwingUtilities.invokeLater(() -> productPanel.displayExpiredProducts(dtos));
     }
     
     @Override
@@ -195,13 +203,17 @@ public class SwingStoreView implements StoreView {
     }
     
     @Override
-    public void displayCustomers(List<CustomerDTO> customers) {
-        SwingUtilities.invokeLater(() -> customerPanel.displayCustomers(customers));
+    public void displayCustomers(List<Customer> customers) {
+        List<CustomerDTO> dtos = customers.stream()
+            .map(CustomerDTO::fromModel)
+            .collect(java.util.stream.Collectors.toList());
+        SwingUtilities.invokeLater(() -> customerPanel.displayCustomers(dtos));
     }
     
     @Override
-    public void displayCustomer(CustomerDTO customer) {
-        SwingUtilities.invokeLater(() -> customerPanel.displayCustomer(customer));
+    public void displayCustomer(Customer customer) {
+        CustomerDTO dto = CustomerDTO.fromModel(customer);
+        SwingUtilities.invokeLater(() -> customerPanel.displayCustomer(dto));
     }
     
     @Override
@@ -215,8 +227,9 @@ public class SwingStoreView implements StoreView {
     }
     
     @Override
-    public void displayCart(CartDTO cart) {
-        SwingUtilities.invokeLater(() -> cartPanel.displayCart(cart));
+    public void displayCart(Cart cart) {
+        CartDTO dto = CartDTO.fromModel(cart);
+        SwingUtilities.invokeLater(() -> cartPanel.displayCart(dto));
     }
     
     @Override
@@ -230,13 +243,17 @@ public class SwingStoreView implements StoreView {
     }
     
     @Override
-    public void displayTransactions(List<TransactionDTO> transactions) {
-        SwingUtilities.invokeLater(() -> transactionPanel.displayTransactions(transactions));
+    public void displayTransactions(List<Transaction> transactions) {
+        List<TransactionDTO> dtos = transactions.stream()
+            .map(TransactionDTO::fromModel)
+            .collect(java.util.stream.Collectors.toList());
+        SwingUtilities.invokeLater(() -> transactionPanel.displayTransactions(dtos));
     }
     
     @Override
-    public void displayTransaction(TransactionDTO transaction) {
-        SwingUtilities.invokeLater(() -> transactionPanel.displayTransaction(transaction));
+    public void displayTransaction(Transaction transaction) {
+        TransactionDTO dto = TransactionDTO.fromModel(transaction);
+        SwingUtilities.invokeLater(() -> transactionPanel.displayTransaction(dto));
     }
     
     @Override

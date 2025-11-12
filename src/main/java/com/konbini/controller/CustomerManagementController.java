@@ -1,10 +1,8 @@
 package com.konbini.controller;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
-import com.konbini.dto.CustomerDTO;
 import com.konbini.model.Customer;
 import com.konbini.view.StoreView;
 
@@ -27,8 +25,7 @@ public class CustomerManagementController {
 
     public void handleViewAllCustomers() {
         try {
-            List<Customer> customers = customerController.getAllCustomers();
-            view.displayCustomers(customers.stream().map(CustomerDTO::fromModel).collect(java.util.stream.Collectors.toList()));
+            view.displayCustomers(customerController.getAllCustomers());
         } catch (Exception e) {
             view.displayErrorMessage("Failed to view customers: " + e.getMessage());
         }
@@ -36,14 +33,13 @@ public class CustomerManagementController {
 
     public void handleViewCustomerDetails() {
         try {
-            List<Customer> customers = customerController.getAllCustomers();
-            view.displayCustomers(customers.stream().map(CustomerDTO::fromModel).collect(java.util.stream.Collectors.toList()));
+            view.displayCustomers(customerController.getAllCustomers());
             String customerId = view.getStringInput("Enter customer ID: ");
             if (customerId == null || customerId.trim().isEmpty()) return;
             
             Optional<Customer> customer = customerController.getCustomerById(customerId);
             if (customer.isPresent()) {
-                view.displayCustomer(CustomerDTO.fromModel(customer.get()));
+                view.displayCustomer(customer.get());
             } else {
                 view.displayErrorMessage("Customer not found.");
             }
@@ -86,8 +82,7 @@ public class CustomerManagementController {
 
     public void handleUpdateCustomer() {
         try {
-            List<Customer> customers = customerController.getAllCustomers();
-            view.displayCustomers(customers.stream().map(CustomerDTO::fromModel).collect(java.util.stream.Collectors.toList()));
+            view.displayCustomers(customerController.getAllCustomers());
             String customerId = view.getStringInput("Enter customer ID to update: ");
             if (customerId == null || customerId.trim().isEmpty()) return;
             
@@ -111,8 +106,7 @@ public class CustomerManagementController {
 
     public void handleRemoveCustomer() {
         try {
-            List<Customer> customers = customerController.getAllCustomers();
-            view.displayCustomers(customers.stream().map(CustomerDTO::fromModel).collect(java.util.stream.Collectors.toList()));
+            view.displayCustomers(customerController.getAllCustomers());
             String customerId = view.getStringInput("Enter customer ID to remove: ");
             if (customerId == null || customerId.trim().isEmpty()) return;
             
@@ -130,8 +124,7 @@ public class CustomerManagementController {
 
     public void handleAddMembershipCard() {
         try {
-            List<Customer> customers = customerController.getAllCustomers();
-            view.displayCustomers(customers.stream().map(CustomerDTO::fromModel).collect(java.util.stream.Collectors.toList()));
+            view.displayCustomers(customerController.getAllCustomers());
             String customerId = view.getStringInput("Enter customer ID: ");
             if (customerId == null || customerId.trim().isEmpty()) return;
             

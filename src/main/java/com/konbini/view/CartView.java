@@ -1,13 +1,10 @@
 package com.konbini.view;
 
-import com.konbini.dto.CartDTO;
+import com.konbini.model.Cart;
 
 /**
  * Defines the user interface contract specifically for managing and displaying the shopping cart.
  * It extends BaseView to inherit fundamental display and input capabilities.
- * 
- * IMPORTANT: This interface uses CartDTO exclusively - no model imports.
- * Controllers are responsible for converting Cart models to CartDTOs.
  */
 public interface CartView extends BaseView {
     /**
@@ -28,7 +25,7 @@ public interface CartView extends BaseView {
      * Displays the current contents of the shopping cart, including all items,
      * quantities, prices, and calculated subtotals.
      *
-     * @param cart The CartDTO object to be displayed.
+     * @param cart The Cart object to be displayed.
      */
-    void displayCart(CartDTO cart);
+    void displayCart(Cart cart);
 }

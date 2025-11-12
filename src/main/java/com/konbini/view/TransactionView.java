@@ -1,16 +1,13 @@
 package com.konbini.view;
 
+import com.konbini.model.Transaction;
+
 import java.time.LocalDate;
 import java.util.List;
-
-import com.konbini.dto.TransactionDTO;
 
 /**
  * Defines the user interface contract specifically for managing and displaying transaction and sales data.
  * It extends BaseView to inherit fundamental display and input capabilities.
- * 
- * IMPORTANT: This interface uses TransactionDTO exclusively - no model imports.
- * Controllers are responsible for converting Transaction models to TransactionDTOs.
  */
 public interface TransactionView extends BaseView {
     /**
@@ -31,17 +28,17 @@ public interface TransactionView extends BaseView {
      * Displays a formatted summary list of multiple transactions.
      * This typically includes key details like Transaction ID, customer name, date, and total.
      *
-     * @param transactions The list of TransactionDTO objects to be displayed.
+     * @param transactions The list of Transaction objects to be displayed.
      */
-    void displayTransactions(List<TransactionDTO> transactions);
+    void displayTransactions(List<Transaction> transactions);
 
     /**
      * Displays the full, detailed summary of a single transaction, including itemized list,
      * payment details, discounts, and loyalty points.
      *
-     * @param transaction The TransactionDTO object whose details are to be displayed.
+     * @param transaction The Transaction object whose details are to be displayed.
      */
-    void displayTransaction(TransactionDTO transaction);
+    void displayTransaction(Transaction transaction);
 
     /**
      * Displays a pre-formatted receipt string, typically immediately after a successful checkout.

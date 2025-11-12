@@ -1,11 +1,7 @@
 package com.konbini.controller;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import com.konbini.dto.CartDTO;
-import com.konbini.dto.CustomerDTO;
-import com.konbini.dto.ProductDTO;
 import com.konbini.model.Cart;
 import com.konbini.model.Customer;
 import com.konbini.model.Transaction;
@@ -40,7 +36,7 @@ public class CartManagementController {
     
     public void handleCreateCart() {
         try {
-            view.displayCustomers(customerController.getAllCustomers().stream().map(CustomerDTO::fromModel).collect(Collectors.toList()));
+            view.displayCustomers(customerController.getAllCustomers());
             String customerId = view.getStringInput("Enter customer ID: ");
             if (customerId == null || customerId.trim().isEmpty()) return;
             
@@ -62,7 +58,7 @@ public class CartManagementController {
                 view.displayErrorMessage("No active cart. Create one first.");
                 return;
             }
-            view.displayCart(CartDTO.fromModel(currentCart));
+            view.displayCart(currentCart);
         } catch (Exception e) {
             view.displayErrorMessage("Error: " + e.getMessage());
         }
@@ -75,7 +71,7 @@ public class CartManagementController {
                 return;
             }
             
-            view.displayProducts(ProductDTO.fromModelList(productController.getAllProducts()));
+            view.displayProducts(productController.getAllProducts());
             String productId = view.getStringInput("Enter product ID: ");
             if (productId == null || productId.trim().isEmpty()) return;
             
@@ -84,7 +80,7 @@ public class CartManagementController {
             
             cartController.addToCart(currentCart, productId, quantity);
             view.displaySuccessMessage("Item added.");
-            view.displayCart(CartDTO.fromModel(currentCart));
+            view.displayCart(currentCart);
         } catch (Exception e) {
             view.displayErrorMessage("Failed to add item: " + e.getMessage());
         }
@@ -97,13 +93,13 @@ public class CartManagementController {
                 return;
             }
             
-            view.displayCart(CartDTO.fromModel(currentCart));
+            view.displayCart(currentCart);
             String productId = view.getStringInput("Enter product ID to remove: ");
             if (productId == null || productId.trim().isEmpty()) return;
             
             cartController.removeFromCart(currentCart, productId);
             view.displaySuccessMessage("Item removed.");
-            view.displayCart(CartDTO.fromModel(currentCart));
+            view.displayCart(currentCart);
         } catch (Exception e) {
             view.displayErrorMessage("Failed to remove: " + e.getMessage());
         }
@@ -116,7 +112,7 @@ public class CartManagementController {
                 return;
             }
             
-            view.displayCart(CartDTO.fromModel(currentCart));
+            view.displayCart(currentCart);
             String productId = view.getStringInput("Enter product ID: ");
             if (productId == null || productId.trim().isEmpty()) return;
             
@@ -125,7 +121,7 @@ public class CartManagementController {
             
             cartController.updateCartItemQuantity(currentCart, productId, newQuantity);
             view.displaySuccessMessage("Quantity updated.");
-            view.displayCart(CartDTO.fromModel(currentCart));
+            view.displayCart(currentCart);
         } catch (Exception e) {
             view.displayErrorMessage("Failed to update: " + e.getMessage());
         }
@@ -152,7 +148,7 @@ public class CartManagementController {
                 return;
             }
             
-            view.displayCart(CartDTO.fromModel(currentCart));
+            view.displayCart(currentCart);
             if (!view.getBooleanInput("Proceed with checkout?")) {
                 return;
             }
