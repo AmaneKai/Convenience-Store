@@ -1,193 +1,393 @@
 package com.konbini.controller;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import com.konbini.model.Cart;
-import com.konbini.model.Customer;
-import com.konbini.model.Transaction;
+import com.konbini.dto.*;
+import com.konbini.model.*;
+import com.konbini.service.*;
 import com.konbini.util.FileUtil;
 import com.konbini.view.StoreView;
 
-/**
- * Cart Management - GUI Event-Driven.
- * Each method is a single action called directly by GUI buttons.
- */
 public class CartManagementController {
     private final StoreView view;
     private final ProductController productController;
     private final CustomerController customerController;
     private final CartController cartController;
     private final TransactionController transactionController;
-    
+    private final CartService cartService;
+
     private Cart currentCart;
-    
+
     public CartManagementController(
             StoreView view,
             ProductController productController,
             CustomerController customerController,
             CartController cartController,
-            TransactionController transactionController) {
+            TransactionController transactionController,
+            CartService cartService) {
+        if (view == null || productController == null || customerController == null ||
+                cartController == null || transactionController == null || cartService == null) {
+            throw new IllegalArgumentException("All dependencies must be provided");
+        }
         this.view = view;
         this.productController = productController;
         this.customerController = customerController;
         this.cartController = cartController;
         this.transactionController = transactionController;
+        this.cartService = cartService;
     }
-    
+
+    // ==================== PUBLIC HANDLERS ====================
+
     public void handleCreateCart() {
         try {
-            view.displayCustomers(customerController.getAllCustomers());
+            List<CustomerDTO> customers = customerController.getAllCustomers().stream()
+                    .map(CustomerDTO::fromModel).collect(Collectors.toList());
+
+            view.displayCustomers(customers);
             String customerId = view.getStringInput("Enter customer ID: ");
-            if (customerId == null || customerId.trim().isEmpty()) return;
-            
-            Optional<Customer> customer = customerController.getCustomerById(customerId);
-            if (customer.isPresent()) {
-                currentCart = cartController.createCart(customer.get());
-                view.displaySuccessMessage("Cart created for " + customer.get().getName());
-            } else {
-                view.displayErrorMessage("Customer not found.");
+
+            if (customerId != null && !customerId.trim().isEmpty()) {
+                createCartForCustomer(customerId);
             }
+
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "creating cart");
         } catch (Exception e) {
-            view.displayErrorMessage("Failed to create cart: " + e.getMessage());
+            handleGenericException(e, "creating cart", "Failed to create cart. Please try again.");
         }
     }
-    
+
     public void handleViewCart() {
         try {
-            if (currentCart == null) {
-                view.displayErrorMessage("No active cart. Create one first.");
-                return;
+            if (ensureCartExists()) {
+                view.displayCart(CartDTO.fromModel(currentCart));
             }
-            view.displayCart(currentCart);
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "viewing cart");
         } catch (Exception e) {
-            view.displayErrorMessage("Error: " + e.getMessage());
+            handleGenericException(e, "viewing cart", "Error displaying cart. Please try again.");
         }
     }
-    
+
     public void handleAddItem() {
         try {
-            if (currentCart == null) {
-                view.displayErrorMessage("No active cart. Create one first.");
-                return;
-            }
-            
-            view.displayProducts(productController.getAllProducts());
-            String productId = view.getStringInput("Enter product ID: ");
-            if (productId == null || productId.trim().isEmpty()) return;
-            
-            int quantity = view.getIntInput("Enter quantity: ");
-            if (quantity <= 0) return;
-            
-            cartController.addToCart(currentCart, productId, quantity);
-            view.displaySuccessMessage("Item added.");
-            view.displayCart(currentCart);
-        } catch (Exception e) {
-            view.displayErrorMessage("Failed to add item: " + e.getMessage());
-        }
-    }
-    
-    public void handleRemoveItem() {
-        try {
-            if (currentCart == null || currentCart.isEmpty()) {
-                view.displayErrorMessage("Cart is empty.");
-                return;
-            }
-            
-            view.displayCart(currentCart);
-            String productId = view.getStringInput("Enter product ID to remove: ");
-            if (productId == null || productId.trim().isEmpty()) return;
-            
-            cartController.removeFromCart(currentCart, productId);
-            view.displaySuccessMessage("Item removed.");
-            view.displayCart(currentCart);
-        } catch (Exception e) {
-            view.displayErrorMessage("Failed to remove: " + e.getMessage());
-        }
-    }
-    
-    public void handleUpdateQuantity() {
-        try {
-            if (currentCart == null || currentCart.isEmpty()) {
-                view.displayErrorMessage("Cart is empty.");
-                return;
-            }
-            
-            view.displayCart(currentCart);
-            String productId = view.getStringInput("Enter product ID: ");
-            if (productId == null || productId.trim().isEmpty()) return;
-            
-            int newQuantity = view.getIntInput("Enter new quantity: ");
-            if (newQuantity <= 0) return;
-            
-            cartController.updateCartItemQuantity(currentCart, productId, newQuantity);
-            view.displaySuccessMessage("Quantity updated.");
-            view.displayCart(currentCart);
-        } catch (Exception e) {
-            view.displayErrorMessage("Failed to update: " + e.getMessage());
-        }
-    }
-    
-    public void handleClearCart() {
-        try {
-            if (currentCart == null) {
-                view.displayErrorMessage("No cart to clear.");
-                return;
-            }
-            
-            cartController.clearCart(currentCart);
-            view.displaySuccessMessage("Cart cleared.");
-        } catch (Exception e) {
-            view.displayErrorMessage("Error: " + e.getMessage());
-        }
-    }
-    
-    public void handleCheckout() {
-        try {
-            if (currentCart == null || currentCart.isEmpty()) {
-                view.displayErrorMessage("Cart is empty.");
-                return;
-            }
-            
-            view.displayCart(currentCart);
-            if (!view.getBooleanInput("Proceed with checkout?")) {
-                return;
-            }
-            
-            Customer customer = currentCart.getCustomer();
-            int pointsToRedeem = 0;
-            
-            if (customer.hasMembershipCard() && customer.getMembershipCard().getPoints() > 0) {
-                int available = customer.getMembershipCard().getPoints();
-                view.displayInfoMessage("Available points: " + available);
-                pointsToRedeem = view.getIntInput("Points to redeem (0 for none): ");
-                if (pointsToRedeem < 0 || pointsToRedeem > available) {
-                    pointsToRedeem = 0;
+            if (ensureCartExists()) {
+                view.displayProducts(ProductDTO.fromModelList(productController.getAllProducts()));
+                String productId = view.getStringInput("Enter product ID: ");
+
+                if (productId != null && !productId.trim().isEmpty()) {
+                    addItemToCart(productId);
                 }
             }
-            
-            double total = currentCart.getSubtotal() * 1.12; // VAT
-            if (customer.isSeniorCitizen()) {
-                total *= 0.8; // 20% senior discount
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "adding item");
+        } catch (Exception e) {
+            handleGenericException(e, "adding item to cart", "Failed to add item. Please try again.");
+        }
+    }
+
+    public void handleRemoveItem() {
+        try {
+            if (ensureCartNotEmpty()) {
+                view.displayCart(CartDTO.fromModel(currentCart));
+                String productId = view.getStringInput("Enter product ID to remove: ");
+
+                if (productId != null && !productId.trim().isEmpty()) {
+                    removeItemFromCart(productId);
+                }
             }
-            total -= pointsToRedeem;
-            
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "removing item");
+        } catch (Exception e) {
+            handleGenericException(e, "removing item from cart", "Failed to remove item. Please try again.");
+        }
+    }
+
+    public void handleUpdateQuantity() {
+        try {
+            if (ensureCartNotEmpty()) {
+                view.displayCart(CartDTO.fromModel(currentCart));
+                String productId = view.getStringInput("Enter product ID: ");
+
+                if (productId != null && !productId.trim().isEmpty()) {
+                    updateItemQuantity(productId);
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "updating quantity");
+        } catch (Exception e) {
+            handleGenericException(e, "updating quantity", "Failed to update quantity. Please try again.");
+        }
+    }
+
+    public void handleClearCart() {
+        try {
+            if (ensureCartExists()) {
+                cartController.clearCart(currentCart);
+                view.displaySuccessMessage("Cart cleared.");
+            }
+        } catch (Exception e) {
+            handleGenericException(e, "clearing cart", "Failed to clear cart. Please try again.");
+        }
+    }
+
+    public void handleCheckout() {
+        try {
+            if (ensureCartNotEmpty()) {
+                processCheckout();
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "during checkout");
+        } catch (Exception e) {
+            System.err.println("Fatal error during checkout: " + e.getMessage());
+            view.displayErrorMessage("Critical error during checkout. Transaction aborted.");
+        }
+    }
+
+    public void handleAddItem(ProductDTO product, int quantity) {
+        try {
+            if (ensureCartExists()) {
+                addProductToCart(product, quantity);
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "adding item");
+        } catch (Exception e) {
+            handleGenericException(e, "adding item to cart", "Failed to add item. Please try again.");
+        }
+    }
+
+    public void loadAvailableProducts() {
+        try {
+            List<Product> allProducts = productController.getAllProducts();
+
+            if (allProducts != null && !allProducts.isEmpty()) {
+                displayProductList(allProducts);
+            } else {
+                view.displayProducts(null);
+            }
+        } catch (Exception e) {
+            handleGenericException(e, "loading products", "Failed to load products. Please try again.");
+        }
+    }
+
+    // ==================== PRIVATE HELPER METHODS ====================
+
+    private void createCartForCustomer(String customerId) {
+        Optional<Customer> customer = customerController.getCustomerById(customerId);
+
+        if (customer.isPresent()) {
+            currentCart = cartController.createCart(customer.get());
+            view.displaySuccessMessage("Cart created for " + customer.get().getName());
+        } else {
+            view.displayErrorMessage("Customer not found.");
+        }
+    }
+
+    private void addItemToCart(String productId) {
+        int quantity = view.getIntInput("Enter quantity: ");
+
+        if (quantity > 0) {
+            cartController.addToCart(currentCart, productId, quantity);
+            view.displaySuccessMessage("Item added.");
+            view.displayCart(CartDTO.fromModel(currentCart));
+        }
+    }
+
+    private void removeItemFromCart(String productId) {
+        cartController.removeFromCart(currentCart, productId);
+        view.displaySuccessMessage("Item removed.");
+        view.displayCart(CartDTO.fromModel(currentCart));
+    }
+
+    private void updateItemQuantity(String productId) {
+        int newQuantity = view.getIntInput("Enter new quantity: ");
+
+        if (newQuantity > 0) {
+            cartController.updateCartItemQuantity(currentCart, productId, newQuantity);
+            view.displaySuccessMessage("Quantity updated.");
+            view.displayCart(CartDTO.fromModel(currentCart));
+        }
+    }
+
+    private void processCheckout() {
+        boolean inventoryValid = true;
+
+        try {
+            cartService.validateInventoryAvailable(currentCart);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Stock validation failed: " + e.getMessage());
+            view.displayErrorMessage("Stock validation failed: " + e.getMessage());
+            inventoryValid = false;
+        }
+
+        if (inventoryValid) {
+            view.displayCart(CartDTO.fromModel(currentCart));
+
+            if (view.getBooleanInput("Proceed with checkout?")) {
+                completeCheckout();
+            }
+        }
+    }
+
+    private void completeCheckout() {
+        Customer customer = currentCart.getCustomer();
+        boolean pointsValid = true;
+        int pointsToRedeem = 0;
+
+        try {
+            pointsToRedeem = handlePointsRedemption(customer);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Points error: " + e.getMessage());
+            view.displayErrorMessage("Points error: " + e.getMessage());
+            pointsValid = false;
+        }
+
+        if (pointsValid) {
+            processPaymentAndFinalize(customer, pointsToRedeem);
+        }
+    }
+
+    private void processPaymentAndFinalize(Customer customer, int pointsToRedeem) {
+        try {
+            double total = cartService.calculateTotal(currentCart, customer);
             double payment = view.getDoubleInput("Enter payment amount: ");
-            if (payment < total) {
+
+            if (payment >= total) {
+                finalizeTransaction(payment, pointsToRedeem);
+            } else {
                 view.displayErrorMessage("Insufficient payment.");
-                return;
             }
-            
-            Transaction transaction = transactionController.processTransaction(currentCart, payment, pointsToRedeem);
-            String receipt = transactionController.generateReceipt(transaction);
-            view.displayReceipt(receipt);
-            
+
+        } catch (IllegalArgumentException e) {
+            System.err.println("Calculation error: " + e.getMessage());
+            view.displayErrorMessage("Calculation error: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Unexpected error during checkout: " + e.getMessage());
+            view.displayErrorMessage("Checkout failed. Please try again.");
+        }
+    }
+
+    private void finalizeTransaction(double payment, int pointsToRedeem) {
+        Transaction transaction = transactionController.processTransaction(currentCart, payment, pointsToRedeem);
+        String receipt = transactionController.generateReceipt(transaction);
+        view.displayReceipt(receipt);
+
+        saveReceiptFile(transaction);
+        refreshProductDisplay();
+
+        currentCart = null;
+    }
+
+    private void saveReceiptFile(Transaction transaction) {
+        try {
             String receiptPath = FileUtil.ensureReceiptsDirectory() + "/receipt_" + transaction.getId() + ".txt";
             transactionController.saveReceiptToFile(transaction, receiptPath);
             view.displaySuccessMessage("Receipt saved. Transaction complete!");
-            
-            currentCart = null;
-        } catch (Exception e) {
-            view.displayErrorMessage("Checkout failed: " + e.getMessage());
+        } catch (Exception receiptError) {
+            System.err.println("Warning: Failed to save receipt file: " + receiptError.getMessage());
+            view.displaySuccessMessage("Transaction complete! (Receipt file save failed)");
         }
+    }
+
+    private void refreshProductDisplay() {
+        List<ProductDTO> updatedProducts = productController.getAllProducts().stream()
+                .map(ProductDTO::fromModel).collect(Collectors.toList());
+        view.displayProducts(updatedProducts);
+    }
+
+    private void addProductToCart(ProductDTO product, int quantity) {
+        String errorMessage = validateProductAndQuantity(product, quantity);
+
+        if (errorMessage == null) {
+            Optional<Product> optionalProduct = productController.getProductById(product.getId());
+
+            if (optionalProduct.isPresent()) {
+                addValidatedProduct(optionalProduct.get(), quantity);
+            } else {
+                view.displayErrorMessage("Product not found in inventory.");
+            }
+        } else {
+            view.displayErrorMessage(errorMessage);
+        }
+    }
+
+    private String validateProductAndQuantity(ProductDTO product, int quantity) {
+        if (product == null) {
+            return "Invalid product selected.";
+        }
+        if (quantity <= 0) {
+            return "Quantity must be greater than 0.";
+        }
+        return null;
+    }
+
+    private void addValidatedProduct(Product product, int quantity) {
+        cartController.addToCart(currentCart, product.getId(), quantity);
+        view.displaySuccessMessage("Item added to cart!");
+        view.displayCart(CartDTO.fromModel(currentCart));
+    }
+
+    private void displayProductList(List<Product> products) {
+        List<ProductDTO> productDTOs = products.stream()
+                .map(ProductDTO::fromModel).collect(Collectors.toList());
+        view.displayProducts(productDTOs);
+    }
+
+    // ==================== VALIDATION & UTILITY METHODS ====================
+
+    private int handlePointsRedemption(Customer customer) {
+        if (!customer.hasMembershipCard() || customer.getMembershipCard().getPoints() <= 0) {
+            return 0;
+        }
+
+        MembershipCard card = customer.getMembershipCard();
+        int availablePoints = card.getPoints();
+
+        view.displayInfoMessage("Available points: " + availablePoints + "\n(1 point = ₱1 discount)");
+
+        if (!view.getBooleanInput("Do you want to redeem points for discount?")) {
+            return 0;
+        }
+
+        int pointsToRedeem = view.getIntInput("Enter points to redeem (0 to skip, max " + availablePoints + "): ");
+
+        if (pointsToRedeem < 0 || pointsToRedeem > availablePoints) {
+            throw new IllegalArgumentException("Invalid points amount: " + pointsToRedeem);
+        }
+
+        return pointsToRedeem;
+    }
+
+    private boolean ensureCartExists() {
+        if (currentCart == null) {
+            view.displayErrorMessage("No active cart. Create one first.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean ensureCartNotEmpty() {
+        if (currentCart == null || currentCart.isEmpty()) {
+            view.displayErrorMessage("Cart is empty.");
+            return false;
+        }
+        return true;
+    }
+
+    // ==================== ERROR HANDLING HELPERS ====================
+
+    private void handleArgumentException(IllegalArgumentException e, String context) {
+        System.err.println("Invalid argument " + context + ": " +
+                (e.getMessage() != null ? e.getMessage() : "Unknown"));
+        view.displayErrorMessage("Invalid input: " +
+                (e.getMessage() != null ? e.getMessage() : "Unknown error"));
+    }
+
+    private void handleGenericException(Exception e, String context, String userMessage) {
+        System.err.println("Error " + context + ": " + e.getMessage());
+        view.displayErrorMessage(userMessage);
     }
 }

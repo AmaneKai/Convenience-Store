@@ -1,154 +1,353 @@
 package com.konbini.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.konbini.dto.CustomerDTO;
 import com.konbini.model.Customer;
+import com.konbini.service.CustomerService;
 import com.konbini.view.StoreView;
 
-/**
- * Controller for customer management operations.
- * FULLY EVENT-DRIVEN - each method is a single action called directly by GUI buttons.
- * No menu loops, no blocking operations.
- */
 public class CustomerManagementController {
     private final StoreView view;
     private final CustomerController customerController;
+    private final CustomerService customerService;
 
-    public CustomerManagementController(StoreView view, CustomerController customerController) {
+    public CustomerManagementController(
+            StoreView view,
+            CustomerController customerController,
+            CustomerService customerService) {
+        if (view == null || customerController == null || customerService == null) {
+            throw new IllegalArgumentException("All dependencies must be provided");
+        }
         this.view = view;
         this.customerController = customerController;
+        this.customerService = customerService;
     }
 
-    // ==================== Single-Action Methods ====================
-    // Each method is called directly by a button - no loops!
+    // ==================== PUBLIC HANDLERS ====================
 
     public void handleViewAllCustomers() {
         try {
-            view.displayCustomers(customerController.getAllCustomers());
+            List<Customer> customers = customerController.getAllCustomers();
+            displayCustomerList(customers);
         } catch (Exception e) {
-            view.displayErrorMessage("Failed to view customers: " + e.getMessage());
+            handleGenericException(e, "loading customers", "Failed to load customers. Please try again.");
         }
     }
 
     public void handleViewCustomerDetails() {
         try {
-            view.displayCustomers(customerController.getAllCustomers());
-            String customerId = view.getStringInput("Enter customer ID: ");
-            if (customerId == null || customerId.trim().isEmpty()) return;
-            
-            Optional<Customer> customer = customerController.getCustomerById(customerId);
-            if (customer.isPresent()) {
-                view.displayCustomer(customer.get());
-            } else {
-                view.displayErrorMessage("Customer not found.");
-            }
+            Optional<String> customerId = promptForCustomerId("view details");
+            customerId.ifPresent(this::showCustomerDetails);
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "viewing customer details");
         } catch (Exception e) {
-            view.displayErrorMessage("Failed to view customer: " + e.getMessage());
+            handleGenericException(e, "viewing customer details", "Failed to view customer details. Please try again.");
         }
     }
 
     public void handleRegisterCustomer() {
         try {
             String name = view.getStringInput("Enter customer name: ");
-            if (name == null || name.trim().isEmpty()) return;
-            
-            boolean isSeniorCitizen = view.getBooleanInput("Is senior citizen?");
-            customerController.registerCustomer(name, isSeniorCitizen);
-            view.displaySuccessMessage("Customer registered successfully.");
+
+            if (name != null && !name.trim().isEmpty()) {
+                registerNewCustomer(name.trim());
+            } else {
+                view.displayErrorMessage("Customer name cannot be empty.");
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "registering customer");
         } catch (Exception e) {
-            view.displayErrorMessage("Failed to register customer: " + e.getMessage());
+            handleGenericException(e, "registering customer", "Failed to register customer. Please try again.");
         }
     }
 
     public void handleRegisterWithMembership() {
         try {
             String name = view.getStringInput("Enter customer name: ");
-            if (name == null || name.trim().isEmpty()) return;
-            
-            boolean isSeniorCitizen = view.getBooleanInput("Is senior citizen?");
-            String cardNumber = view.getStringInput("Enter card number: ");
-            if (cardNumber == null || cardNumber.trim().isEmpty()) return;
-            
-            LocalDate expiryDate = view.getDateInput("Enter expiry date (YYYY-MM-DD): ");
-            if (expiryDate == null) return;
 
-            customerController.registerCustomerWithMembershipCard(name, isSeniorCitizen, cardNumber, expiryDate);
-            view.displaySuccessMessage("Customer registered with membership card.");
+            if (name != null && !name.trim().isEmpty()) {
+                registerCustomerWithCard(name.trim());
+            } else {
+                view.displayErrorMessage("Customer name cannot be empty.");
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "registering customer with membership");
         } catch (Exception e) {
-            view.displayErrorMessage("Failed: " + e.getMessage());
+            handleGenericException(e, "registering customer with membership", "Failed to register customer with membership. Please try again.");
         }
     }
 
     public void handleUpdateCustomer() {
         try {
-            view.displayCustomers(customerController.getAllCustomers());
-            String customerId = view.getStringInput("Enter customer ID to update: ");
-            if (customerId == null || customerId.trim().isEmpty()) return;
-            
-            Optional<Customer> customer = customerController.getCustomerById(customerId);
-            if (!customer.isPresent()) {
-                view.displayErrorMessage("Customer not found.");
-                return;
-            }
-
-            String name = view.getStringInput("Enter new name (leave empty to keep): ");
-            name = (name == null || name.isEmpty()) ? customer.get().getName() : name;
-            
-            boolean isSeniorCitizen = view.getBooleanInput("Is senior citizen?");
-            
-            customerController.updateCustomer(customerId, name, isSeniorCitizen);
-            view.displaySuccessMessage("Customer updated successfully.");
+            Optional<String> customerId = promptForCustomerId("update");
+            customerId.ifPresent(this::updateExistingCustomer);
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "updating customer");
         } catch (Exception e) {
-            view.displayErrorMessage("Failed to update: " + e.getMessage());
+            handleGenericException(e, "updating customer", "Failed to update customer. Please try again.");
         }
     }
 
     public void handleRemoveCustomer() {
         try {
-            view.displayCustomers(customerController.getAllCustomers());
-            String customerId = view.getStringInput("Enter customer ID to remove: ");
-            if (customerId == null || customerId.trim().isEmpty()) return;
-            
-            if (!view.getBooleanInput("Are you sure?")) {
-                view.displayInfoMessage("Cancelled.");
-                return;
-            }
-
-            customerController.removeCustomer(customerId);
-            view.displaySuccessMessage("Customer removed successfully.");
+            Optional<String> customerId = promptForCustomerId("remove");
+            customerId.ifPresent(this::confirmAndRemoveCustomer);
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "removing customer");
         } catch (Exception e) {
-            view.displayErrorMessage("Failed to remove: " + e.getMessage());
+            handleGenericException(e, "removing customer", "Failed to remove customer. Please try again.");
         }
     }
 
     public void handleAddMembershipCard() {
         try {
-            view.displayCustomers(customerController.getAllCustomers());
-            String customerId = view.getStringInput("Enter customer ID: ");
-            if (customerId == null || customerId.trim().isEmpty()) return;
-            
-            Optional<Customer> customer = customerController.getCustomerById(customerId);
-            if (!customer.isPresent()) {
-                view.displayErrorMessage("Customer not found.");
-                return;
-            }
-
-            if (customer.get().hasMembershipCard()) {
-                view.displayErrorMessage("Customer already has a membership card.");
-                return;
-            }
-
-            String cardNumber = view.getStringInput("Enter card number: ");
-            if (cardNumber == null || cardNumber.trim().isEmpty()) return;
-            
-            LocalDate expiryDate = view.getDateInput("Enter expiry date (YYYY-MM-DD): ");
-            if (expiryDate == null) return;
-
-            customerController.addMembershipCard(customerId, cardNumber, expiryDate);
-            view.displaySuccessMessage("Membership card added successfully.");
+            Optional<String> customerId = promptForCustomerId("add membership card");
+            customerId.ifPresent(this::addMembershipCardToCustomer);
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "adding membership card");
         } catch (Exception e) {
-            view.displayErrorMessage("Failed: " + e.getMessage());
+            handleGenericException(e, "adding membership card", "Failed to add membership card. Please try again.");
         }
+    }
+
+    // ==================== PRIVATE HELPER METHODS ====================
+
+    private void displayCustomerList(List<Customer> customers) {
+        try {
+            List<CustomerDTO> customerDTOs = customers.stream()
+                    .map(CustomerDTO::fromModel)
+                    .collect(Collectors.toList());
+            view.displayCustomers(customerDTOs);
+        } catch (Exception e) {
+            handleGenericException(e, "displaying customer list", "Error displaying customers.");
+        }
+    }
+
+    private void showCustomerDetails(String customerId) {
+        try {
+            customerService.validateCustomerId(customerId);
+            Optional<Customer> customer = customerController.getCustomerById(customerId);
+
+            if (customer.isPresent()) {
+                view.displayCustomer(CustomerDTO.fromModel(customer.get()));
+            } else {
+                view.displayErrorMessage("Customer not found.");
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "showing customer details");
+        } catch (Exception e) {
+            handleGenericException(e, "showing customer details", "Error displaying customer details.");
+        }
+    }
+
+    private void registerNewCustomer(String name) {
+        try {
+            customerService.validateCustomerName(name);
+            boolean isSeniorCitizen = view.getBooleanInput("Is senior citizen?");
+
+            customerController.registerCustomer(name, isSeniorCitizen);
+            view.displaySuccessMessage("Customer registered successfully.");
+
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "registering new customer");
+        } catch (Exception e) {
+            handleGenericException(e, "registering new customer", "Failed to complete customer registration.");
+        }
+    }
+
+    private void registerCustomerWithCard(String name) {
+        boolean shouldProceed = true;
+        String operation = "registering customer with membership card";
+
+        try {
+            // Input validation phase
+            if (shouldProceed && (name == null || name.trim().isEmpty())) {
+                view.displayErrorMessage("Customer name cannot be empty.");
+                shouldProceed = false;
+            }
+
+            if (shouldProceed) {
+                customerService.validateCustomerName(name);
+            }
+
+            // Data collection phase
+            boolean isSeniorCitizen = false;
+            String cardNumber = "";
+            LocalDate expiryDate = null;
+
+            if (shouldProceed) {
+                isSeniorCitizen = view.getBooleanInput("Is senior citizen?");
+                cardNumber = view.getStringInput("Enter card number: ").trim();
+
+                if (cardNumber.isEmpty()) {
+                    view.displayErrorMessage("Card number cannot be empty.");
+                    shouldProceed = false;
+                }
+            }
+
+            if (shouldProceed) {
+                expiryDate = view.getDateInput("Enter expiry date (YYYY-MM-DD): ");
+
+                if (expiryDate == null) {
+                    view.displayErrorMessage("Expiry date is required.");
+                    shouldProceed = false;
+                }
+            }
+
+            // Final execution phase
+            if (shouldProceed) {
+                customerController.registerCustomerWithMembershipCard(name, isSeniorCitizen, cardNumber, expiryDate);
+                view.displaySuccessMessage("Customer registered with membership card.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, operation);
+        } catch (Exception e) {
+            handleGenericException(e, operation, "Failed to complete registration with membership card.");
+        }
+    }
+
+    private void updateExistingCustomer(String customerId) {
+        try {
+            customerService.validateCustomerId(customerId);
+            Optional<Customer> customer = customerController.getCustomerById(customerId);
+
+            if (customer.isPresent()) {
+                String name = view.getStringInput("Enter new name (leave empty to keep current): ");
+                name = (name == null || name.trim().isEmpty()) ? customer.get().getName() : name.trim();
+
+                boolean isSeniorCitizen = view.getBooleanInput("Is senior citizen?");
+
+                customerController.updateCustomer(customerId, name, isSeniorCitizen);
+                view.displaySuccessMessage("Customer updated successfully.");
+            } else {
+                view.displayErrorMessage("Customer not found.");
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "updating existing customer");
+        } catch (Exception e) {
+            handleGenericException(e, "updating existing customer", "Failed to update customer.");
+        }
+    }
+
+    private void confirmAndRemoveCustomer(String customerId) {
+        try {
+            customerService.validateCustomerId(customerId);
+
+            if (view.getBooleanInput("Are you sure you want to remove this customer?")) {
+                customerController.removeCustomer(customerId);
+                view.displaySuccessMessage("Customer removed successfully.");
+            } else {
+                view.displayInfoMessage("Operation cancelled.");
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "removing customer");
+        } catch (Exception e) {
+            handleGenericException(e, "removing customer", "Failed to remove customer.");
+        }
+    }
+
+    private void addMembershipCardToCustomer(String customerId) {
+        try {
+            customerService.validateCustomerId(customerId);
+            Optional<Customer> customer = customerController.getCustomerById(customerId);
+
+            if (customer.isPresent()) {
+                if (customer.get().hasMembershipCard()) {
+                    view.displayErrorMessage("Customer already has a membership card.");
+                } else {
+                    promptAndAddMembershipCard(customerId);
+                }
+            } else {
+                view.displayErrorMessage("Customer not found.");
+            }
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, "adding membership card to customer");
+        } catch (Exception e) {
+            handleGenericException(e, "adding membership card to customer", "Failed to add membership card.");
+        }
+    }
+
+    private void promptAndAddMembershipCard(String customerId) {
+        boolean shouldProceed = true;
+        String operation = "prompting for membership card details";
+
+        try {
+            String cardNumber = view.getStringInput("Enter card number: ");
+            LocalDate expiryDate = null;
+
+            // Validate card number
+            if (cardNumber == null || cardNumber.trim().isEmpty()) {
+                view.displayErrorMessage("Card number cannot be empty.");
+                shouldProceed = false;
+            }
+
+            String trimmedCardNumber = cardNumber != null ? cardNumber.trim() : "";
+
+            // Only proceed to get expiry date if card number is valid
+            if (shouldProceed) {
+                expiryDate = view.getDateInput("Enter expiry date (YYYY-MM-DD): ");
+
+                if (expiryDate == null) {
+                    view.displayErrorMessage("Expiry date is required.");
+                    shouldProceed = false;
+                }
+            }
+
+            // Only execute the final operation if all validations passed
+            if (shouldProceed) {
+                customerController.addMembershipCard(customerId, trimmedCardNumber, expiryDate);
+                view.displaySuccessMessage("Membership card added successfully.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            handleArgumentException(e, operation);
+        } catch (Exception e) {
+            handleGenericException(e, operation, "Failed to process membership card information.");
+        }
+    }
+
+    // ==================== VALIDATION & UTILITY METHODS ====================
+
+    private Optional<String> promptForCustomerId(String operation) {
+        try {
+            List<Customer> customers = customerController.getAllCustomers();
+
+            if (customers.isEmpty()) {
+                view.displayInfoMessage("No customers available.");
+                return Optional.empty();
+            }
+
+            displayCustomerList(customers);
+            String customerId = view.getStringInput("Enter customer ID: ");
+
+            if (customerId != null && !customerId.trim().isEmpty()) {
+                return Optional.of(customerId.trim());
+            } else {
+                view.displayInfoMessage("No customer ID provided for " + operation + ".");
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            handleGenericException(e, "prompting for customer ID", "Failed to load customer list.");
+            return Optional.empty();
+        }
+    }
+
+    // ==================== ERROR HANDLING HELPERS ====================
+
+    private void handleArgumentException(IllegalArgumentException e, String context) {
+        System.err.println("Invalid argument " + context + ": " +
+                (e.getMessage() != null ? e.getMessage() : "Unknown"));
+        view.displayErrorMessage("Invalid input: " +
+                (e.getMessage() != null ? e.getMessage() : "Please check your input and try again."));
+    }
+
+    private void handleGenericException(Exception e, String context, String userMessage) {
+        System.err.println("Error " + context + ": " + e.getMessage());
+        view.displayErrorMessage(userMessage);
     }
 }

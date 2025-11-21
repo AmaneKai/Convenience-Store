@@ -3,35 +3,12 @@ package com.konbini.model;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * Utility class responsible for formatting and generating a printable text receipt
- * based on a completed Transaction.
- * It pulls all necessary details from the Transaction object, including items,
- * financial totals, customer information, and loyalty points summary.
- */
 public class Receipt {
-    /**
-     * The completed transaction record used to generate the receipt.
-     */
-    private final Transaction transaction;
 
-    /**
-     * Constructs a Receipt generator using a specific Transaction.
-     *
-     * @param transaction The Transaction object containing all purchase details.
-     */
+    private final Transaction transaction;
     public Receipt(Transaction transaction) {
         this.transaction = transaction;
     }
-
-    /**
-     * Generates a formatted multi-line String representing the sales receipt.
-     * The receipt includes store branding, transaction ID, date, customer name,
-     * itemized list, financial summary (subtotal, tax, discount, total, paid, change),
-     * and loyalty points activity if applicable.
-     *
-     * @return A formatted String suitable for console output or printing.
-     */
     public String generateReceiptText() {
         StringBuilder receipt = new StringBuilder();
 
