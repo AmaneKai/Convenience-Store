@@ -56,10 +56,13 @@ public class FileCustomerRepository implements CustomerRepository {
 
     @Override
     public Optional<Customer> findById(String customerId) {
-        if (customerId == null || customerId.trim().isEmpty()) {
-            return Optional.empty();
+        Optional<Customer> temp = Optional.empty();
+
+        if (customerId != null && !customerId.trim().isEmpty()) {
+            temp = Optional.ofNullable(customers.get(customerId));
         }
-        return Optional.ofNullable(customers.get(customerId));
+
+        return temp;
     }
 
     @Override
@@ -69,63 +72,66 @@ public class FileCustomerRepository implements CustomerRepository {
 
     @Override
     public Optional<Customer> findByMembershipCard(String cardNumber) {
-        if (cardNumber == null || cardNumber.trim().isEmpty()) {
-            return Optional.empty();
+        Optional<Customer> temp = Optional.empty();
+
+        if (cardNumber != null && !cardNumber.trim().isEmpty()) {
+            temp = customers.values().stream()
+                    .filter(customer -> customer.hasMembershipCard() &&
+                            customer.getMembershipCard().getCardNumber().equals(cardNumber))
+                    .findFirst();
         }
-        return customers.values().stream()
-                .filter(customer -> customer.hasMembershipCard() &&
-                        customer.getMembershipCard().getCardNumber().equals(cardNumber))
-                .findFirst();
+
+        return temp;
     }
 
     @Override
     public boolean save() {
+        boolean temp = false;
+
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(new ArrayList<>(customers.values()));
-            return true;
+            temp = true;
         } catch (IOException e) {
             System.err.println("Error saving customer data to file: " + filePath);
             System.err.println("Reason: " + e.getMessage());
-            return false;
         }
+
+        return temp;
     }
 
     @Override
     public boolean load() {
+        boolean temp = false;
         File file = new File(filePath);
 
-        if (!file.exists()) {
-            return false; 
-        }
+        if (file.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                @SuppressWarnings("unchecked")
+                List<Customer> loadedCustomers = (List<Customer>) ois.readObject();
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            @SuppressWarnings("unchecked")
-            List<Customer> loadedCustomers = (List<Customer>) ois.readObject();
-            
-            if (loadedCustomers == null) {
-                customers.clear();
-                return false;
-            }
-
-            customers.clear();
-            loadedCustomers.forEach(customer -> {
-                if (customer != null) {
-                    customers.put(customer.getId(), customer);
+                if (loadedCustomers != null) {
+                    customers.clear();
+                    loadedCustomers.forEach(customer -> {
+                        if (customer != null) {
+                            customers.put(customer.getId(), customer);
+                        }
+                    });
+                    temp = true;
+                } else {
+                    customers.clear();
                 }
-            });
-            return true;
-        } catch (IOException e) {
-            System.err.println("Error reading customer data from file: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
-        } catch (ClassNotFoundException e) {
-            System.err.println("Customer class definition mismatch: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
-        } catch (Exception e) {
-            System.err.println("Unexpected error loading customer data: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
+            } catch (IOException e) {
+                System.err.println("Error reading customer data from file: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                System.err.println("Customer class definition mismatch: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println("Unexpected error loading customer data: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            }
         }
+
+        return temp;
     }
 }

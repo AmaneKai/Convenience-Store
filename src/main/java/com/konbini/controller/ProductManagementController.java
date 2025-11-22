@@ -171,16 +171,18 @@ public class ProductManagementController {
     }
 
     public List<ProductDTO> getAllProductsDTO() {
+        List<ProductDTO> temp = new java.util.ArrayList<>();
+
         try {
             List<Product> products = productController.getAllProducts();
-            if (products == null || products.isEmpty()) {
-                return new java.util.ArrayList<>();
+            if (products != null && !products.isEmpty()) {
+                temp = ProductDTO.fromModelList(products);
             }
-            return ProductDTO.fromModelList(products);
         } catch (Exception e) {
             handleGenericException(e, "fetching products for DTO", "Error loading product data");
-            return new java.util.ArrayList<>();
         }
+
+        return temp;
     }
 
     // ==================== PRIVATE HELPER METHODS ====================

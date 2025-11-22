@@ -37,14 +37,14 @@ public class TransactionServiceImpl implements TransactionService {
         if (cart.isEmpty()) {
             throw new IllegalArgumentException("Cart is empty");
         }
-        
+
         validateCartInventory(cart);
-        
+
         Transaction.Builder transactionBuilder = new Transaction.Builder(cart.getCustomer(), cart)
-            .withTaxStrategy(new VATTaxStrategy());
-        
+                .withTaxStrategy(new VATTaxStrategy());
+
         transactionBuilder.addDiscountStrategy(new SeniorDiscountStrategy());
-        
+
         if (pointsToRedeem > 0) {
             PointsRedemptionStrategy pointsStrategy = new PointsRedemptionStrategy(pointsToRedeem);
             if (pointsStrategy.isApplicable(cart.getCustomer())) {
@@ -52,14 +52,14 @@ public class TransactionServiceImpl implements TransactionService {
                 transactionBuilder.withPointsRedeemed(pointsToRedeem);
             }
         }
-        
+
         transactionBuilder.withPointsEarned();
-        
+
         transactionBuilder.withPayment(paymentAmount);
-        
+
         Transaction transaction = transactionBuilder.build();
         transactionRepository.addTransaction(transaction);
-        
+
         return transaction;
     }
 
@@ -74,26 +74,33 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public boolean saveReceiptToFile(Transaction transaction, String filePath) throws IOException {
-        if (transaction == null) {
-            throw new IllegalArgumentException("Transaction cannot be null");
-        }
-        if (filePath == null || filePath.trim().isEmpty()) {
+        boolean temp = false;
+
+        if (transaction != null && filePath != null && !filePath.trim().isEmpty()) {
+            String receiptText = generateReceipt(transaction);
+            try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+                writer.print(receiptText);
+                temp = true;
+            }
+        } else {
+            if (transaction == null) {
+                throw new IllegalArgumentException("Transaction cannot be null");
+            }
             throw new IllegalArgumentException("File path cannot be null or empty");
         }
-        
-        String receiptText = generateReceipt(transaction);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
-            writer.print(receiptText);
-            return true;
-        }
+
+        return temp;
     }
 
     @Override
     public Optional<Transaction> findById(String transactionId) {
-        if (transactionId == null || transactionId.trim().isEmpty()) {
-            return Optional.empty();
+        Optional<Transaction> temp = Optional.empty();
+
+        if (transactionId != null && !transactionId.trim().isEmpty()) {
+            temp = transactionRepository.findById(transactionId);
         }
-        return transactionRepository.findById(transactionId);
+
+        return temp;
     }
 
     @Override
@@ -103,26 +110,41 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<Transaction> findByCustomerId(String customerId) {
-        if (customerId == null || customerId.trim().isEmpty()) {
-            return transactionRepository.findAll();
+        List<Transaction> temp;
+
+        if (customerId != null && !customerId.trim().isEmpty()) {
+            temp = transactionRepository.findByCustomerId(customerId);
+        } else {
+            temp = transactionRepository.findAll();
         }
-        return transactionRepository.findByCustomerId(customerId);
+
+        return temp;
     }
 
     @Override
     public List<Transaction> findByDate(LocalDate date) {
-        if (date == null) {
-            return transactionRepository.findAll();
+        List<Transaction> temp;
+
+        if (date != null) {
+            temp = transactionRepository.findByDate(date);
+        } else {
+            temp = transactionRepository.findAll();
         }
-        return transactionRepository.findByDate(date);
+
+        return temp;
     }
 
     @Override
     public List<Transaction> findByDateRange(LocalDate startDate, LocalDate endDate) {
-        if (startDate == null || endDate == null) {
-            return transactionRepository.findAll();
+        List<Transaction> temp;
+
+        if (startDate != null && endDate != null) {
+            temp = transactionRepository.findByDateRange(startDate, endDate);
+        } else {
+            temp = transactionRepository.findAll();
         }
-        return transactionRepository.findByDateRange(startDate, endDate);
+
+        return temp;
     }
 
     @Override
@@ -136,27 +158,27 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public double getTotalSalesByDate(LocalDate date) {
-        if (date == null) {
-            return 0.0;
-        }
-        
         double total = 0.0;
-        for (Transaction transaction : transactionRepository.findByDate(date)) {
-            total += transaction.getTotal();
+
+        if (date != null) {
+            for (Transaction transaction : transactionRepository.findByDate(date)) {
+                total += transaction.getTotal();
+            }
         }
+
         return total;
     }
 
     @Override
     public double getTotalSalesByDateRange(LocalDate startDate, LocalDate endDate) {
-        if (startDate == null || endDate == null) {
-            return 0.0;
-        }
-        
         double total = 0.0;
-        for (Transaction transaction : transactionRepository.findByDateRange(startDate, endDate)) {
-            total += transaction.getTotal();
+
+        if (startDate != null && endDate != null) {
+            for (Transaction transaction : transactionRepository.findByDateRange(startDate, endDate)) {
+                total += transaction.getTotal();
+            }
         }
+
         return total;
     }
 
@@ -170,21 +192,21 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.load();
     }
 
-   private void validateCartInventory(Cart cart) {
+    private void validateCartInventory(Cart cart) {
         for (CartItem item : cart.getItems()) {
             Product product = item.getProduct();
-            
+
             if (product == null) {
                 throw new IllegalArgumentException("Cart contains null product");
             }
-            
+
             if (product.getQuantity() < item.getQuantity()) {
                 throw new IllegalArgumentException(
-                    "Insufficient quantity for product: " + product.getName() + 
-                    ". Available: " + product.getQuantity() + 
-                    ", Requested: " + item.getQuantity());
+                        "Insufficient quantity for product: " + product.getName() +
+                                ". Available: " + product.getQuantity() +
+                                ", Requested: " + item.getQuantity());
             }
-            
+
             if (product.isExpired()) {
                 throw new IllegalArgumentException("Product is expired: " + product.getName());
             }

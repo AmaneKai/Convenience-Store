@@ -26,26 +26,30 @@ public class IdGenerator implements Serializable {
     }
 
     private static IdGenerator loadFromFile() {
+        IdGenerator temp;
         File file = new File(ID_FILE);
+
         if (file.exists()) {
             try (ObjectInputStream ois = new ObjectInputStream
-                (new FileInputStream(file))) {
-                return (IdGenerator) ois.readObject();
+                    (new FileInputStream(file))) {
+                temp = (IdGenerator) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Error loading ID generator: "
-                    + e.getMessage());
+                        + e.getMessage());
+                temp = new IdGenerator();
+                temp.save(); // Save the newly created default state
             }
+        } else {
+            temp = new IdGenerator();
+            temp.save(); // Save the newly created default state
         }
-        
-        IdGenerator generator = new IdGenerator();
-        generator.save(); // Save the newly created default state
-        return generator;
-    }
 
+        return temp;
+    }
     public void save() {
         FileUtil.ensureDataDirectory();
         try (ObjectOutputStream oos = new ObjectOutputStream
-            (new FileOutputStream(ID_FILE))) {
+                (new FileOutputStream(ID_FILE))) {
             oos.writeObject(this);
         } catch (IOException e) {
             System.err.println("Error saving ID generator: " + e.getMessage());
@@ -63,6 +67,6 @@ public class IdGenerator implements Serializable {
         counters.put(entityType, counter + 1);
         save();
         return entityType.substring(0, 3).toUpperCase()
-            + String.format("%04d", counter);
+                + String.format("%04d", counter);
     }
 }

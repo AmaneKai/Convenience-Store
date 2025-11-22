@@ -22,9 +22,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void addProduct(String name, double price, int quantity,
-        ProductCategory category, String brand,
-        ProductSubcategory subcategory, LocalDate expirationDate) {
-        
+                           ProductCategory category, String brand,
+                           ProductSubcategory subcategory, LocalDate expirationDate) {
+
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Product name cannot be empty");
         }
@@ -59,9 +59,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProduct(String productId, String name, double price,
-        int quantity, ProductCategory category, String brand,
-        ProductSubcategory subcategory, LocalDate expirationDate) {
-        
+                              int quantity, ProductCategory category, String brand,
+                              ProductSubcategory subcategory, LocalDate expirationDate) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
 
@@ -112,17 +112,20 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
-        
+
         product.increaseQuantity(quantity);
         productRepository.updateProduct(product);
     }
 
     @Override
     public Optional<Product> findById(String productId) {
-        if (productId == null || productId.trim().isEmpty()) {
-            return Optional.empty();
+        Optional<Product> temp = Optional.empty();
+
+        if (productId != null && !productId.trim().isEmpty()) {
+            temp = productRepository.findById(productId);
         }
-        return productRepository.findById(productId);
+
+        return temp;
     }
 
     @Override
@@ -132,26 +135,40 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findByCategory(ProductCategory category) {
-        if (category == null) {
-            return productRepository.findAll();
-        }
-        return productRepository.findByCategory(category);
-    }
+        List<Product> temp;
 
+        if (category == null) {
+            temp = productRepository.findAll();
+        } else {
+            temp = productRepository.findByCategory(category);
+        }
+
+        return temp;
+    }
     @Override
     public List<Product> findBySubcategory(ProductSubcategory subcategory) {
+        List<Product> temp;
+
         if (subcategory == null) {
-            return productRepository.findAll();
+            temp = productRepository.findAll();
+        } else {
+            temp = productRepository.findBySubcategory(subcategory);
         }
-        return productRepository.findBySubcategory(subcategory);
+
+        return temp;
     }
 
     @Override
     public List<Product> findByName(String name) {
+        List<Product> temp;
+
         if (name == null || name.trim().isEmpty()) {
-            return productRepository.findAll();
+            temp = productRepository.findAll();
+        } else {
+            temp = productRepository.findByName(name);
         }
-        return productRepository.findByName(name);
+
+        return temp;
     }
 
     @Override

@@ -5,12 +5,13 @@ import java.util.List;
 
 import com.konbini.dto.CartDTO;
 import com.konbini.dto.CustomerDTO;
+import com.konbini.dto.EmployeeDTO;
 import com.konbini.dto.ProductDTO;
 import com.konbini.dto.TransactionDTO;
 import com.konbini.model.ProductCategory;
 import com.konbini.model.ProductSubcategory;
 
-public interface StoreView extends MainView, ProductView, CustomerView, CartView, TransactionView {
+public interface StoreView extends MainView, ProductView, CustomerView, CartView, TransactionView, EmployeeView {
 
     void displayWelcomeMessage();
 
@@ -33,6 +34,10 @@ public interface StoreView extends MainView, ProductView, CustomerView, CartView
     void displayTransactionMenu();
 
     int getTransactionMenuChoice();
+
+    void displayEmployeeMenu();
+
+    int getEmployeeMenuChoice();
 
     void displayProducts(List<ProductDTO> products);
 
@@ -59,6 +64,10 @@ public interface StoreView extends MainView, ProductView, CustomerView, CartView
     void displayTotalSalesByDate(LocalDate date, double totalSales);
 
     void displayTotalSalesByDateRange(LocalDate startDate, LocalDate endDate, double totalSales);
+
+    void displayEmployees(List<EmployeeDTO> employees);
+
+    void displayEmployee(EmployeeDTO employee);
 
     void displayErrorMessage(String message);
 

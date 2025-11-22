@@ -140,60 +140,68 @@ public class DataManagementController {
 
     // ==================== PRIVATE HELPER METHODS ====================
 
+
     private boolean saveProducts() {
+        boolean temp = false;
+
         try {
-            return productController.saveData();
+            temp = productController.saveData();
         } catch (Exception e) {
             System.err.println("Failed to save products: " + e.getMessage());
-            return false;
         }
+
+        return temp;
     }
 
     private boolean saveCustomers() {
+        boolean temp = false;
         try {
-            return customerController.saveData();
+            temp = customerController.saveData();
         } catch (Exception e) {
             System.err.println("Failed to save customers: " + e.getMessage());
-            return false;
         }
+        return temp;
     }
 
     private boolean saveTransactions() {
+        boolean temp = false;
         try {
-            return transactionController.saveData();
+            temp = transactionController.saveData();
         } catch (Exception e) {
             System.err.println("Failed to save transactions: " + e.getMessage());
-            return false;
         }
+        return temp;
     }
 
     private boolean loadProducts() {
+        boolean temp = false;
         try {
-            return productController.loadData();
+            temp = productController.loadData();
         } catch (Exception e) {
             System.err.println("Failed to load products: " + e.getMessage());
-            return false;
         }
+        return temp;
     }
 
     private boolean loadCustomers() {
+        boolean temp = false;
         try {
-            return customerController.loadData();
+            temp = customerController.loadData();
         } catch (Exception e) {
             System.err.println("Failed to load customers: " + e.getMessage());
-            return false;
         }
+        return temp;
     }
 
     private boolean loadTransactions() {
+        boolean temp = false;
         try {
-            return transactionController.loadData();
+            temp = transactionController.loadData();
         } catch (Exception e) {
             System.err.println("Failed to load transactions: " + e.getMessage());
-            return false;
         }
+        return temp;
     }
-
     // ==================== ERROR HANDLING HELPERS ====================
 
     private void handleArgumentException(IllegalArgumentException e, String context) {

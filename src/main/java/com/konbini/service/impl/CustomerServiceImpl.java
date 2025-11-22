@@ -28,8 +28,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void registerCustomerWithMembershipCard(String name,
-        boolean isSeniorCitizen, String cardNumber, LocalDate expiryDate) {
-        
+                                                   boolean isSeniorCitizen, String cardNumber, LocalDate expiryDate) {
+
         validateName(name);
         validateCardNumber(cardNumber);
         validateExpiryDate(expiryDate);
@@ -115,24 +115,30 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         MembershipCard card = customer.getMembershipCard();
-        card.deductPoints(points); 
+        card.deductPoints(points);
         customerRepository.updateCustomer(customer);
     }
 
     @Override
     public Optional<Customer> findById(String customerId) {
-        if (customerId == null || customerId.trim().isEmpty()) {
-            return Optional.empty();
+        Optional<Customer> temp = Optional.empty();
+
+        if (customerId != null && !customerId.trim().isEmpty()) {
+            temp = customerRepository.findById(customerId);
         }
-        return customerRepository.findById(customerId);
+
+        return temp;
     }
 
     @Override
     public Optional<Customer> findByMembershipCard(String cardNumber) {
-        if (cardNumber == null || cardNumber.trim().isEmpty()) {
-            return Optional.empty();
+        Optional<Customer> temp = Optional.empty();
+
+        if (cardNumber != null && !cardNumber.trim().isEmpty()) {
+            temp = customerRepository.findByMembershipCard(cardNumber);
         }
-        return customerRepository.findByMembershipCard(cardNumber);
+
+        return temp;
     }
 
     @Override

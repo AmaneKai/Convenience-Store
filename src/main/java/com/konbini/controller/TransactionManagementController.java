@@ -179,31 +179,32 @@ public class TransactionManagementController {
     }
 
     private Optional<DateRange> promptForDateRange(String operation) {
+        Optional<DateRange> temp = Optional.empty();
+
         try {
             LocalDate startDate = view.getDateInput("Enter start date: ");
+            LocalDate endDate = null;
+
+            if (startDate != null) {
+                endDate = view.getDateInput("Enter end date: ");
+            }
+
             if (startDate == null) {
                 view.displayInfoMessage("Start date required for " + operation + ".");
-                return Optional.empty();
-            }
-
-            LocalDate endDate = view.getDateInput("Enter end date: ");
-            if (endDate == null) {
+            } else if (endDate == null) {
                 view.displayInfoMessage("End date required for " + operation + ".");
-                return Optional.empty();
+            } else {
+                validateDateRange(startDate, endDate);
+                temp = Optional.of(new DateRange(startDate, endDate));
             }
-
-            validateDateRange(startDate, endDate);
-            return Optional.of(new DateRange(startDate, endDate));
-
         } catch (IllegalArgumentException e) {
             handleArgumentException(e, "prompting for date range");
-            return Optional.empty();
         } catch (Exception e) {
             handleGenericException(e, "prompting for date range", "Failed to process date range input.");
-            return Optional.empty();
         }
-    }
 
+        return temp;
+    }
     // ==================== VALIDATION METHODS ====================
 
     private void validateTransactionId(String transactionId) {

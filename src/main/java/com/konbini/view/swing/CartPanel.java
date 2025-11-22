@@ -242,7 +242,11 @@ public class CartPanel extends JPanel {
 
     private void handleCheckout() {
         try {
-            controller.handleCheckout();
+            boolean success = controller.handleCheckout();
+            if (success) {
+                displayCart(null);
+                SwingUtilities.invokeLater(() -> backCallback.run());
+            }
         } catch (Exception e) {
             handleUIException(e, "processing checkout", "Failed to process checkout. Please try again.");
         }
@@ -385,14 +389,15 @@ public class CartPanel extends JPanel {
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
     }
-
     private String getSafeErrorMessage(Exception e) {
-        if (e.getMessage() != null && !e.getMessage().trim().isEmpty()) {
-            return e.getMessage();
-        }
-        return "Please check your input and try again.";
-    }
+        String temp = "Please check your input and try again.";
 
+        if (e.getMessage() != null && !e.getMessage().trim().isEmpty()) {
+            temp = e.getMessage();
+        }
+
+        return temp;
+    }
     private void loadAvailableProducts() {
         try {
             controller.loadAvailableProducts();
@@ -483,28 +488,29 @@ public class CartPanel extends JPanel {
                 customerInfoLabel.setText("No active cart");
                 subtotalLabel.setText("Subtotal: ₱0.00");
                 tableModel.setRowCount(0);
-            }
+            } else {
 
-            StringBuilder customerInfo = new StringBuilder();
-            customerInfo.append("Customer: ").append(cart.getCustomerName());
-            customerInfo.append(" (ID: ").append(cart.getCustomerId()).append(")");
-            if (cart.isCustomerIsSeniorCitizen())
-                customerInfo.append(" [SENIOR]");
-            if (cart.isCustomerHasMembershipCard())
-                customerInfo.append(" [MEMBER: ").append(cart.getCustomerPoints()).append(" pts]");
+                StringBuilder customerInfo = new StringBuilder();
+                customerInfo.append("Customer: ").append(cart.getCustomerName());
+                customerInfo.append(" (ID: ").append(cart.getCustomerId()).append(")");
+                if (cart.isCustomerIsSeniorCitizen())
+                    customerInfo.append(" [SENIOR]");
+                if (cart.isCustomerHasMembershipCard())
+                    customerInfo.append(" [MEMBER: ").append(cart.getCustomerPoints()).append(" pts]");
 
-            customerInfoLabel.setText(customerInfo.toString());
-            subtotalLabel.setText(String.format("Subtotal: ₱%.2f", cart.getSubtotal()));
+                customerInfoLabel.setText(customerInfo.toString());
+                subtotalLabel.setText(String.format("Subtotal: ₱%.2f", cart.getSubtotal()));
 
-            tableModel.setRowCount(0);
-            for (TransactionItemDTO item : cart.getItems()) {
-                tableModel.addRow(new Object[] {
-                        item.getProductId(),
-                        item.getProductName(),
-                        "₱" + String.format("%.2f", item.getUnitPrice()),
-                        item.getQuantity(),
-                        "₱" + String.format("%.2f", item.getTotalPrice())
-                });
+                tableModel.setRowCount(0);
+                for (TransactionItemDTO item : cart.getItems()) {
+                    tableModel.addRow(new Object[]{
+                            item.getProductId(),
+                            item.getProductName(),
+                            "₱" + String.format("%.2f", item.getUnitPrice()),
+                            item.getQuantity(),
+                            "₱" + String.format("%.2f", item.getTotalPrice())
+                    });
+                }
             }
         } catch (Exception e) {
             handleUIException(e, "displaying cart", "Failed to display cart information.");

@@ -44,15 +44,16 @@ public class CustomerDTO {
     }
 
     public static List<CustomerDTO> fromModelList(List<Customer> customers) {
-        if (customers == null) {
-            return new ArrayList<>();
-        }
         List<CustomerDTO> dtos = new ArrayList<>();
-        for (Customer customer : customers) {
-            if (customer != null) {
-                dtos.add(fromModel(customer));
+
+        if (customers != null) {
+            for (Customer customer : customers) {
+                if (customer != null) {
+                    dtos.add(fromModel(customer));
+                }
             }
         }
+
         return dtos;
     }
 
@@ -135,12 +136,14 @@ public class CustomerDTO {
     }
 
     public String getCardId() {
-        if (hasMembershipCard && cardNumber != null) {
-            return cardNumber;
-        }
-        return null;
-    }
+        String temp = null;
 
+        if (hasMembershipCard && cardNumber != null) {
+            temp = cardNumber;
+        }
+
+        return temp;
+    }
     @Override
     public String toString() {
         return "CustomerDTO{" +

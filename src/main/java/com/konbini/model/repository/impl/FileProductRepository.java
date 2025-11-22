@@ -59,10 +59,13 @@ public class FileProductRepository implements ProductRepository {
 
     @Override
     public Optional<Product> findById(String productId) {
-        if (productId == null || productId.trim().isEmpty()) {
-            return Optional.empty();
+        Optional<Product> temp = Optional.empty();
+
+        if (productId != null && !productId.trim().isEmpty()) {
+            temp = Optional.ofNullable(products.get(productId));
         }
-        return Optional.ofNullable(products.get(productId));
+
+        return temp;
     }
 
     @Override
@@ -72,35 +75,43 @@ public class FileProductRepository implements ProductRepository {
 
     @Override
     public List<Product> findByCategory(ProductCategory category) {
-        if (category == null) {
-            return new ArrayList<>();
-        }
-        return products.values().stream()
-                .filter(product -> product.getCategory().equals(category.getDisplayName()))
-                .collect(Collectors.toList());
-    }
+        List<Product> temp = new ArrayList<>();
 
+        if (category != null) {
+            temp = products.values().stream()
+                    .filter(product -> product.getCategory().equals(category.getDisplayName()))
+                    .collect(Collectors.toList());
+        }
+
+        return temp;
+    }
     @Override
     public List<Product> findBySubcategory(ProductSubcategory subcategory) {
-        if (subcategory == null) {
-            return new ArrayList<>();
+        List<Product> temp = new ArrayList<>();
+
+        if (subcategory != null) {
+            String subcategoryStr = subcategory.getDisplayName();
+            temp = products.values().stream()
+                    .filter(product -> product.getVariant() != null &&
+                            product.getVariant().equals(subcategoryStr))
+                    .collect(Collectors.toList());
         }
-        String subcategoryStr = subcategory.getDisplayName();
-        return products.values().stream()
-                .filter(product -> product.getVariant() != null && 
-                        product.getVariant().equals(subcategoryStr))
-                .collect(Collectors.toList());
+
+        return temp;
     }
 
     @Override
     public List<Product> findByName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            return new ArrayList<>();
+        List<Product> temp = new ArrayList<>();
+
+        if (name != null && !name.trim().isEmpty()) {
+            temp = products.values().stream()
+                    .filter(product -> product.getName().toLowerCase()
+                            .contains(name.toLowerCase()))
+                    .collect(Collectors.toList());
         }
-        return products.values().stream()
-                .filter(product -> product.getName().toLowerCase()
-                        .contains(name.toLowerCase()))
-                .collect(Collectors.toList());
+
+        return temp;
     }
 
     @Override
@@ -119,52 +130,51 @@ public class FileProductRepository implements ProductRepository {
 
     @Override
     public boolean save() {
+        boolean temp = false;
+
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(new ArrayList<>(products.values()));
-            return true;
+            temp = true;
         } catch (IOException e) {
             System.err.println("Error saving product data to file: " + filePath);
             System.err.println("Reason: " + e.getMessage());
-            return false;
         }
-    }
 
+        return temp;
+    }
     @Override
     public boolean load() {
+        boolean temp = false;
         File file = new File(filePath);
 
-        if (!file.exists()) {
-            return false; 
-        }
+        if (file.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                @SuppressWarnings("unchecked")
+                List<Product> loadedProducts = (List<Product>) ois.readObject();
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            @SuppressWarnings("unchecked")
-            List<Product> loadedProducts = (List<Product>) ois.readObject();
-            
-            if (loadedProducts == null) {
-                products.clear();
-                return false;
-            }
-
-            products.clear();
-            loadedProducts.forEach(product -> {
-                if (product != null) {
-                    products.put(product.getId(), product);
+                if (loadedProducts != null) {
+                    products.clear();
+                    loadedProducts.forEach(product -> {
+                        if (product != null) {
+                            products.put(product.getId(), product);
+                        }
+                    });
+                    temp = true;
+                } else {
+                    products.clear();
                 }
-            });
-            return true;
-        } catch (IOException e) {
-            System.err.println("Error reading product data from file: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
-        } catch (ClassNotFoundException e) {
-            System.err.println("Product class definition mismatch: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
-        } catch (Exception e) {
-            System.err.println("Unexpected error loading product data: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
+            } catch (IOException e) {
+                System.err.println("Error reading product data from file: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                System.err.println("Product class definition mismatch: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println("Unexpected error loading product data: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            }
         }
+
+        return temp;
     }
 }

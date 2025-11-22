@@ -21,20 +21,16 @@ public class PointsRedemptionStrategy implements DiscountStrategy {
     }
 
     @Override
-    public boolean isApplicable(Customer customer) {    
-        if (pointsToRedeem <= 0) {
-            return false;
-        }
-    
-        if (!customer.hasMembershipCard()) {
-            return false;
+    public boolean isApplicable(Customer customer) {
+        boolean temp = false;
+
+        if (pointsToRedeem > 0 && customer.hasMembershipCard()) {
+            MembershipCard card = customer.getMembershipCard();
+            temp = card.getPoints() >= pointsToRedeem && !card.isExpired();
         }
 
-        MembershipCard card = customer.getMembershipCard();
-
-        return card.getPoints() >= pointsToRedeem && !card.isExpired();
+        return temp;
     }
-
     public void processRedemption(Customer customer) {
         if (isApplicable(customer)) {
             customer.getMembershipCard().deductPoints(pointsToRedeem);

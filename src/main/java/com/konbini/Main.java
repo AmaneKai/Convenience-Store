@@ -13,11 +13,13 @@ public class Main {
         ProductRepository productRepository = new FileProductRepository("products.dat");
         CustomerRepository customerRepository = new FileCustomerRepository("customers.dat");
         TransactionRepository transactionRepository = new FileTransactionRepository("transactions.dat");
+        EmployeeRepository employeeRepository = new FileEmployeeRepository("employees.dat");
 
         ProductService productService = new ProductServiceImpl(productRepository);
         CustomerService customerService = new CustomerServiceImpl(customerRepository);
         CartService cartService = new CartServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
+        EmployeeService employeeService = new EmployeeServiceImpl(employeeRepository);
 
         SwingStoreView view = new SwingStoreView();
 
@@ -25,6 +27,7 @@ public class Main {
         CustomerController customerController = new CustomerController(customerService);
         CartController cartController = new CartController(productService);
         TransactionController transactionController = new TransactionController(transactionService);
+        EmployeeController employeeController = new EmployeeController(employeeService);
 
         ProductManagementController productManagementController = new ProductManagementController(
                 view,
@@ -56,13 +59,20 @@ public class Main {
                 transactionController,
                 productManagementController
         );
+        EmployeeManagementController employeeManagementController = new EmployeeManagementController(
+                view,
+                employeeController,
+                employeeService
+        );
 
         view.setControllers(
                 productManagementController,
                 customerManagementController,
                 cartManagementController,
                 transactionManagementController,
-                dataManagementController
+                dataManagementController,
+                employeeController,
+                employeeManagementController
         );
 
         MainController mainController = new MainController(
@@ -73,6 +83,7 @@ public class Main {
         boolean productsLoaded = productController.loadData();
         boolean customersLoaded = customerController.loadData();
         boolean transactionsLoaded = transactionController.loadData();
+        boolean employeesLoaded = employeeController.loadData();
 
         boolean needSampleData = false;
 
@@ -88,6 +99,15 @@ public class Main {
 
         if (!transactionsLoaded) {
             view.displayInfoMessage("No transaction data found.");
+        }
+
+        if (!employeesLoaded) {
+            view.displayInfoMessage("No employee data found. Initializing sample employees.");
+            employeeController.addEmployee("Manager", "password");
+            employeeController.addEmployee("Cashier", "cashier123");
+            employeeController.addEmployee("Supervisor", "super456");
+            employeeController.saveData();
+            employeeController.loadData();
         }
 
         if (needSampleData) {

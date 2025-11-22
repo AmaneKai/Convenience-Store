@@ -7,31 +7,43 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class FileUtil {
-
     public static boolean createDirectoryIfNotExists(String directoryPath) {
         File directory = new File(directoryPath);
+        boolean temp = true;
+
         if (!directory.exists()) {
-            return directory.mkdirs();
+            temp = directory.mkdirs();
         }
-        return true;
+
+        return temp;
     }
 
-    public static void copyFile(File sourceFile, File destFile) throws IOException {
-        if (!destFile.exists()) {
-            destFile.createNewFile();
+    public static boolean copyFile(File sourceFile, File destFile) {
+        boolean temp = false;
+
+        if (sourceFile == null || destFile == null || !sourceFile.exists()) {
+            return temp;
         }
 
-        // More explicit try-with-resources to eliminate IDE warnings
-        try (FileInputStream fis = new FileInputStream(sourceFile);
-             FileOutputStream fos = new FileOutputStream(destFile);
-             FileChannel source = fis.getChannel();
-             FileChannel destination = fos.getChannel()) {
-            destination.transferFrom(source, 0, source.size());
+        try {
+            // Ensure destination directory exists
+            File parentDir = destFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+
+            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            temp = true;
+        } catch (IOException e) {
+            System.err.println("Failed to copy file: " + e.getMessage());
         }
+
+        return temp;
     }
 
     public static boolean deleteFile(String filePath) {
@@ -45,49 +57,54 @@ public class FileUtil {
     }
 
     public static boolean createBackup(String filePath) {
-        if (!fileExists(filePath)) {
-            return false;
+        boolean temp = false;
+
+        if (fileExists(filePath)) {
+            try {
+                String backupPath = filePath + "." + LocalDate.now()
+                        .format(DateTimeFormatter.ISO_DATE) + ".bak";
+                Files.copy(Paths.get(filePath), Paths.get(backupPath));
+                temp = true;
+            } catch (IOException e) {
+                System.err.println("Error creating backup of file: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            }
         }
 
-        try {
-            String backupPath = filePath + "." + LocalDate.now()
-                .format(DateTimeFormatter.ISO_DATE) + ".bak";
-            // Use Files.copy for simplicity and modern approach
-            Files.copy(Paths.get(filePath), Paths.get(backupPath));
-            return true;
-        } catch (IOException e) {
-            System.err.println("Error creating backup of file: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
-        }
+        return temp;
     }
 
     public static String getFileExtension(String fileName) {
+        String temp = "";
         int lastIndexOf = fileName.lastIndexOf(".");
-        if (lastIndexOf == -1) {
-            return ""; // No extension
+
+        if (lastIndexOf != -1) {
+            temp = fileName.substring(lastIndexOf + 1);
         }
-        return fileName.substring(lastIndexOf + 1);
+
+        return temp;
     }
 
     public static String getFileNameWithoutExtension(String fileName) {
+        String temp = fileName;
         int lastIndexOf = fileName.lastIndexOf(".");
-        if (lastIndexOf == -1) {
-            return fileName; // No extension
-        }
-        return fileName.substring(0, lastIndexOf);
-    }
 
+        if (lastIndexOf != -1) {
+            temp = fileName.substring(0, lastIndexOf);
+        }
+
+        return temp;
+    }
     public static String ensureReceiptsDirectory() {
         String directoryPath = System.getProperty("user.dir")
-            + File.separator + "receipts";
+                + File.separator + "receipts";
         createDirectoryIfNotExists(directoryPath);
         return directoryPath;
     }
 
     public static String ensureDataDirectory() {
         String directoryPath = System.getProperty("user.dir")
-            + File.separator + "data";
+                + File.separator + "data";
         createDirectoryIfNotExists(directoryPath);
         return directoryPath;
     }
@@ -97,23 +114,23 @@ public class FileUtil {
     }
 
     public static String combinePath(String... elements) {
-        if (elements.length == 0) {
-            return "";
-        }
+        StringBuilder path = new StringBuilder();
+        int j = 0;
 
-        StringBuilder path = new StringBuilder(elements[0]);
-        int j;
+        if (elements.length > 0) {
+            path.append(elements[0]);
 
-        for (j = 1; j < elements.length; j++) {
-            String element = elements[j];
+            for (j = 1; j < elements.length; j++) {
+                String element = elements[j];
 
-            if (!path.toString().endsWith(File.separator) && !element.startsWith(File.separator)) {
-                path.append(File.separator);
-            } else if (path.toString().endsWith(File.separator) && element.startsWith(File.separator)) {
-                element = element.substring(1);
+                if (!path.toString().endsWith(File.separator) && !element.startsWith(File.separator)) {
+                    path.append(File.separator);
+                } else if (path.toString().endsWith(File.separator) && element.startsWith(File.separator)) {
+                    element = element.substring(1);
+                }
+
+                path.append(element);
             }
-
-            path.append(element);
         }
 
         return path.toString();

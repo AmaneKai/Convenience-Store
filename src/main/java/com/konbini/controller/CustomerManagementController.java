@@ -181,11 +181,17 @@ public class CustomerManagementController {
 
             if (shouldProceed) {
                 isSeniorCitizen = view.getBooleanInput("Is senior citizen?");
-                cardNumber = view.getStringInput("Enter card number: ").trim();
+                String cardInput = view.getStringInput("Enter card number: ");
 
-                if (cardNumber.isEmpty()) {
-                    view.displayErrorMessage("Card number cannot be empty.");
+                if (cardInput == null) {
                     shouldProceed = false;
+                } else {
+                    cardNumber = cardInput.trim();
+
+                    if (cardNumber.isEmpty()) {
+                        view.displayErrorMessage("Card number cannot be empty.");
+                        shouldProceed = false;
+                    }
                 }
             }
 
@@ -193,7 +199,6 @@ public class CustomerManagementController {
                 expiryDate = view.getDateInput("Enter expiry date (YYYY-MM-DD): ");
 
                 if (expiryDate == null) {
-                    view.displayErrorMessage("Expiry date is required.");
                     shouldProceed = false;
                 }
             }
@@ -293,7 +298,6 @@ public class CustomerManagementController {
                 expiryDate = view.getDateInput("Enter expiry date (YYYY-MM-DD): ");
 
                 if (expiryDate == null) {
-                    view.displayErrorMessage("Expiry date is required.");
                     shouldProceed = false;
                 }
             }
@@ -314,29 +318,29 @@ public class CustomerManagementController {
     // ==================== VALIDATION & UTILITY METHODS ====================
 
     private Optional<String> promptForCustomerId(String operation) {
+        Optional<String> temp = Optional.empty();
+
         try {
             List<Customer> customers = customerController.getAllCustomers();
 
             if (customers.isEmpty()) {
                 view.displayInfoMessage("No customers available.");
-                return Optional.empty();
-            }
-
-            displayCustomerList(customers);
-            String customerId = view.getStringInput("Enter customer ID: ");
-
-            if (customerId != null && !customerId.trim().isEmpty()) {
-                return Optional.of(customerId.trim());
             } else {
-                view.displayInfoMessage("No customer ID provided for " + operation + ".");
-                return Optional.empty();
+                displayCustomerList(customers);
+                String customerId = view.getStringInput("Enter customer ID: ");
+
+                if (customerId != null && !customerId.trim().isEmpty()) {
+                    temp = Optional.of(customerId.trim());
+                } else {
+                    view.displayInfoMessage("No customer ID provided for " + operation + ".");
+                }
             }
         } catch (Exception e) {
             handleGenericException(e, "prompting for customer ID", "Failed to load customer list.");
-            return Optional.empty();
         }
-    }
 
+        return temp;
+    }
     // ==================== ERROR HANDLING HELPERS ====================
 
     private void handleArgumentException(IllegalArgumentException e, String context) {

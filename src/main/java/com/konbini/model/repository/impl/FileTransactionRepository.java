@@ -39,12 +39,14 @@ public class FileTransactionRepository implements TransactionRepository {
 
     @Override
     public Optional<Transaction> findById(String transactionId) {
-        if (transactionId == null || transactionId.trim().isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(transactions.get(transactionId));
-    }
+        Optional<Transaction> temp = Optional.empty();
 
+        if (transactionId != null && !transactionId.trim().isEmpty()) {
+            temp = Optional.ofNullable(transactions.get(transactionId));
+        }
+
+        return temp;
+    }
     @Override
     public List<Transaction> findAll() {
         return new ArrayList<>(transactions.values());
@@ -52,38 +54,46 @@ public class FileTransactionRepository implements TransactionRepository {
 
     @Override
     public List<Transaction> findByCustomerId(String customerId) {
-        if (customerId == null || customerId.trim().isEmpty()) {
-            return new ArrayList<>();
+        List<Transaction> temp = new ArrayList<>();
+
+        if (customerId != null && !customerId.trim().isEmpty()) {
+            temp = transactions.values().stream()
+                    .filter(transaction -> transaction.getCustomer().getId().equals(customerId))
+                    .collect(Collectors.toList());
         }
-        return transactions.values().stream()
-                .filter(transaction -> transaction.getCustomer().getId().equals(customerId))
-                .collect(Collectors.toList());
+
+        return temp;
     }
 
     @Override
     public List<Transaction> findByDate(LocalDate date) {
-        if (date == null) {
-            return new ArrayList<>();
+        List<Transaction> temp = new ArrayList<>();
+
+        if (date != null) {
+            temp = transactions.values().stream()
+                    .filter(transaction -> transaction.getTimestamp().toLocalDate().equals(date))
+                    .collect(Collectors.toList());
         }
-        return transactions.values().stream()
-                .filter(transaction -> transaction.getTimestamp().toLocalDate().equals(date))
-                .collect(Collectors.toList());
+
+        return temp;
     }
 
     @Override
     public List<Transaction> findByDateRange(LocalDate startDate, LocalDate endDate) {
-        if (startDate == null || endDate == null) {
-            return new ArrayList<>();
-        }
-        return transactions.values().stream()
-                .filter(transaction -> {
-                    LocalDate transactionDate = transaction.getTimestamp().toLocalDate();
-                    return (transactionDate.isEqual(startDate) || transactionDate.isAfter(startDate)) &&
-                           (transactionDate.isEqual(endDate) || transactionDate.isBefore(endDate));
-                })
-                .collect(Collectors.toList());
-    }
+        List<Transaction> temp = new ArrayList<>();
 
+        if (startDate != null && endDate != null) {
+            temp = transactions.values().stream()
+                    .filter(transaction -> {
+                        LocalDate transactionDate = transaction.getTimestamp().toLocalDate();
+                        return (transactionDate.isEqual(startDate) || transactionDate.isAfter(startDate)) &&
+                                (transactionDate.isEqual(endDate) || transactionDate.isBefore(endDate));
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        return temp;
+    }
     @Override
     public double getTotalSales() {
         return transactions.values().stream()
@@ -107,52 +117,52 @@ public class FileTransactionRepository implements TransactionRepository {
 
     @Override
     public boolean save() {
+        boolean temp = false;
+
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(new ArrayList<>(transactions.values()));
-            return true;
+            temp = true;
         } catch (IOException e) {
             System.err.println("Error saving transaction data to file: " + filePath);
             System.err.println("Reason: " + e.getMessage());
-            return false;
         }
+
+        return temp;
     }
 
     @Override
     public boolean load() {
+        boolean temp = false;
         File file = new File(filePath);
 
-        if (!file.exists()) {
-            return false; 
-        }
+        if (file.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                @SuppressWarnings("unchecked")
+                List<Transaction> loadedTransactions = (List<Transaction>) ois.readObject();
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            @SuppressWarnings("unchecked")
-            List<Transaction> loadedTransactions = (List<Transaction>) ois.readObject();
-            
-            if (loadedTransactions == null) {
-                transactions.clear();
-                return false;
-            }
-
-            transactions.clear();
-            loadedTransactions.forEach(transaction -> {
-                if (transaction != null) {
-                    transactions.put(transaction.getId(), transaction);
+                if (loadedTransactions != null) {
+                    transactions.clear();
+                    loadedTransactions.forEach(transaction -> {
+                        if (transaction != null) {
+                            transactions.put(transaction.getId(), transaction);
+                        }
+                    });
+                    temp = true;
+                } else {
+                    transactions.clear();
                 }
-            });
-            return true;
-        } catch (IOException e) {
-            System.err.println("Error reading transaction data from file: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
-        } catch (ClassNotFoundException e) {
-            System.err.println("Transaction class definition mismatch: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
-        } catch (Exception e) {
-            System.err.println("Unexpected error loading transaction data: " + filePath);
-            System.err.println("Reason: " + e.getMessage());
-            return false;
+            } catch (IOException e) {
+                System.err.println("Error reading transaction data from file: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                System.err.println("Transaction class definition mismatch: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println("Unexpected error loading transaction data: " + filePath);
+                System.err.println("Reason: " + e.getMessage());
+            }
         }
+
+        return temp;
     }
 }

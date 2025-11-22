@@ -1,29 +1,14 @@
 package com.konbini.view.swing;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.List;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
+import javax.swing.*;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
-import com.konbini.controller.CartManagementController;
-import com.konbini.controller.CustomerManagementController;
-import com.konbini.controller.DataManagementController;
-import com.konbini.controller.ProductManagementController;
-import com.konbini.controller.TransactionManagementController;
-import com.konbini.dto.CartDTO;
-import com.konbini.dto.CustomerDTO;
-import com.konbini.dto.ProductDTO;
-import com.konbini.dto.TransactionDTO;
-import com.konbini.model.ProductCategory;
-import com.konbini.model.ProductSubcategory;
+import com.konbini.controller.*;
+import com.konbini.dto.*;
+import com.konbini.model.*;
+import com.konbini.util.UserSession;
 import com.konbini.view.StoreView;
 
 public class SwingStoreView implements StoreView {
@@ -31,23 +16,31 @@ public class SwingStoreView implements StoreView {
     private JPanel mainPanel;
     private java.awt.CardLayout cardLayout;
 
-    private MainMenuPanel mainMenuPanel;
+    private CustomerMenuPanel customerMenuPanel;
+    private EmployeeMenuPanel employeeMenuPanel;
     private ProductPanel productPanel;
     private CustomerPanel customerPanel;
     private CartPanel cartPanel;
     private TransactionPanel transactionPanel;
+    private EmployeePanel employeePanel;
 
     private ProductManagementController productManagementController;
     private CustomerManagementController customerManagementController;
     private CartManagementController cartManagementController;
     private TransactionManagementController transactionManagementController;
     private DataManagementController dataManagementController;
+    private EmployeeController employeeController;
+    private EmployeeManagementController employeeManagementController;
 
-    private static final String MAIN_MENU_CARD = "MainMenu";
+    private static final String CUSTOMER_MENU_CARD = "CustomerMenu";
+    private static final String EMPLOYEE_MENU_CARD = "EmployeeMenu";
     private static final String PRODUCT_CARD = "Product";
     private static final String CUSTOMER_CARD = "Customer";
     private static final String CART_CARD = "Cart";
     private static final String TRANSACTION_CARD = "Transaction";
+    private static final String EMPLOYEE_CARD = "Employee";
+
+    private boolean applicationRunning = true;
 
     public SwingStoreView() {
         initializeGUI();
@@ -58,7 +51,9 @@ public class SwingStoreView implements StoreView {
             CustomerManagementController customerManagementController,
             CartManagementController cartManagementController,
             TransactionManagementController transactionManagementController,
-            DataManagementController dataManagementController) {
+            DataManagementController dataManagementController,
+            EmployeeController employeeController,
+            EmployeeManagementController employeeManagementController) {
         validateControllerDependencies(
                 productManagementController,
                 customerManagementController,
@@ -72,6 +67,8 @@ public class SwingStoreView implements StoreView {
         this.cartManagementController = cartManagementController;
         this.transactionManagementController = transactionManagementController;
         this.dataManagementController = dataManagementController;
+        this.employeeController = employeeController;
+        this.employeeManagementController = employeeManagementController;
 
         createPanelsWithControllers();
     }
@@ -85,7 +82,13 @@ public class SwingStoreView implements StoreView {
 
         try {
             mainFrame = new JFrame("コンビニ");
-            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                    handleExit();
+                }
+            });
             mainFrame.setSize(1024, 768);
 
             cardLayout = new java.awt.CardLayout();
@@ -93,11 +96,10 @@ public class SwingStoreView implements StoreView {
 
             mainFrame.add(mainPanel);
             mainFrame.setLocationRelativeTo(null);
-            mainFrame.setVisible(true);
 
         } catch (Exception e) {
             handleUIException(e, "initializing main window", "Failed to initialize application window.");
-            System.exit(1);
+            applicationRunning = false;
         }
     }
 
@@ -105,23 +107,31 @@ public class SwingStoreView implements StoreView {
         try {
             mainPanel.removeAll();
 
-            mainMenuPanel = new MainMenuPanel(
+            customerMenuPanel = new CustomerMenuPanel(
                     this.mainFrame,
                     this::navigateToScreen,
-                    this::handleExit,
-                    dataManagementController
+                    this::showLoginScreen
             );
 
-            productPanel = new ProductPanel(productManagementController, this::navigateToMainMenu);
-            customerPanel = new CustomerPanel(customerManagementController, this::navigateToMainMenu);
-            cartPanel = new CartPanel(cartManagementController, this::navigateToMainMenu);
-            transactionPanel = new TransactionPanel(transactionManagementController, this::navigateToMainMenu);
+            employeeMenuPanel = new EmployeeMenuPanel(
+                    this.mainFrame,
+                    this::navigateToScreen,
+                    this::showLoginScreen
+            );
 
-            mainPanel.add(mainMenuPanel, MAIN_MENU_CARD);
+            productPanel = new ProductPanel(productManagementController, this::navigateToUserMenu);
+            customerPanel = new CustomerPanel(customerManagementController, this::navigateToUserMenu);
+            cartPanel = new CartPanel(cartManagementController, this::navigateToUserMenu);
+            transactionPanel = new TransactionPanel(transactionManagementController, this::navigateToUserMenu);
+            employeePanel = new EmployeePanel(employeeManagementController, this::navigateToUserMenu);
+
+            mainPanel.add(customerMenuPanel, CUSTOMER_MENU_CARD);
+            mainPanel.add(employeeMenuPanel, EMPLOYEE_MENU_CARD);
             mainPanel.add(productPanel, PRODUCT_CARD);
             mainPanel.add(customerPanel, CUSTOMER_CARD);
             mainPanel.add(cartPanel, CART_CARD);
             mainPanel.add(transactionPanel, TRANSACTION_CARD);
+            mainPanel.add(employeePanel, EMPLOYEE_CARD);
 
             mainPanel.revalidate();
             mainPanel.repaint();
@@ -152,7 +162,7 @@ public class SwingStoreView implements StoreView {
             handleUIException(e, "loading initial data", "Failed to load application data on startup.");
         }
 
-        navigateToScreen(MAIN_MENU_CARD);
+        showLoginScreen();
     }
 
     // ==================== NAVIGATION METHODS ====================
@@ -171,20 +181,75 @@ public class SwingStoreView implements StoreView {
         }
     }
 
-    private void navigateToMainMenu() {
-        navigateToScreen(MAIN_MENU_CARD);
-    }
-
     private void handleExit() {
         try {
             int confirm = JOptionPane.showConfirmDialog(mainFrame,
                     "Are you sure you want to exit?", "Confirm Exit", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                System.exit(0);
+                applicationRunning = false;
+                mainFrame.dispose();
             }
         } catch (Exception e) {
             handleUIException(e, "exiting application", "Failed to exit properly.");
+            applicationRunning = false;
+            mainFrame.dispose();
+        }
+    }
+
+    private void showLoginScreen() {
+        SwingUtilities.invokeLater(() -> {
+            performLoginProcess();
+        });
+    }
+
+    private void performLoginProcess() {
+        boolean exit = false;
+
+        while (applicationRunning && !exit) {
+            mainFrame.setVisible(false);
+            UserSession.getInstance().logout();
+
+            String userType = UserTypeSelectionDialog.showDialog(mainFrame);
+
+            if (userType == null) {
+                handleExit();
+                exit = true;
+            } else if (attemptLogin(userType))
+                exit = true;
+        }
+    }
+
+    private boolean attemptLogin(String userType) {
+        boolean temp = false;
+
+        if ("CUSTOMER".equals(userType)) {
+            UserSession.getInstance().login("CUSTOMER", "CUSTOMER");
+            navigateToScreen(CUSTOMER_MENU_CARD);
+            mainFrame.setVisible(true);
+            temp = true;
+        } else if ("EMPLOYEE".equals(userType)) {
+            EmployeeLoginDialog.LoginResult result = EmployeeLoginDialog.showLoginDialog(mainFrame, employeeController);
+            if (result.isAuthenticated()) {
+                UserSession.getInstance().login(result.getEmployeeId(), "EMPLOYEE");
+                navigateToScreen(EMPLOYEE_MENU_CARD);
+                mainFrame.setVisible(true);
+                temp = true;
+            }
+        } else {
+            displayErrorMessage("Invalid user type selected.");
+        }
+
+        return temp;
+    }
+    private void navigateToUserMenu() {
+        UserSession session = UserSession.getInstance();
+        if (session.isCustomer()) {
+            navigateToScreen(CUSTOMER_MENU_CARD);
+        } else if (session.isEmployee()) {
+            navigateToScreen(EMPLOYEE_MENU_CARD);
+        } else {
+            showLoginScreen();
         }
     }
 
@@ -192,20 +257,10 @@ public class SwingStoreView implements StoreView {
 
     @Override
     public void displayWelcomeMessage() {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                if (mainMenuPanel != null) {
-                    mainMenuPanel.showWelcomeMessage();
-                }
-            } catch (Exception e) {
-                handleUIException(e, "displaying welcome message", "Failed to show welcome message.");
-            }
-        });
     }
 
     @Override
     public void displayMainMenu() {
-        navigateToScreen(MAIN_MENU_CARD);
     }
 
     @Override
@@ -429,6 +484,42 @@ public class SwingStoreView implements StoreView {
     }
 
     @Override
+    public void displayEmployeeMenu() {
+        navigateToScreen(EMPLOYEE_CARD);
+    }
+
+    @Override
+    public int getEmployeeMenuChoice() {
+        return -1;
+    }
+
+    @Override
+    public void displayEmployees(List<EmployeeDTO> employees) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                if (employeePanel != null) {
+                    employeePanel.displayEmployees(employees);
+                }
+            } catch (Exception e) {
+                handleUIException(e, "displaying employees", "Failed to display employees.");
+            }
+        });
+    }
+
+    @Override
+    public void displayEmployee(EmployeeDTO employee) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                if (employeePanel != null) {
+                    employeePanel.displayEmployee(employee);
+                }
+            } catch (Exception e) {
+                handleUIException(e, "displaying employee", "Failed to display employee details.");
+            }
+        });
+    }
+
+    @Override
     public void displayErrorMessage(String message) {
         SwingUtilities.invokeLater(() -> {
             try {
@@ -477,13 +568,13 @@ public class SwingStoreView implements StoreView {
     public int getIntInput(String prompt) {
         int result = 0;
         boolean validInput = false;
-        boolean userCancelled = false;
+        boolean shouldExitLoop = false;
 
-        while (!validInput && !userCancelled) {
+        while (!validInput && !shouldExitLoop && applicationRunning) {
             String input = getStringInput(prompt);
 
             if (input == null) {
-                userCancelled = true;
+                shouldExitLoop = true; // User cancelled
             } else {
                 try {
                     result = Integer.parseInt(input.trim());
@@ -492,7 +583,7 @@ public class SwingStoreView implements StoreView {
                     displayErrorMessage("Invalid integer. Please enter a valid number.");
                 } catch (Exception e) {
                     handleUIException(e, "parsing integer input", "Input processing failed.");
-                    break;
+                    shouldExitLoop = true; // Fatal error
                 }
             }
         }
@@ -505,8 +596,9 @@ public class SwingStoreView implements StoreView {
         double result = 0.0;
         boolean validInput = false;
         boolean userCancelled = false;
+        boolean fatalError = false;
 
-        while (!validInput && !userCancelled) {
+        while (!validInput && !userCancelled && !fatalError && applicationRunning) {
             String input = getStringInput(prompt);
 
             if (input == null) {
@@ -519,7 +611,7 @@ public class SwingStoreView implements StoreView {
                     displayErrorMessage("Invalid number. Please enter a valid decimal number.");
                 } catch (Exception e) {
                     handleUIException(e, "parsing double input", "Input processing failed.");
-                    break;
+                    fatalError = true;
                 }
             }
         }
@@ -540,15 +632,18 @@ public class SwingStoreView implements StoreView {
 
     @Override
     public LocalDate getDateInput(String prompt) {
-        LocalDate result = LocalDate.now();
+        LocalDate result = null;
         boolean validInput = false;
         boolean userCancelled = false;
+        boolean fatalError = false;
 
-        while (!validInput && !userCancelled) {
+        while (!validInput && !userCancelled && !fatalError && applicationRunning) {
             String input = getStringInput(prompt + " (YYYY-MM-DD)");
 
             if (input == null) {
                 userCancelled = true;
+            } else if (input.trim().isEmpty()) {
+                validInput = true;
             } else {
                 try {
                     result = LocalDate.parse(input.trim());
@@ -557,7 +652,7 @@ public class SwingStoreView implements StoreView {
                     displayErrorMessage("Invalid date format. Please use YYYY-MM-DD.");
                 } catch (Exception e) {
                     handleUIException(e, "parsing date input", "Date input processing failed.");
-                    break;
+                    fatalError = true;
                 }
             }
         }
@@ -581,24 +676,25 @@ public class SwingStoreView implements StoreView {
 
     @Override
     public ProductSubcategory getSubcategoryInput(ProductCategory category) {
+        ProductSubcategory temp = null;
+
         try {
-            if (category == null) {
+            if (category != null) {
+                ProductSubcategory[] subcategories = ProductSubcategory.getSubcategoriesFor(category);
+                if (subcategories.length > 0) {
+                    temp = (ProductSubcategory) JOptionPane.showInputDialog(
+                            mainFrame, "Select subcategory:", "Subcategory", JOptionPane.QUESTION_MESSAGE, null, subcategories, subcategories[0]
+                    );
+                }
+            } else {
                 throw new IllegalArgumentException("Category cannot be null");
             }
-
-            ProductSubcategory[] subcategories = ProductSubcategory.getSubcategoriesFor(category);
-            if (subcategories.length == 0) return null;
-
-            ProductSubcategory selected = (ProductSubcategory) JOptionPane.showInputDialog(
-                    mainFrame, "Select subcategory:", "Subcategory", JOptionPane.QUESTION_MESSAGE, null, subcategories, subcategories[0]
-            );
-            return selected;
         } catch (Exception e) {
             handleUIException(e, "getting subcategory input", "Subcategory selection failed.");
-            return null;
         }
-    }
 
+        return temp;
+    }
     // ==================== VALIDATION METHODS ====================
 
     private void validateControllerDependencies(
@@ -633,5 +729,9 @@ public class SwingStoreView implements StoreView {
 
     public JFrame getMainFrame() {
         return mainFrame;
+    }
+
+    public boolean isApplicationRunning() {
+        return applicationRunning;
     }
 }

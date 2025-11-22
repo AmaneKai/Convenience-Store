@@ -118,12 +118,14 @@ public class Product implements Serializable {
     }
 
     public boolean isExpired() {
-        if (expirationDate == null) {
-            return false;
-        }
-        return expirationDate.isBefore(LocalDate.now());
-    }
+        boolean temp = false;
 
+        if (expirationDate != null) {
+            temp = expirationDate.isBefore(LocalDate.now());
+        }
+
+        return temp;
+    }
     public int getLowStockThreshold() {
         return lowStockThreshold;
     }

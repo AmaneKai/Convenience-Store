@@ -134,16 +134,21 @@ public class CartManagementController {
         }
     }
 
-    public void handleCheckout() {
+    public boolean handleCheckout() {
         try {
             if (ensureCartNotEmpty()) {
                 processCheckout();
+                return currentCart == null;
             }
+
+            return false;
         } catch (IllegalArgumentException e) {
             handleArgumentException(e, "during checkout");
+            return false;
         } catch (Exception e) {
             System.err.println("Fatal error during checkout: " + e.getMessage());
             view.displayErrorMessage("Critical error during checkout. Transaction aborted.");
+            return false;
         }
     }
 
@@ -315,13 +320,19 @@ public class CartManagementController {
     }
 
     private String validateProductAndQuantity(ProductDTO product, int quantity) {
+        String temp;
+
         if (product == null) {
-            return "Invalid product selected.";
+            temp = "Invalid product selected.";
         }
-        if (quantity <= 0) {
-            return "Quantity must be greater than 0.";
+        else if (quantity <= 0) {
+            temp = "Quantity must be greater than 0.";
         }
-        return null;
+        else {
+           temp = null;
+        }
+
+        return temp;
     }
 
     private void addValidatedProduct(Product product, int quantity) {
@@ -339,42 +350,51 @@ public class CartManagementController {
     // ==================== VALIDATION & UTILITY METHODS ====================
 
     private int handlePointsRedemption(Customer customer) {
-        if (!customer.hasMembershipCard() || customer.getMembershipCard().getPoints() <= 0) {
-            return 0;
+        int temp = 0;
+
+        if (customer.hasMembershipCard() && customer.getMembershipCard().getPoints() > 0) {
+            MembershipCard card = customer.getMembershipCard();
+            int availablePoints = card.getPoints();
+
+            view.displayInfoMessage("Available points: " + availablePoints + "\n(1 point = ₱1 discount)");
+
+            if (view.getBooleanInput("Do you want to redeem points for discount?")) {
+                int pointsToRedeem = view.getIntInput("Enter points to redeem (0 to skip, max " + availablePoints + "): ");
+
+                if (pointsToRedeem >= 0 && pointsToRedeem <= availablePoints) {
+                    temp = pointsToRedeem;
+                } else {
+                    throw new IllegalArgumentException("Invalid points amount: " + pointsToRedeem);
+                }
+            }
         }
-
-        MembershipCard card = customer.getMembershipCard();
-        int availablePoints = card.getPoints();
-
-        view.displayInfoMessage("Available points: " + availablePoints + "\n(1 point = ₱1 discount)");
-
-        if (!view.getBooleanInput("Do you want to redeem points for discount?")) {
-            return 0;
-        }
-
-        int pointsToRedeem = view.getIntInput("Enter points to redeem (0 to skip, max " + availablePoints + "): ");
-
-        if (pointsToRedeem < 0 || pointsToRedeem > availablePoints) {
-            throw new IllegalArgumentException("Invalid points amount: " + pointsToRedeem);
-        }
-
-        return pointsToRedeem;
+        return temp;
     }
 
     private boolean ensureCartExists() {
+        boolean temp;
+
         if (currentCart == null) {
             view.displayErrorMessage("No active cart. Create one first.");
-            return false;
+            temp = false;
+        } else {
+            temp = true;
         }
-        return true;
+
+        return temp;
     }
 
     private boolean ensureCartNotEmpty() {
+        boolean temp;
+
         if (currentCart == null || currentCart.isEmpty()) {
             view.displayErrorMessage("Cart is empty.");
-            return false;
+            temp = false;
+        } else {
+            temp = true;
         }
-        return true;
+
+        return temp;
     }
 
     // ==================== ERROR HANDLING HELPERS ====================
