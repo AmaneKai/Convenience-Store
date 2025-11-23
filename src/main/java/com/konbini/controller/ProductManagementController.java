@@ -356,7 +356,6 @@ public class ProductManagementController {
             int successCount = 0;
             int totalProducts = 25;
 
-            // Food category products
             try {
                 productController.addProduct("Sandwich", 75.0, 10, ProductCategory.FOOD, "Konbini",
                         ProductSubcategory.READY_TO_EAT, LocalDate.now().plusDays(2));
@@ -375,7 +374,216 @@ public class ProductManagementController {
                 System.err.println("✗ Failed to add Potato Chips: " + e.getMessage());
             }
 
-            // ... (similar documentation for other sample products)
+            try {
+                productController.addProduct("Chocolate Bar", 35.0, 15, ProductCategory.FOOD, "Hershey's",
+                        ProductSubcategory.SNACK, LocalDate.now().plusMonths(8));
+                successCount++;
+                System.out.println("✓ Added Chocolate Bar");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Chocolate Bar: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Instant Ramen", 25.0, 30, ProductCategory.FOOD, "Nissin",
+                        ProductSubcategory.READY_TO_EAT, LocalDate.now().plusYears(1));
+                successCount++;
+                System.out.println("✓ Added Instant Ramen");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Instant Ramen: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Cookies", 40.0, 15, ProductCategory.FOOD, "Oreo",
+                        ProductSubcategory.SNACK, LocalDate.now().plusMonths(10));
+                successCount++;
+                System.out.println("✓ Added Cookies");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Cookies: " + e.getMessage());
+            }
+
+            // Beverage Category
+            try {
+                productController.addProduct("Coffee", 30.0, 10, ProductCategory.BEVERAGE, "Nescafe",
+                        ProductSubcategory.HOT, LocalDate.now().plusMonths(12));
+                successCount++;
+                System.out.println("✓ Added Coffee");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Coffee: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Bottled Water", 20.0, 50, ProductCategory.BEVERAGE, "Nature's Spring",
+                        ProductSubcategory.COLD, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Bottled Water");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Bottled Water: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Soda", 35.0, 25, ProductCategory.BEVERAGE, "Coca-Cola",
+                        ProductSubcategory.COLD, LocalDate.now().plusMonths(6));
+                successCount++;
+                System.out.println("✓ Added Soda");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Soda: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Beer", 60.0, 15, ProductCategory.BEVERAGE, "San Miguel",
+                        ProductSubcategory.ALCOHOLIC, LocalDate.now().plusYears(1));
+                successCount++;
+                System.out.println("✓ Added Beer");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Beer: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Tea", 25.0, 20, ProductCategory.BEVERAGE, "Lipton",
+                        ProductSubcategory.HOT, LocalDate.now().plusMonths(18));
+                successCount++;
+                System.out.println("✓ Added Tea");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Tea: " + e.getMessage());
+            }
+
+            // Toiletries Category
+            try {
+                productController.addProduct("Bath Soap", 25.0, 30, ProductCategory.TOILETRIES, "Dove",
+                        ProductSubcategory.SOAP, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Bath Soap");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Bath Soap: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Shampoo", 120.0, 15, ProductCategory.TOILETRIES, "Pantene",
+                        ProductSubcategory.SHAMPOO, LocalDate.now().plusYears(3));
+                successCount++;
+                System.out.println("✓ Added Shampoo");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Shampoo: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Toothpaste", 80.0, 20, ProductCategory.TOILETRIES, "Colgate",
+                        ProductSubcategory.BEAUTY, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Toothpaste");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Toothpaste: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Facial Wash", 150.0, 10, ProductCategory.TOILETRIES, "Nivea",
+                        ProductSubcategory.BEAUTY, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Facial Wash");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Facial Wash: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Hand Lotion", 90.0, 12, ProductCategory.TOILETRIES, "Jergens",
+                        ProductSubcategory.BEAUTY, LocalDate.now().plusYears(1));
+                successCount++;
+                System.out.println("✓ Added Hand Lotion");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Hand Lotion: " + e.getMessage());
+            }
+
+            // Cleaning Category
+            try {
+                productController.addProduct("Dishwashing Liquid", 50.0, 20, ProductCategory.CLEANING, "Joy",
+                        ProductSubcategory.DETERGENT, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Dishwashing Liquid");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Dishwashing Liquid: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Bathroom Tissue", 75.0, 30, ProductCategory.CLEANING, "Tissue",
+                        ProductSubcategory.TISSUE, LocalDate.now().plusYears(5));
+                successCount++;
+                System.out.println("✓ Added Bathroom Tissue");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Bathroom Tissue: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Hand Sanitizer", 45.0, 25, ProductCategory.CLEANING, "Safeguard",
+                        ProductSubcategory.SANITIZER, LocalDate.now().plusYears(3));
+                successCount++;
+                System.out.println("✓ Added Hand Sanitizer");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Hand Sanitizer: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Laundry Detergent", 120.0, 15, ProductCategory.CLEANING, "Tide",
+                        ProductSubcategory.DETERGENT, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Laundry Detergent");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Laundry Detergent: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Floor Cleaner", 100.0, 10, ProductCategory.CLEANING, "Mr. Clean",
+                        ProductSubcategory.DETERGENT, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Floor Cleaner");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Floor Cleaner: " + e.getMessage());
+            }
+
+            // Medication Category
+            try {
+                productController.addProduct("Paracetamol", 50.0, 40, ProductCategory.MEDICATION, "Biogesic",
+                        ProductSubcategory.PAIN_RELIEF, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Paracetamol");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Paracetamol: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Ibuprofen", 75.0, 30, ProductCategory.MEDICATION, "Advil",
+                        ProductSubcategory.PAIN_RELIEF, LocalDate.now().plusYears(3));
+                successCount++;
+                System.out.println("✓ Added Ibuprofen");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Ibuprofen: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Cold Medicine", 120.0, 20, ProductCategory.MEDICATION, "Neozep",
+                        ProductSubcategory.COLD_FLU, LocalDate.now().plusYears(1));
+                successCount++;
+                System.out.println("✓ Added Cold Medicine");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Cold Medicine: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Antacid", 60.0, 25, ProductCategory.MEDICATION, "Kremil-S",
+                        ProductSubcategory.PAIN_RELIEF, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Antacid");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Antacid: " + e.getMessage());
+            }
+
+            try {
+                productController.addProduct("Antihistamine", 80.0, 15, ProductCategory.MEDICATION, "Claritin",
+                        ProductSubcategory.ALLERGY, LocalDate.now().plusYears(2));
+                successCount++;
+                System.out.println("✓ Added Antihistamine");
+            } catch (Exception e) {
+                System.err.println("✗ Failed to add Antihistamine: " + e.getMessage());
+            }
 
             System.out.println("=== SAMPLE PRODUCTS INITIALIZATION COMPLETED ===");
             System.out.println("Successfully added: " + successCount + "/" + totalProducts + " products");
