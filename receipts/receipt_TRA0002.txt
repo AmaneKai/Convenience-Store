@@ -2,24 +2,25 @@
           KONBINI STORE           
 ===================================
 
-Receipt #: TRA0001
-Date: 2025-11-23 21:36:35
-Customer: Maria Santos
+Receipt #: TRA0002
+Date: 2025-11-23 21:41:59
+Customer: Pedro Reyes
 
 Items:
 -----------------------------------
-Shampoo              x7
-  ₱120.00 x 7 = ₱840.00
+Shampoo              x12
+  ₱120.00 x 12 = ₱1440.00
 -----------------------------------
 
-Subtotal: ₱840.00
-Value Added Tax (VAT): ₱100.80
-Discount: ₱168.00
-  - Senior Citizen Discount
-Total: ₱772.80
+Subtotal: ₱1440.00
+Value Added Tax (VAT): ₱172.80
+Total: ₱1612.80
 
-Amount Paid: ₱1000.00
-Change: ₱227.20
+Amount Paid: ₱100000.00
+Change: ₱98387.20
+
+Points Earned: 32
+Current Points Balance: 32
 
 ===================================
          Thank You! Come Again!    

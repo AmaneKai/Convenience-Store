@@ -234,6 +234,12 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
                     "Are you sure you want to exit?", "Confirm Exit", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
+
+                if (dataManagementController != null) {
+                    dataManagementController.handleSaveData();
+                    displayInfoMessage("Data saved successfully.");
+                }
+
                 applicationRunning = false;
                 mainFrame.dispose();
             }

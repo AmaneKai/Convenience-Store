@@ -148,6 +148,12 @@ public class FileCustomerRepository implements CustomerRepository {
     public boolean save() {
         boolean temp = false;
 
+        File file = new File(filePath);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(new ArrayList<>(customers.values()));
             temp = true;

@@ -13,9 +13,9 @@ import com.konbini.view.swing.SwingStoreView;
  */
 public class Main {
     public static void main(String[] args) {
-        ProductRepository productRepository = new FileProductRepository("products.dat");
-        CustomerRepository customerRepository = new FileCustomerRepository("customers.dat");
-        TransactionRepository transactionRepository = new FileTransactionRepository("transactions.dat");
+        ProductRepository productRepository = new FileProductRepository("data/products.dat");
+        CustomerRepository customerRepository = new FileCustomerRepository("data/customers.dat");
+        TransactionRepository transactionRepository = new FileTransactionRepository("data/transactions.dat");
         EmployeeRepository employeeRepository = new FileEmployeeRepository("employees.dat");
 
         ProductService productService = new ProductServiceImpl(productRepository);

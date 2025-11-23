@@ -106,6 +106,7 @@ public class DataManagementController {
     /**
      * Initializes sample data for the application including sample products and customers.
      * Only initializes data if no existing data is found to avoid overwriting.
+     * Automatically saves the initialized data to persistent storage.
      */
     public void initializeSampleData() {
         try {
@@ -113,7 +114,18 @@ public class DataManagementController {
             if (shouldInitializeSampleData()) {
                 initializeSampleProducts();
                 initializeSampleCustomers();
-                view.displaySuccessMessage("Sample data initialized successfully.");
+
+                // Auto-save the initialized data
+                int successCount = 0;
+                if (saveProducts()) successCount++;
+                if (saveCustomers()) successCount++;
+                if (saveTransactions()) successCount++;
+
+                if (successCount >= 2) {
+                    view.displaySuccessMessage("Sample data initialized and saved successfully.");
+                } else {
+                    view.displayInfoMessage("Sample data initialized but may not have saved completely. Please use 'Save Data' to persist.");
+                }
             } else {
                 view.displayInfoMessage("Sample data already exists. No initialization needed.");
             }

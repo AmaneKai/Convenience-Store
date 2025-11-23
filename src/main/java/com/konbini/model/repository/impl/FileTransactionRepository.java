@@ -201,6 +201,12 @@ public class FileTransactionRepository implements TransactionRepository {
     public boolean save() {
         boolean temp = false;
 
+        File file = new File(filePath);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(new ArrayList<>(transactions.values()));
             temp = true;
