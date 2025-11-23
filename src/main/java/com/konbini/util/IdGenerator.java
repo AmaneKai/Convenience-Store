@@ -5,19 +5,41 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Singleton class for generating unique identifiers for various entities.
+ * Maintains persistent counters for different entity types and generates
+ * formatted IDs with entity prefixes and sequential numbers.
+ * Implements Serializable to support persistence of counter state.
+ */
 public class IdGenerator implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * File path for storing ID counter state.
+     */
     private static final String ID_FILE = "data/id_counters.dat";
 
     private static IdGenerator instance;
 
+    /**
+     * Synchronized map storing counters for different entity types.
+     */
     private Map<String, Integer> counters;
 
+    /**
+     * Private constructor for singleton pattern.
+     * Initializes synchronized counters map.
+     */
     private IdGenerator() {
         counters = Collections.synchronizedMap(new HashMap<>());
     }
 
+    /**
+     * Gets the singleton instance of IdGenerator.
+     * Loads from file if available, otherwise creates new instance.
+     *
+     * @return the singleton IdGenerator instance
+     */
     public static synchronized IdGenerator getInstance() {
         if (instance == null) {
             instance = loadFromFile();
@@ -25,6 +47,11 @@ public class IdGenerator implements Serializable {
         return instance;
     }
 
+    /**
+     * Loads IdGenerator state from file or creates new instance if file doesn't exist.
+     *
+     * @return loaded or new IdGenerator instance
+     */
     private static IdGenerator loadFromFile() {
         IdGenerator temp;
         File file = new File(ID_FILE);
@@ -46,6 +73,11 @@ public class IdGenerator implements Serializable {
 
         return temp;
     }
+
+    /**
+     * Saves the current IdGenerator state to file.
+     * Ensures data directory exists before saving.
+     */
     public void save() {
         FileUtil.ensureDataDirectory();
         try (ObjectOutputStream oos = new ObjectOutputStream
@@ -56,6 +88,14 @@ public class IdGenerator implements Serializable {
         }
     }
 
+    /**
+     * Generates a unique identifier for the specified entity type.
+     * Format: [3-letter prefix][4-digit sequential number] (e.g., "CUS0001")
+     *
+     * @param entityType the type of entity (must be at least 3 characters)
+     * @return the generated unique ID
+     * @throws IllegalArgumentException if entityType is null or less than 3 characters
+     */
     public synchronized String generateId(String entityType) {
 
         if (entityType == null || entityType.length() < 3) {

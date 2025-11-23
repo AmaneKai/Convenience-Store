@@ -21,16 +21,38 @@ import javax.swing.table.DefaultTableModel;
 import com.konbini.controller.EmployeeManagementController;
 import com.konbini.dto.EmployeeDTO;
 
+/**
+ * EmployeePanel provides a graphical user interface for employee management operations.
+ * This panel displays a table of employees and provides buttons for various employee-related
+ * actions such as viewing details, adding new employees, updates, and password management.
+ */
 public class EmployeePanel extends JPanel {
+    /** Callback function to navigate back to the previous screen */
     private Runnable backCallback;
+
+    /** Controller responsible for handling employee management business logic */
     private EmployeeManagementController controller;
 
+    /** Table component for displaying employee data */
     private JTable employeeTable;
+
+    /** Table model managing the data for the employee table */
     private DefaultTableModel tableModel;
+
+    /** Label for displaying status messages and operation results */
     private JLabel statusLabel;
 
+    /** Column names for the employee table */
     private static final String[] COLUMN_NAMES = {"ID", "Name"};
 
+    /**
+     * Constructs a new EmployeePanel with the specified controller and navigation callback.
+     * Initializes the UI components and sets up the panel layout.
+     *
+     * @param controller the EmployeeManagementController that handles business logic operations
+     * @param backCallback a Runnable that executes when navigating back to the previous screen
+     * @throws IllegalArgumentException if controller or backCallback parameters are null
+     */
     public EmployeePanel(EmployeeManagementController controller, Runnable backCallback) {
         if (controller == null) {
             throw new IllegalArgumentException("EmployeeManagementController cannot be null");
@@ -43,6 +65,10 @@ public class EmployeePanel extends JPanel {
         initializeUI();
     }
 
+    /**
+     * Initializes the user interface components of the panel.
+     * Sets up the main layout and creates the header, center, and button panels.
+     */
     private void initializeUI() {
         setLayout(new BorderLayout());
 
@@ -59,6 +85,11 @@ public class EmployeePanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Creates the header panel containing the title and back button.
+     *
+     * @return JPanel containing the header components
+     */
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(41, 128, 185));
@@ -76,10 +107,22 @@ public class EmployeePanel extends JPanel {
         return headerPanel;
     }
 
+    /**
+     * Creates the center panel containing the employee table and status label.
+     *
+     * @return JPanel containing the table and status components
+     */
     private JPanel createCenterPanel() {
         JPanel centerPanel = new JPanel(new BorderLayout());
 
         tableModel = new DefaultTableModel(COLUMN_NAMES, 0) {
+            /**
+             * Prevents table cells from being editable by the user.
+             *
+             * @param row the row index of the cell
+             * @param col the column index of the cell
+             * @return false to make all cells non-editable
+             */
             public boolean isCellEditable(int row, int col) { return false; }
         };
         employeeTable = new JTable(tableModel);
@@ -95,6 +138,11 @@ public class EmployeePanel extends JPanel {
         return centerPanel;
     }
 
+    /**
+     * Creates the button panel with all employee management action buttons.
+     *
+     * @return JPanel containing the action buttons
+     */
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(236, 240, 241));
@@ -109,6 +157,13 @@ public class EmployeePanel extends JPanel {
         return buttonPanel;
     }
 
+    /**
+     * Creates a standardized button with consistent styling and error handling.
+     *
+     * @param text the text to display on the button
+     * @param action the Runnable to execute when the button is clicked
+     * @return a configured JButton with the specified text and action
+     */
     private JButton createButton(String text, Runnable action) {
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(140, 40));
@@ -124,6 +179,10 @@ public class EmployeePanel extends JPanel {
 
     // ==================== EVENT HANDLERS ====================
 
+    /**
+     * Handles the back navigation action.
+     * Executes the back callback with exception handling.
+     */
     private void handleBackAction() {
         try {
             backCallback.run();
@@ -132,6 +191,10 @@ public class EmployeePanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the view all employees action.
+     * Delegates to the controller to retrieve and display all employees.
+     */
     private void handleViewAllEmployees() {
         try {
             controller.handleViewAllEmployees();
@@ -140,6 +203,10 @@ public class EmployeePanel extends JPanel {
         }
     }
 
+    /**
+     * Handles viewing detailed information for a specific employee.
+     * Delegates to the controller to show employee details.
+     */
     private void handleViewEmployeeDetails() {
         try {
             controller.handleViewEmployeeDetails();
@@ -148,6 +215,10 @@ public class EmployeePanel extends JPanel {
         }
     }
 
+    /**
+     * Handles adding a new employee to the system.
+     * Delegates to the controller to register a new employee.
+     */
     private void handleAddEmployee() {
         try {
             controller.handleAddEmployee();
@@ -156,6 +227,10 @@ public class EmployeePanel extends JPanel {
         }
     }
 
+    /**
+     * Handles updating existing employee information.
+     * Delegates to the controller to modify employee data.
+     */
     private void handleUpdateEmployee() {
         try {
             controller.handleUpdateEmployee();
@@ -164,6 +239,10 @@ public class EmployeePanel extends JPanel {
         }
     }
 
+    /**
+     * Handles employee removal/deletion from the system.
+     * Delegates to the controller to remove an employee.
+     */
     private void handleRemoveEmployee() {
         try {
             controller.handleRemoveEmployee();
@@ -172,6 +251,10 @@ public class EmployeePanel extends JPanel {
         }
     }
 
+    /**
+     * Handles changing an employee's password.
+     * Delegates to the controller to update password credentials.
+     */
     private void handleChangePassword() {
         try {
             controller.handleChangePassword();
@@ -182,6 +265,13 @@ public class EmployeePanel extends JPanel {
 
     // ==================== DISPLAY METHODS ====================
 
+    /**
+     * Displays a list of employees in the table.
+     * Clears existing data and populates the table with the provided employee list.
+     *
+     * @param employees the list of EmployeeDTO objects to display
+     * @throws IllegalArgumentException if the employee list is null or contains invalid data
+     */
     public void displayEmployees(List<EmployeeDTO> employees) {
         try {
             validateEmployeeList(employees);
@@ -203,6 +293,13 @@ public class EmployeePanel extends JPanel {
         }
     }
 
+    /**
+     * Displays detailed information for a single employee in a dialog.
+     * Shows comprehensive employee data while masking sensitive password information.
+     *
+     * @param employee the EmployeeDTO object containing employee details to display
+     * @throws IllegalArgumentException if the employee data is invalid
+     */
     public void displayEmployee(EmployeeDTO employee) {
         try {
             validateEmployee(employee);
@@ -230,16 +327,31 @@ public class EmployeePanel extends JPanel {
         }
     }
 
+    /**
+     * Displays an error message in both the status label and a dialog.
+     *
+     * @param message the error message to display
+     */
     public void displayErrorMessage(String message) {
         updateStatus("Error: " + message);
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Displays a success message in both the status label and a dialog.
+     *
+     * @param message the success message to display
+     */
     public void displaySuccessMessage(String message) {
         updateStatus("Success: " + message);
         JOptionPane.showMessageDialog(this, message, "Success", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Displays an informational message in both the status label and a dialog.
+     *
+     * @param message the informational message to display
+     */
     public void displayInfoMessage(String message) {
         updateStatus("Info: " + message);
         JOptionPane.showMessageDialog(this, message, "Information", JOptionPane.INFORMATION_MESSAGE);
@@ -247,12 +359,24 @@ public class EmployeePanel extends JPanel {
 
     // ==================== VALIDATION METHODS ====================
 
+    /**
+     * Validates that the employee list is not null.
+     *
+     * @param employees the list of employees to validate
+     * @throws IllegalArgumentException if the employee list is null
+     */
     private void validateEmployeeList(List<EmployeeDTO> employees) {
         if (employees == null) {
             throw new IllegalArgumentException("Employee list cannot be null");
         }
     }
 
+    /**
+     * Validates that an employee object contains required data.
+     *
+     * @param employee the EmployeeDTO object to validate
+     * @throws IllegalArgumentException if the employee is null or has invalid data
+     */
     private void validateEmployee(EmployeeDTO employee) {
         if (employee == null) {
             throw new IllegalArgumentException("Employee cannot be null");
@@ -267,12 +391,24 @@ public class EmployeePanel extends JPanel {
 
     // ==================== UTILITY METHODS ====================
 
+    /**
+     * Updates the status label with the specified message.
+     *
+     * @param message the message to display in the status label
+     */
     private void updateStatus(String message) {
         if (statusLabel != null) {
             statusLabel.setText(message);
         }
     }
 
+    /**
+     * Handles UI exceptions by logging the error and displaying a user-friendly message.
+     *
+     * @param e the exception that occurred
+     * @param context a description of where the error occurred
+     * @param userMessage the user-friendly message to display
+     */
     private void handleUIException(Exception e, String context, String userMessage) {
         System.err.println("UI Error " + context + ": " + e.getMessage());
         updateStatus("Error: " + userMessage);
@@ -281,6 +417,10 @@ public class EmployeePanel extends JPanel {
 
     // ==================== CLEANUP METHOD ====================
 
+    /**
+     * Cleans up resources and resets the panel state.
+     * Clears the table data and resets the status message.
+     */
     public void cleanup() {
         if (tableModel != null) {
             tableModel.setRowCount(0);

@@ -6,12 +6,40 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
 
+/**
+ * CustomerMenuPanel provides a graphical user interface for the customer portal menu.
+ * This panel displays navigation options for customers, including access to the shopping cart
+ * and logout functionality. It integrates with the application's navigation system and
+ * user session management.
+ *
+ * The panel features a clean, centered layout with styled buttons for different customer
+ * actions and includes confirmation dialogs for logout operations.
+ */
 public class CustomerMenuPanel extends JPanel {
+    /** The parent frame containing this panel for dialog positioning */
     private final JFrame parentFrame;
+
+    /** Callback function for navigating to different sections of the application */
     private final Consumer<String> navigationCallback;
+
+    /** Callback function to execute when user logs out */
     private final Runnable logoutCallback;
 
+    /**
+     * Constructs a new CustomerMenuPanel with the specified parameters.
+     * Initializes the UI components and sets up the panel layout.
+     *
+     * @param parentFrame the parent JFrame that contains this panel, used for dialog positioning
+     * @param navigationCallback a Consumer that accepts navigation commands as Strings,
+     *                          used to switch between different application views
+     * @param logoutCallback a Runnable that executes logout procedures when invoked
+     * @throws IllegalArgumentException if any of the parameters are null
+     */
     public CustomerMenuPanel(JFrame parentFrame, Consumer<String> navigationCallback, Runnable logoutCallback) {
+        if (parentFrame == null || navigationCallback == null || logoutCallback == null) {
+            throw new IllegalArgumentException("Parameters cannot be null");
+        }
+
         this.parentFrame = parentFrame;
         this.navigationCallback = navigationCallback;
         this.logoutCallback = logoutCallback;
@@ -20,6 +48,17 @@ public class CustomerMenuPanel extends JPanel {
         initializeUI();
     }
 
+    /**
+     * Initializes the user interface components of the panel.
+     * Creates and arranges the title section and menu buttons in a organized layout.
+     *
+     * <p>The UI consists of:
+     * <ul>
+     *   <li>A title panel with the application name</li>
+     *   <li>A menu panel with navigation buttons</li>
+     * </ul>
+     * </p>
+     */
     private void initializeUI() {
         // Title Panel
         JPanel titlePanel = new JPanel();
@@ -57,6 +96,13 @@ public class CustomerMenuPanel extends JPanel {
         add(menuPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Creates a styled menu button with consistent appearance.
+     *
+     * @param text the text to display on the button
+     * @param color the background color for the button
+     * @return a configured JButton with the specified text and styling
+     */
     private JButton createMenuButton(String text, Color color) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(300, 60));
@@ -69,6 +115,14 @@ public class CustomerMenuPanel extends JPanel {
         return button;
     }
 
+    /**
+     * Handles the logout process by displaying a confirmation dialog.
+     * If the user confirms logout, it clears the user session and executes
+     * the logout callback.
+     *
+     * <p>This method shows a confirmation dialog to prevent accidental logouts.
+     * Only proceeds with logout if the user explicitly confirms.</p>
+     */
     private void handleLogout() {
         int confirm = JOptionPane.showConfirmDialog(
                 parentFrame,

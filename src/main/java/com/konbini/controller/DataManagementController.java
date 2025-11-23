@@ -1,17 +1,31 @@
 package com.konbini.controller;
 
-import com.konbini.view.StoreView;
+import com.konbini.view.BaseView;
 import java.time.LocalDate;
 
+/**
+ * Controller responsible for managing data operations including saving, loading,
+ * and initializing sample data for products, customers, and transactions.
+ */
 public class DataManagementController {
-    private final StoreView view;
+    private final BaseView view;
     private final ProductController productController;
     private final CustomerController customerController;
     private final TransactionController transactionController;
     private final ProductManagementController productManagementController;
 
+    /**
+     * Constructs a DataManagementController with all required dependencies.
+     *
+     * @param view the store view for user interface interactions
+     * @param productController controller for product operations
+     * @param customerController controller for customer operations
+     * @param transactionController controller for transaction operations
+     * @param productManagementController controller for product management operations
+     * @throws IllegalArgumentException if any dependency is null
+     */
     public DataManagementController(
-            StoreView view,
+            BaseView view,
             ProductController productController,
             CustomerController customerController,
             TransactionController transactionController,
@@ -27,6 +41,10 @@ public class DataManagementController {
         this.productManagementController = productManagementController;
     }
 
+    /**
+     * Saves all data (products, customers, transactions) to persistent storage.
+     * Displays appropriate success/error messages based on the operation results.
+     */
     public void handleSaveData() {
         try {
             int successCount = 0;
@@ -53,6 +71,10 @@ public class DataManagementController {
         }
     }
 
+    /**
+     * Loads all data (products, customers, transactions) from persistent storage.
+     * Provides user-friendly messages for first-time use when no data exists.
+     */
     public void handleLoadData() {
         try {
             int successCount = 0;
@@ -81,6 +103,10 @@ public class DataManagementController {
         }
     }
 
+    /**
+     * Initializes sample data for the application including sample products and customers.
+     * Only initializes data if no existing data is found to avoid overwriting.
+     */
     public void initializeSampleData() {
         try {
             // Check if we need to initialize
@@ -99,11 +125,20 @@ public class DataManagementController {
         }
     }
 
+    /**
+     * Checks if sample data should be initialized by verifying if current data is empty.
+     *
+     * @return true if both products and customers lists are empty, false otherwise
+     */
     private boolean shouldInitializeSampleData() {
         return productController.getAllProducts().isEmpty() &&
                 customerController.getAllCustomers().isEmpty();
     }
 
+    /**
+     * Initializes sample customers with various types including membership customers.
+     * Continues initialization even if some customers fail to be created.
+     */
     private void initializeSampleCustomers() {
         try {
             customerController.registerCustomer("Juan Dela Cruz", false);
@@ -129,6 +164,11 @@ public class DataManagementController {
         }
     }
 
+    /**
+     * Initializes sample products by delegating to the product management controller.
+     *
+     * @throws Exception if product initialization fails
+     */
     private void initializeSampleProducts() {
         try {
             productManagementController.initializeSampleProducts();
@@ -140,7 +180,11 @@ public class DataManagementController {
 
     // ==================== PRIVATE HELPER METHODS ====================
 
-
+    /**
+     * Saves product data to persistent storage.
+     *
+     * @return true if save operation was successful, false otherwise
+     */
     private boolean saveProducts() {
         boolean temp = false;
 
@@ -153,6 +197,11 @@ public class DataManagementController {
         return temp;
     }
 
+    /**
+     * Saves customer data to persistent storage.
+     *
+     * @return true if save operation was successful, false otherwise
+     */
     private boolean saveCustomers() {
         boolean temp = false;
         try {
@@ -163,6 +212,11 @@ public class DataManagementController {
         return temp;
     }
 
+    /**
+     * Saves transaction data to persistent storage.
+     *
+     * @return true if save operation was successful, false otherwise
+     */
     private boolean saveTransactions() {
         boolean temp = false;
         try {
@@ -173,6 +227,11 @@ public class DataManagementController {
         return temp;
     }
 
+    /**
+     * Loads product data from persistent storage.
+     *
+     * @return true if load operation was successful, false otherwise
+     */
     private boolean loadProducts() {
         boolean temp = false;
         try {
@@ -183,6 +242,11 @@ public class DataManagementController {
         return temp;
     }
 
+    /**
+     * Loads customer data from persistent storage.
+     *
+     * @return true if load operation was successful, false otherwise
+     */
     private boolean loadCustomers() {
         boolean temp = false;
         try {
@@ -193,6 +257,11 @@ public class DataManagementController {
         return temp;
     }
 
+    /**
+     * Loads transaction data from persistent storage.
+     *
+     * @return true if load operation was successful, false otherwise
+     */
     private boolean loadTransactions() {
         boolean temp = false;
         try {
@@ -202,8 +271,15 @@ public class DataManagementController {
         }
         return temp;
     }
+
     // ==================== ERROR HANDLING HELPERS ====================
 
+    /**
+     * Handles IllegalArgumentException by logging and displaying user-friendly error message.
+     *
+     * @param e the exception that occurred
+     * @param context the context where the exception occurred
+     */
     private void handleArgumentException(IllegalArgumentException e, String context) {
         System.err.println("Invalid argument " + context + ": " +
                 (e.getMessage() != null ? e.getMessage() : "Unknown"));
@@ -211,6 +287,13 @@ public class DataManagementController {
                 (e.getMessage() != null ? e.getMessage() : "Please check your input and try again."));
     }
 
+    /**
+     * Handles generic exceptions by logging and displaying user-friendly error message.
+     *
+     * @param e the exception that occurred
+     * @param context the context where the exception occurred
+     * @param userMessage the message to display to the user
+     */
     private void handleGenericException(Exception e, String context, String userMessage) {
         System.err.println("Error " + context + ": " + e.getMessage());
         view.displayErrorMessage(userMessage);

@@ -18,10 +18,21 @@ import com.konbini.service.discount.PointsRedemptionStrategy;
 import com.konbini.service.discount.SeniorDiscountStrategy;
 import com.konbini.service.tax.VATTaxStrategy;
 
-
+/**
+ * TransactionServiceImpl provides business logic implementation for transaction processing and management.
+ * This service handles transaction processing, receipt generation, sales reporting, and transaction data persistence.
+ * It applies business rules including tax calculation, discount strategies, and inventory validation.
+ */
 public class TransactionServiceImpl implements TransactionService {
+    /** Repository for transaction data persistence operations */
     private final TransactionRepository transactionRepository;
 
+    /**
+     * Constructs a new TransactionServiceImpl with the specified transaction repository.
+     *
+     * @param transactionRepository the TransactionRepository for data access operations
+     * @throws IllegalArgumentException if transactionRepository is null
+     */
     public TransactionServiceImpl(TransactionRepository transactionRepository) {
         if (transactionRepository == null) {
             throw new IllegalArgumentException("Transaction repository cannot be null");
@@ -29,6 +40,16 @@ public class TransactionServiceImpl implements TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
+    /**
+     * Processes a complete transaction including validation, discount application, and payment.
+     * Applies VAT tax, senior citizen discounts, and points redemption as applicable.
+     *
+     * @param cart the Cart containing items to purchase
+     * @param paymentAmount the amount paid by the customer
+     * @param pointsToRedeem the number of loyalty points to redeem (0 if none)
+     * @return the processed Transaction object
+     * @throws IllegalArgumentException if cart is null, empty, or inventory validation fails
+     */
     @Override
     public Transaction processTransaction(Cart cart, double paymentAmount, int pointsToRedeem) {
         if (cart == null) {
@@ -63,6 +84,13 @@ public class TransactionServiceImpl implements TransactionService {
         return transaction;
     }
 
+    /**
+     * Generates a formatted receipt text for a transaction.
+     *
+     * @param transaction the Transaction to generate receipt for
+     * @return formatted receipt text as a String
+     * @throws IllegalArgumentException if transaction is null
+     */
     @Override
     public String generateReceipt(Transaction transaction) {
         if (transaction == null) {
@@ -72,6 +100,15 @@ public class TransactionServiceImpl implements TransactionService {
         return receipt.generateReceiptText();
     }
 
+    /**
+     * Saves a transaction receipt to a text file.
+     *
+     * @param transaction the Transaction to save receipt for
+     * @param filePath the file path where the receipt should be saved
+     * @return true if the save operation was successful, false otherwise
+     * @throws IOException if file writing fails
+     * @throws IllegalArgumentException if transaction or filePath is null or empty
+     */
     @Override
     public boolean saveReceiptToFile(Transaction transaction, String filePath) throws IOException {
         boolean temp = false;
@@ -92,6 +129,12 @@ public class TransactionServiceImpl implements TransactionService {
         return temp;
     }
 
+    /**
+     * Finds a transaction by its ID.
+     *
+     * @param transactionId the ID of the transaction to find
+     * @return an Optional containing the Transaction if found, empty Optional otherwise
+     */
     @Override
     public Optional<Transaction> findById(String transactionId) {
         Optional<Transaction> temp = Optional.empty();
@@ -103,11 +146,23 @@ public class TransactionServiceImpl implements TransactionService {
         return temp;
     }
 
+    /**
+     * Retrieves all transactions from the system.
+     *
+     * @return a List containing all Transaction objects
+     */
     @Override
     public List<Transaction> findAll() {
         return transactionRepository.findAll();
     }
 
+    /**
+     * Finds transactions by customer ID.
+     * Returns all transactions if customerId is null or empty.
+     *
+     * @param customerId the ID of the customer to filter by
+     * @return a List of transactions for the specified customer, or all transactions if customerId is invalid
+     */
     @Override
     public List<Transaction> findByCustomerId(String customerId) {
         List<Transaction> temp;
@@ -121,6 +176,13 @@ public class TransactionServiceImpl implements TransactionService {
         return temp;
     }
 
+    /**
+     * Finds transactions by specific date.
+     * Returns all transactions if date is null.
+     *
+     * @param date the date to filter transactions by
+     * @return a List of transactions for the specified date, or all transactions if date is null
+     */
     @Override
     public List<Transaction> findByDate(LocalDate date) {
         List<Transaction> temp;
@@ -134,6 +196,14 @@ public class TransactionServiceImpl implements TransactionService {
         return temp;
     }
 
+    /**
+     * Finds transactions within a date range.
+     * Returns all transactions if startDate or endDate is null.
+     *
+     * @param startDate the start date of the range (inclusive)
+     * @param endDate the end date of the range (inclusive)
+     * @return a List of transactions within the specified date range, or all transactions if dates are invalid
+     */
     @Override
     public List<Transaction> findByDateRange(LocalDate startDate, LocalDate endDate) {
         List<Transaction> temp;
@@ -147,6 +217,11 @@ public class TransactionServiceImpl implements TransactionService {
         return temp;
     }
 
+    /**
+     * Calculates the total sales amount across all transactions.
+     *
+     * @return the sum of all transaction totals as a double
+     */
     @Override
     public double getTotalSales() {
         double total = 0.0;
@@ -156,6 +231,12 @@ public class TransactionServiceImpl implements TransactionService {
         return total;
     }
 
+    /**
+     * Calculates the total sales amount for a specific date.
+     *
+     * @param date the date to calculate sales for
+     * @return the sum of transaction totals for the specified date as a double
+     */
     @Override
     public double getTotalSalesByDate(LocalDate date) {
         double total = 0.0;
@@ -169,6 +250,13 @@ public class TransactionServiceImpl implements TransactionService {
         return total;
     }
 
+    /**
+     * Calculates the total sales amount for a date range.
+     *
+     * @param startDate the start date of the range (inclusive)
+     * @param endDate the end date of the range (inclusive)
+     * @return the sum of transaction totals within the specified date range as a double
+     */
     @Override
     public double getTotalSalesByDateRange(LocalDate startDate, LocalDate endDate) {
         double total = 0.0;
@@ -182,16 +270,33 @@ public class TransactionServiceImpl implements TransactionService {
         return total;
     }
 
+    /**
+     * Saves all transaction data to persistent storage.
+     *
+     * @return true if the save operation was successful, false otherwise
+     */
     @Override
     public boolean saveTransactions() {
         return transactionRepository.save();
     }
 
+    /**
+     * Loads all transaction data from persistent storage.
+     *
+     * @return true if the load operation was successful, false otherwise
+     */
     @Override
     public boolean loadTransactions() {
         return transactionRepository.load();
     }
 
+    /**
+     * Validates that sufficient inventory is available for all items in the cart.
+     * Checks for null products, insufficient quantities, and expired products.
+     *
+     * @param cart the Cart to validate inventory for
+     * @throws IllegalArgumentException if any item fails inventory validation
+     */
     private void validateCartInventory(Cart cart) {
         for (CartItem item : cart.getItems()) {
             Product product = item.getProduct();

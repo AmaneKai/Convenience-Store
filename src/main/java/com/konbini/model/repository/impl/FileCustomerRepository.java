@@ -15,10 +15,25 @@ import java.util.Optional;
 import com.konbini.model.Customer;
 import com.konbini.model.repository.CustomerRepository;
 
+/**
+ * FileCustomerRepository provides a file-based implementation of the CustomerRepository interface.
+ * This implementation stores customer data in a serialized file format and maintains an in-memory
+ * cache of customer objects for fast access. It supports basic CRUD operations and membership card lookup.
+ */
 public class FileCustomerRepository implements CustomerRepository {
+    /** In-memory cache of customers stored by customer ID */
     private final Map<String, Customer> customers;
+
+    /** File path where customer data is persisted */
     private final String filePath;
 
+    /**
+     * Constructs a new FileCustomerRepository with the specified file path.
+     * Initializes the in-memory customer cache.
+     *
+     * @param filePath the file path where customer data will be stored and loaded from
+     * @throws IllegalArgumentException if filePath is null or empty
+     */
     public FileCustomerRepository(String filePath) {
         if (filePath == null || filePath.trim().isEmpty()) {
             throw new IllegalArgumentException("File path cannot be null or empty");
@@ -27,6 +42,13 @@ public class FileCustomerRepository implements CustomerRepository {
         this.filePath = filePath;
     }
 
+    /**
+     * Adds a new customer to the repository.
+     * The customer is added to the in-memory cache but not automatically persisted to disk.
+     *
+     * @param customer the Customer object to add
+     * @throws IllegalArgumentException if customer is null
+     */
     @Override
     public void addCustomer(Customer customer) {
         if (customer == null) {
@@ -35,6 +57,13 @@ public class FileCustomerRepository implements CustomerRepository {
         customers.put(customer.getId(), customer);
     }
 
+    /**
+     * Updates an existing customer in the repository.
+     * Replaces the customer with the same ID in the in-memory cache.
+     *
+     * @param customer the Customer object with updated information
+     * @throws IllegalArgumentException if customer is null or not found in repository
+     */
     @Override
     public void updateCustomer(Customer customer) {
         if (customer == null) {
@@ -46,6 +75,13 @@ public class FileCustomerRepository implements CustomerRepository {
         customers.put(customer.getId(), customer);
     }
 
+    /**
+     * Removes a customer from the repository by ID.
+     * Removes the customer from the in-memory cache but not automatically from disk.
+     *
+     * @param customerId the ID of the customer to remove
+     * @throws IllegalArgumentException if customerId is null or empty
+     */
     @Override
     public void removeCustomer(String customerId) {
         if (customerId == null || customerId.trim().isEmpty()) {
@@ -54,6 +90,12 @@ public class FileCustomerRepository implements CustomerRepository {
         customers.remove(customerId);
     }
 
+    /**
+     * Finds a customer by their ID.
+     *
+     * @param customerId the ID of the customer to find
+     * @return an Optional containing the Customer if found, empty Optional otherwise
+     */
     @Override
     public Optional<Customer> findById(String customerId) {
         Optional<Customer> temp = Optional.empty();
@@ -65,11 +107,23 @@ public class FileCustomerRepository implements CustomerRepository {
         return temp;
     }
 
+    /**
+     * Retrieves all customers from the repository.
+     *
+     * @return a List containing all Customer objects in the repository
+     */
     @Override
     public List<Customer> findAll() {
         return new ArrayList<>(customers.values());
     }
 
+    /**
+     * Finds a customer by their membership card number.
+     * Searches through all customers to find one with a matching membership card.
+     *
+     * @param cardNumber the membership card number to search for
+     * @return an Optional containing the Customer if found with matching card, empty Optional otherwise
+     */
     @Override
     public Optional<Customer> findByMembershipCard(String cardNumber) {
         Optional<Customer> temp = Optional.empty();
@@ -84,6 +138,12 @@ public class FileCustomerRepository implements CustomerRepository {
         return temp;
     }
 
+    /**
+     * Saves all customer data to the file system.
+     * Serializes the current in-memory customer cache to the specified file path.
+     *
+     * @return true if the save operation was successful, false otherwise
+     */
     @Override
     public boolean save() {
         boolean temp = false;
@@ -99,6 +159,13 @@ public class FileCustomerRepository implements CustomerRepository {
         return temp;
     }
 
+    /**
+     * Loads customer data from the file system.
+     * Deserializes customer data from the specified file path into the in-memory cache.
+     * If the file doesn't exist, the operation fails silently and returns false.
+     *
+     * @return true if the load operation was successful, false otherwise
+     */
     @Override
     public boolean load() {
         boolean temp = false;

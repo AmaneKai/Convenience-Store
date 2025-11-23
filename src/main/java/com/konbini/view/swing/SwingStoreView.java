@@ -9,13 +9,26 @@ import com.konbini.controller.*;
 import com.konbini.dto.*;
 import com.konbini.model.*;
 import com.konbini.util.UserSession;
-import com.konbini.view.StoreView;
+import com.konbini.view.*;
 
-public class SwingStoreView implements StoreView {
+/**
+ * Main Swing-based GUI implementation of the StoreView interface.
+ * Provides a comprehensive graphical user interface for the store management system
+ * using Java Swing components with card-based navigation.
+ *
+ * Features include:
+ * - Multi-panel card layout navigation
+ * - User authentication (customer/employee)
+ * - Integrated view for all store operations
+ * - Exception handling and user feedback
+ * - Responsive UI with proper threading
+ */
+public class SwingStoreView implements MainView, ProductView, CustomerView, CartView, TransactionView, EmployeeView {
     private JFrame mainFrame;
     private JPanel mainPanel;
     private java.awt.CardLayout cardLayout;
 
+    // Panel components for different application sections
     private CustomerMenuPanel customerMenuPanel;
     private EmployeeMenuPanel employeeMenuPanel;
     private ProductPanel productPanel;
@@ -24,6 +37,7 @@ public class SwingStoreView implements StoreView {
     private TransactionPanel transactionPanel;
     private EmployeePanel employeePanel;
 
+    // Controller dependencies
     private ProductManagementController productManagementController;
     private CustomerManagementController customerManagementController;
     private CartManagementController cartManagementController;
@@ -32,6 +46,7 @@ public class SwingStoreView implements StoreView {
     private EmployeeController employeeController;
     private EmployeeManagementController employeeManagementController;
 
+    // Card layout identifiers
     private static final String CUSTOMER_MENU_CARD = "CustomerMenu";
     private static final String EMPLOYEE_MENU_CARD = "EmployeeMenu";
     private static final String PRODUCT_CARD = "Product";
@@ -42,10 +57,25 @@ public class SwingStoreView implements StoreView {
 
     private boolean applicationRunning = true;
 
+    /**
+     * Constructs a new SwingStoreView and initializes the GUI components.
+     */
     public SwingStoreView() {
         initializeGUI();
     }
 
+    /**
+     * Sets all controller dependencies required for the view to function.
+     * Validates dependencies and initializes panels with controllers.
+     *
+     * @param productManagementController controller for product operations
+     * @param customerManagementController controller for customer operations
+     * @param cartManagementController controller for cart operations
+     * @param transactionManagementController controller for transaction operations
+     * @param dataManagementController controller for data management operations
+     * @param employeeController controller for employee operations
+     * @param employeeManagementController controller for employee management operations
+     */
     public void setControllers(
             ProductManagementController productManagementController,
             CustomerManagementController customerManagementController,
@@ -73,6 +103,9 @@ public class SwingStoreView implements StoreView {
         createPanelsWithControllers();
     }
 
+    /**
+     * Initializes the main GUI components including window, layout, and basic styling.
+     */
     private void initializeGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -103,6 +136,9 @@ public class SwingStoreView implements StoreView {
         }
     }
 
+    /**
+     * Creates and initializes all specialized panels with their respective controllers.
+     */
     private void createPanelsWithControllers() {
         try {
             mainPanel.removeAll();
@@ -143,6 +179,9 @@ public class SwingStoreView implements StoreView {
         }
     }
 
+    /**
+     * Initializes application data on startup, loading existing data or creating sample data.
+     */
     private void initializeApplicationData() {
         try {
             dataManagementController.handleLoadData();
@@ -167,6 +206,11 @@ public class SwingStoreView implements StoreView {
 
     // ==================== NAVIGATION METHODS ====================
 
+    /**
+     * Navigates to the specified screen using card layout.
+     *
+     * @param screenName the name of the screen/card to display
+     */
     private void navigateToScreen(String screenName) {
         try {
             SwingUtilities.invokeLater(() -> {
@@ -181,6 +225,9 @@ public class SwingStoreView implements StoreView {
         }
     }
 
+    /**
+     * Handles application exit with confirmation dialog.
+     */
     private void handleExit() {
         try {
             int confirm = JOptionPane.showConfirmDialog(mainFrame,
@@ -197,12 +244,18 @@ public class SwingStoreView implements StoreView {
         }
     }
 
+    /**
+     * Shows the login screen and initiates authentication process.
+     */
     private void showLoginScreen() {
         SwingUtilities.invokeLater(() -> {
             performLoginProcess();
         });
     }
 
+    /**
+     * Performs the complete login process including user type selection and authentication.
+     */
     private void performLoginProcess() {
         boolean exit = false;
 
@@ -220,6 +273,12 @@ public class SwingStoreView implements StoreView {
         }
     }
 
+    /**
+     * Attempts to login a user of the specified type.
+     *
+     * @param userType the type of user ("CUSTOMER" or "EMPLOYEE")
+     * @return true if login was successful, false otherwise
+     */
     private boolean attemptLogin(String userType) {
         boolean temp = false;
 
@@ -242,6 +301,10 @@ public class SwingStoreView implements StoreView {
 
         return temp;
     }
+
+    /**
+     * Navigates to the appropriate user menu based on current session.
+     */
     private void navigateToUserMenu() {
         UserSession session = UserSession.getInstance();
         if (session.isCustomer()) {
@@ -255,29 +318,53 @@ public class SwingStoreView implements StoreView {
 
     // ==================== DISPLAY METHODS ====================
 
+    /**
+     * {@inheritDoc}
+     * Not implemented in Swing version - handled by navigation.
+     */
     @Override
     public void displayWelcomeMessage() {
     }
 
+    /**
+     * {@inheritDoc}
+     * Not implemented in Swing version - handled by navigation.
+     */
     @Override
     public void displayMainMenu() {
     }
 
+    /**
+     * {@inheritDoc}
+     * Not implemented in Swing version - handled by navigation.
+     */
     @Override
     public int getMainMenuChoice() {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     * Navigates to the product management screen.
+     */
     @Override
     public void displayProductMenu() {
         navigateToScreen(PRODUCT_CARD);
     }
 
+    /**
+     * {@inheritDoc}
+     * Not implemented in Swing version - handled by panel components.
+     */
     @Override
     public int getProductMenuChoice() {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays products in both product and cart panels.
+     */
     @Override
     public void displayProducts(List<ProductDTO> products) {
         SwingUtilities.invokeLater(() -> {
@@ -294,6 +381,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays detailed product information in the product panel.
+     */
     @Override
     public void displayProduct(ProductDTO product) {
         SwingUtilities.invokeLater(() -> {
@@ -307,6 +398,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays low stock products in the product panel.
+     */
     @Override
     public void displayLowStockProducts(List<ProductDTO> products) {
         SwingUtilities.invokeLater(() -> {
@@ -320,6 +415,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays expired products in the product panel.
+     */
     @Override
     public void displayExpiredProducts(List<ProductDTO> products) {
         SwingUtilities.invokeLater(() -> {
@@ -333,16 +432,28 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Navigates to the customer management screen.
+     */
     @Override
     public void displayCustomerMenu() {
         navigateToScreen(CUSTOMER_CARD);
     }
 
+    /**
+     * {@inheritDoc}
+     * Not implemented in Swing version - handled by panel components.
+     */
     @Override
     public int getCustomerMenuChoice() {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays customers in the customer panel.
+     */
     @Override
     public void displayCustomers(List<CustomerDTO> customers) {
         SwingUtilities.invokeLater(() -> {
@@ -356,6 +467,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays detailed customer information in the customer panel.
+     */
     @Override
     public void displayCustomer(CustomerDTO customer) {
         SwingUtilities.invokeLater(() -> {
@@ -369,16 +484,28 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Navigates to the cart management screen.
+     */
     @Override
     public void displayCartMenu() {
         navigateToScreen(CART_CARD);
     }
 
+    /**
+     * {@inheritDoc}
+     * Not implemented in Swing version - handled by panel components.
+     */
     @Override
     public int getCartMenuChoice() {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays cart contents in the cart panel.
+     */
     @Override
     public void displayCart(CartDTO cart) {
         SwingUtilities.invokeLater(() -> {
@@ -392,16 +519,28 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Navigates to the transaction management screen.
+     */
     @Override
     public void displayTransactionMenu() {
         navigateToScreen(TRANSACTION_CARD);
     }
 
+    /**
+     * {@inheritDoc}
+     * Not implemented in Swing version - handled by panel components.
+     */
     @Override
     public int getTransactionMenuChoice() {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays transactions in the transaction panel.
+     */
     @Override
     public void displayTransactions(List<TransactionDTO> transactions) {
         SwingUtilities.invokeLater(() -> {
@@ -415,6 +554,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays detailed transaction information in the transaction panel.
+     */
     @Override
     public void displayTransaction(TransactionDTO transaction) {
         SwingUtilities.invokeLater(() -> {
@@ -428,6 +571,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays a receipt in a scrollable dialog with monospaced font.
+     */
     @Override
     public void displayReceipt(String receipt) {
         SwingUtilities.invokeLater(() -> {
@@ -444,6 +591,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays total sales in the transaction panel.
+     */
     @Override
     public void displayTotalSales(double totalSales) {
         SwingUtilities.invokeLater(() -> {
@@ -457,6 +608,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays sales for a specific date in the transaction panel.
+     */
     @Override
     public void displayTotalSalesByDate(LocalDate date, double totalSales) {
         SwingUtilities.invokeLater(() -> {
@@ -470,6 +625,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays sales for a date range in the transaction panel.
+     */
     @Override
     public void displayTotalSalesByDateRange(LocalDate startDate, LocalDate endDate, double totalSales) {
         SwingUtilities.invokeLater(() -> {
@@ -483,16 +642,28 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Navigates to the employee management screen.
+     */
     @Override
     public void displayEmployeeMenu() {
         navigateToScreen(EMPLOYEE_CARD);
     }
 
+    /**
+     * {@inheritDoc}
+     * Not implemented in Swing version - handled by panel components.
+     */
     @Override
     public int getEmployeeMenuChoice() {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays employees in the employee panel.
+     */
     @Override
     public void displayEmployees(List<EmployeeDTO> employees) {
         SwingUtilities.invokeLater(() -> {
@@ -506,6 +677,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays detailed employee information in the employee panel.
+     */
     @Override
     public void displayEmployee(EmployeeDTO employee) {
         SwingUtilities.invokeLater(() -> {
@@ -519,6 +694,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays an error message in a dialog box.
+     */
     @Override
     public void displayErrorMessage(String message) {
         SwingUtilities.invokeLater(() -> {
@@ -530,6 +709,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays a success message in a dialog box.
+     */
     @Override
     public void displaySuccessMessage(String message) {
         SwingUtilities.invokeLater(() -> {
@@ -541,6 +724,10 @@ public class SwingStoreView implements StoreView {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     * Displays an informational message in a dialog box.
+     */
     @Override
     public void displayInfoMessage(String message) {
         SwingUtilities.invokeLater(() -> {
@@ -554,6 +741,10 @@ public class SwingStoreView implements StoreView {
 
     // ==================== INPUT METHODS ====================
 
+    /**
+     * {@inheritDoc}
+     * Gets string input from the user via a dialog box.
+     */
     @Override
     public String getStringInput(String prompt) {
         try {
@@ -564,6 +755,10 @@ public class SwingStoreView implements StoreView {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Gets integer input from the user with validation and error handling.
+     */
     @Override
     public int getIntInput(String prompt) {
         int result = 0;
@@ -591,6 +786,10 @@ public class SwingStoreView implements StoreView {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * Gets double input from the user with validation and error handling.
+     */
     @Override
     public double getDoubleInput(String prompt) {
         double result = 0.0;
@@ -619,6 +818,10 @@ public class SwingStoreView implements StoreView {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * Gets boolean input from the user via a confirmation dialog.
+     */
     @Override
     public boolean getBooleanInput(String prompt) {
         try {
@@ -630,6 +833,10 @@ public class SwingStoreView implements StoreView {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Gets date input from the user with format validation.
+     */
     @Override
     public LocalDate getDateInput(String prompt) {
         LocalDate result = null;
@@ -660,6 +867,10 @@ public class SwingStoreView implements StoreView {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * Gets product category input from the user via a selection dialog.
+     */
     @Override
     public ProductCategory getCategoryInput() {
         try {
@@ -674,6 +885,10 @@ public class SwingStoreView implements StoreView {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Gets product subcategory input from the user based on the selected category.
+     */
     @Override
     public ProductSubcategory getSubcategoryInput(ProductCategory category) {
         ProductSubcategory temp = null;
@@ -695,8 +910,19 @@ public class SwingStoreView implements StoreView {
 
         return temp;
     }
+
     // ==================== VALIDATION METHODS ====================
 
+    /**
+     * Validates that all required controller dependencies are provided.
+     *
+     * @param productManagementController product management controller
+     * @param customerManagementController customer management controller
+     * @param cartManagementController cart management controller
+     * @param transactionManagementController transaction management controller
+     * @param dataManagementController data management controller
+     * @throws IllegalArgumentException if any controller is null
+     */
     private void validateControllerDependencies(
             ProductManagementController productManagementController,
             CustomerManagementController customerManagementController,
@@ -722,15 +948,32 @@ public class SwingStoreView implements StoreView {
 
     // ==================== ERROR HANDLING ====================
 
+    /**
+     * Handles UI-related exceptions by logging and displaying user-friendly messages.
+     *
+     * @param e the exception that occurred
+     * @param context the context where the exception occurred
+     * @param userMessage the message to display to the user
+     */
     private void handleUIException(Exception e, String context, String userMessage) {
         System.err.println("SwingStoreView Error " + context + ": " + e.getMessage());
         displayErrorMessage(userMessage);
     }
 
+    /**
+     * Gets the main application frame.
+     *
+     * @return the main JFrame instance
+     */
     public JFrame getMainFrame() {
         return mainFrame;
     }
 
+    /**
+     * Checks if the application is currently running.
+     *
+     * @return true if the application is running, false otherwise
+     */
     public boolean isApplicationRunning() {
         return applicationRunning;
     }

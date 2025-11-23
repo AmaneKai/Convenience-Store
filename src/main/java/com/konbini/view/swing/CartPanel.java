@@ -16,6 +16,18 @@ import com.konbini.dto.CartDTO;
 import com.konbini.dto.ProductDTO;
 import com.konbini.dto.TransactionItemDTO;
 
+/**
+ * Swing panel for managing shopping cart operations and product selection.
+ * Provides a comprehensive interface for viewing available products, adding items to cart,
+ * managing cart contents, and processing checkout.
+ *
+ * Features include:
+ * - Product browsing with category filtering
+ * - Real-time cart display with item details
+ * - Quantity selection for product addition
+ * - Cart management operations (create, view, remove, clear)
+ * - Checkout processing
+ */
 public class CartPanel extends JPanel {
     private Runnable backCallback;
     private CartManagementController controller;
@@ -34,6 +46,13 @@ public class CartPanel extends JPanel {
     private static final String[] COLUMN_NAMES = { "Product ID", "Product Name", "Price", "Quantity", "Total" };
     private static final String ALL_CATEGORIES = "All Categories";
 
+    /**
+     * Constructs a new CartPanel with the specified controller and navigation callback.
+     *
+     * @param controller the cart management controller for business operations
+     * @param backCallback callback function for navigating back to previous screen
+     * @throws IllegalArgumentException if controller or backCallback is null
+     */
     public CartPanel(CartManagementController controller, Runnable backCallback) {
         if (controller == null) {
             throw new IllegalArgumentException("CartManagementController cannot be null");
@@ -48,6 +67,9 @@ public class CartPanel extends JPanel {
         loadAvailableProducts();
     }
 
+    /**
+     * Initializes the user interface components and layout.
+     */
     private void initializeUI() {
         setLayout(new BorderLayout());
 
@@ -73,6 +95,11 @@ public class CartPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Creates the header panel with title and back button.
+     *
+     * @return the configured header panel
+     */
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(41, 128, 185));
@@ -90,6 +117,11 @@ public class CartPanel extends JPanel {
         return headerPanel;
     }
 
+    /**
+     * Creates the button panel with cart management actions.
+     *
+     * @return the configured button panel
+     */
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(236, 240, 241));
@@ -107,6 +139,11 @@ public class CartPanel extends JPanel {
         return buttonPanel;
     }
 
+    /**
+     * Creates the products panel with category filtering and product list.
+     *
+     * @return the configured products panel
+     */
     private JPanel createProductsPanel() {
         JPanel panelWrapper = new JPanel(new BorderLayout());
         panelWrapper.setBorder(BorderFactory.createTitledBorder("Available Products"));
@@ -123,6 +160,11 @@ public class CartPanel extends JPanel {
         return panelWrapper;
     }
 
+    /**
+     * Creates the category filter panel with combo box.
+     *
+     * @return the configured filter panel
+     */
     private JPanel createFilterPanel() {
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         filterPanel.setBackground(new Color(236, 240, 241));
@@ -140,6 +182,11 @@ public class CartPanel extends JPanel {
         return filterPanel;
     }
 
+    /**
+     * Creates the product list panel with scrollable product buttons.
+     *
+     * @return the configured product list panel
+     */
     private JPanel createProductListPanel() {
         JLabel titleLabel = new JLabel("Click to add items:");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 12));
@@ -160,6 +207,11 @@ public class CartPanel extends JPanel {
         return centerWrapper;
     }
 
+    /**
+     * Creates the cart information panel with customer details and cart table.
+     *
+     * @return the configured cart info panel
+     */
     private JPanel createCartInfoPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -174,6 +226,11 @@ public class CartPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Creates the cart information panel displaying customer and subtotal details.
+     *
+     * @return the configured info panel
+     */
     private JPanel createInfoPanel() {
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
@@ -194,6 +251,11 @@ public class CartPanel extends JPanel {
         return infoPanel;
     }
 
+    /**
+     * Creates the cart table with item details.
+     *
+     * @return the configured scroll pane containing the cart table
+     */
     private JScrollPane createCartTable() {
         tableModel = new DefaultTableModel(COLUMN_NAMES, 0) {
             public boolean isCellEditable(int row, int col) {
@@ -208,6 +270,9 @@ public class CartPanel extends JPanel {
 
     // ==================== EVENT HANDLERS ====================
 
+    /**
+     * Handles the create cart action by delegating to the controller.
+     */
     private void handleCreateCart() {
         try {
             controller.handleCreateCart();
@@ -216,6 +281,9 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the view cart action by delegating to the controller.
+     */
     private void handleViewCart() {
         try {
             controller.handleViewCart();
@@ -224,6 +292,9 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the remove item action by delegating to the controller.
+     */
     private void handleRemoveItem() {
         try {
             controller.handleRemoveItem();
@@ -232,6 +303,9 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the clear cart action by delegating to the controller.
+     */
     private void handleClearCart() {
         try {
             controller.handleClearCart();
@@ -240,6 +314,10 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the checkout process by delegating to the controller.
+     * Navigates back to the previous screen if checkout is successful.
+     */
     private void handleCheckout() {
         try {
             boolean success = controller.handleCheckout();
@@ -252,6 +330,11 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles adding a product to the cart with quantity validation.
+     *
+     * @param product the product to add to the cart
+     */
     private void handleProductAdd(ProductDTO product) {
         try {
             validateProductForAdd(product);
@@ -269,6 +352,12 @@ public class CartPanel extends JPanel {
 
     // ==================== VALIDATION METHODS ====================
 
+    /**
+     * Validates that a product can be added to the cart.
+     *
+     * @param product the product to validate
+     * @throws IllegalArgumentException if product is null, expired, or out of stock
+     */
     private void validateProductForAdd(ProductDTO product) {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
@@ -283,6 +372,13 @@ public class CartPanel extends JPanel {
 
     // ==================== UI HELPER METHODS ====================
 
+    /**
+     * Creates a standardized button with action handling.
+     *
+     * @param text the button text
+     * @param action the action to execute when clicked
+     * @return the configured button
+     */
     private JButton createButton(String text, Runnable action) {
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(120, 40));
@@ -296,6 +392,12 @@ public class CartPanel extends JPanel {
         return btn;
     }
 
+    /**
+     * Creates a spinner with buttons only (non-editable text field).
+     *
+     * @param model the spinner number model
+     * @return the configured spinner
+     */
     private JSpinner createButtonOnlySpinner(SpinnerNumberModel model) {
         JSpinner spinner = new JSpinner(model);
 
@@ -309,6 +411,12 @@ public class CartPanel extends JPanel {
         return spinner;
     }
 
+    /**
+     * Creates a product button row with details and add action.
+     *
+     * @param product the product to display
+     * @return the configured product row panel
+     */
     private JPanel createProductButtonRow(ProductDTO product) {
         JPanel rowPanel = new JPanel(new BorderLayout(5, 2));
         rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
@@ -328,6 +436,12 @@ public class CartPanel extends JPanel {
         return rowPanel;
     }
 
+    /**
+     * Creates the product details panel with name, brand, and price.
+     *
+     * @param product the product to display
+     * @return the configured details panel
+     */
     private JPanel createProductDetailsPanel(ProductDTO product) {
         JPanel detailsPanel = new JPanel();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
@@ -348,6 +462,12 @@ public class CartPanel extends JPanel {
         return detailsPanel;
     }
 
+    /**
+     * Creates the product action panel with quantity spinner and add button.
+     *
+     * @param product the product to create actions for
+     * @return the configured action panel
+     */
     private JPanel createProductActionPanel(ProductDTO product) {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
         actionPanel.setBackground(Color.WHITE);
@@ -370,6 +490,12 @@ public class CartPanel extends JPanel {
         return actionPanel;
     }
 
+    /**
+     * Creates a category header label for product grouping.
+     *
+     * @param categoryName the name of the category
+     * @return the configured category header label
+     */
     private JLabel createCategoryHeader(String categoryName) {
         JLabel header = new JLabel("  " + categoryName);
         header.setFont(new Font("Arial", Font.BOLD, 12));
@@ -382,6 +508,13 @@ public class CartPanel extends JPanel {
 
     // ==================== ERROR HANDLING METHODS ====================
 
+    /**
+     * Handles UI-related exceptions by logging and displaying user-friendly messages.
+     *
+     * @param e the exception that occurred
+     * @param context the context where the exception occurred
+     * @param userMessage the message to display to the user
+     */
     private void handleUIException(Exception e, String context, String userMessage) {
         System.err.println("UI Error " + context + ": " + e.getMessage());
         JOptionPane.showMessageDialog(this,
@@ -389,6 +522,13 @@ public class CartPanel extends JPanel {
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
     }
+
+    /**
+     * Extracts a safe error message from an exception.
+     *
+     * @param e the exception to extract message from
+     * @return the exception message or a default message if none available
+     */
     private String getSafeErrorMessage(Exception e) {
         String temp = "Please check your input and try again.";
 
@@ -398,6 +538,10 @@ public class CartPanel extends JPanel {
 
         return temp;
     }
+
+    /**
+     * Loads available products by delegating to the controller.
+     */
     private void loadAvailableProducts() {
         try {
             controller.loadAvailableProducts();
@@ -408,6 +552,9 @@ public class CartPanel extends JPanel {
 
     // ==================== DISPLAY METHODS ====================
 
+    /**
+     * Refreshes the product display based on the selected category filter.
+     */
     private void refreshProductDisplay() {
         try {
             String selectedCategory = (String) categoryComboBox.getSelectedItem();
@@ -426,6 +573,9 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays all available products grouped by category and subcategory.
+     */
     private void displayAllProducts() {
         if (availableProducts == null || availableProducts.isEmpty()) {
             JLabel noProductsLabel = new JLabel("No products available");
@@ -456,6 +606,11 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays products filtered by a specific category.
+     *
+     * @param category the category to filter products by
+     */
     private void displayProductsByCategory(String category) {
         List<ProductDTO> filteredProducts = availableProducts.stream()
                 .filter(p -> p.getCategory().equals(category) && !p.isExpired() && p.getQuantity() > 0)
@@ -482,6 +637,11 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays the current cart contents and customer information.
+     *
+     * @param cart the cart data to display, or null to clear the display
+     */
     public void displayCart(CartDTO cart) {
         try {
             if (cart == null) {
@@ -517,6 +677,11 @@ public class CartPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays the available products list and updates the category filter.
+     *
+     * @param products the list of products to display
+     */
     public void displayProducts(List<ProductDTO> products) {
         try {
             this.availableProducts = products;
@@ -541,6 +706,9 @@ public class CartPanel extends JPanel {
 
     // ==================== CLEANUP METHOD ====================
 
+    /**
+     * Cleans up resources used by the panel.
+     */
     public void cleanup() {
         if (quantitySpinners != null) {
             quantitySpinners.clear();

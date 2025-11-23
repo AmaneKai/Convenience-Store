@@ -7,7 +7,10 @@ import com.konbini.service.*;
 import com.konbini.service.impl.*;
 import com.konbini.view.swing.SwingStoreView;
 
-
+/**
+ * Main entry point for the Store Management System application.
+ * Initializes all components including repositories, services, controllers, and the UI.
+ */
 public class Main {
     public static void main(String[] args) {
         ProductRepository productRepository = new FileProductRepository("products.dat");

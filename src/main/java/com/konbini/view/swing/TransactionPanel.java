@@ -22,17 +22,41 @@ import com.konbini.controller.TransactionManagementController;
 import com.konbini.dto.TransactionDTO;
 import com.konbini.dto.TransactionItemDTO;
 
+/**
+ * TransactionPanel provides a graphical user interface for transaction reporting and management.
+ * This panel displays transaction data, sales summaries, and provides various reporting options
+ * including date-based filtering and customer-specific transaction views.
+ */
 public class TransactionPanel extends JPanel {
+    /** Callback function to navigate back to the previous screen */
     private Runnable backCallback;
+
+    /** Controller responsible for handling transaction management business logic */
     private TransactionManagementController controller;
 
+    /** Table component for displaying transaction data */
     private JTable transactionTable;
+
+    /** Table model managing the data for the transaction table */
     private DefaultTableModel tableModel;
+
+    /** Label for displaying status messages and operation results */
     private JLabel statusLabel;
+
+    /** Label for displaying sales summary information */
     private JLabel salesSummaryLabel;
 
+    /** Column names for the transaction table */
     private static final String[] COLUMN_NAMES = {"ID", "Customer", "Date", "Total", "Payment", "Change", "Items"};
 
+    /**
+     * Constructs a new TransactionPanel with the specified controller and navigation callback.
+     * Initializes the UI components and sets up the panel layout.
+     *
+     * @param controller the TransactionManagementController that handles business logic operations
+     * @param backCallback a Runnable that executes when navigating back to the previous screen
+     * @throws IllegalArgumentException if controller or backCallback parameters are null
+     */
     public TransactionPanel(TransactionManagementController controller, Runnable backCallback) {
         validateConstructorArgs(controller, backCallback);
         this.controller = controller;
@@ -40,6 +64,10 @@ public class TransactionPanel extends JPanel {
         initializeUI();
     }
 
+    /**
+     * Initializes the user interface components of the panel.
+     * Sets up the main layout and creates the header, center, and button panels.
+     */
     private void initializeUI() {
         setLayout(new BorderLayout());
 
@@ -56,6 +84,11 @@ public class TransactionPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Creates the header panel containing the title and back button.
+     *
+     * @return JPanel containing the header components
+     */
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(41, 128, 185));
@@ -73,6 +106,11 @@ public class TransactionPanel extends JPanel {
         return headerPanel;
     }
 
+    /**
+     * Creates the center panel containing the sales summary label and transaction table.
+     *
+     * @return JPanel containing the sales summary and table components
+     */
     private JPanel createCenterPanel() {
         JPanel centerPanel = new JPanel(new BorderLayout());
 
@@ -85,6 +123,13 @@ public class TransactionPanel extends JPanel {
         centerPanel.add(salesSummaryLabel, BorderLayout.NORTH);
 
         tableModel = new DefaultTableModel(COLUMN_NAMES, 0) {
+            /**
+             * Prevents table cells from being editable by the user.
+             *
+             * @param row the row index of the cell
+             * @param col the column index of the cell
+             * @return false to make all cells non-editable
+             */
             public boolean isCellEditable(int row, int col) {
                 return false;
             }
@@ -102,6 +147,11 @@ public class TransactionPanel extends JPanel {
         return centerPanel;
     }
 
+    /**
+     * Creates the button panel with all transaction management action buttons.
+     *
+     * @return JPanel containing the action buttons
+     */
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 10));
         buttonPanel.setBackground(new Color(236, 240, 241));
@@ -119,6 +169,10 @@ public class TransactionPanel extends JPanel {
 
     // ==================== EVENT HANDLERS ====================
 
+    /**
+     * Handles the back navigation action.
+     * Executes the back callback with exception handling.
+     */
     private void handleBackAction() {
         try {
             backCallback.run();
@@ -127,6 +181,10 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the view all transactions action.
+     * Delegates to the controller to retrieve and display all transactions.
+     */
     private void handleViewAllTransactions() {
         try {
             controller.handleViewAllTransactions();
@@ -135,6 +193,10 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles viewing transactions for a specific customer.
+     * Delegates to the controller to retrieve customer-specific transactions.
+     */
     private void handleViewCustomerTransactions() {
         try {
             controller.handleViewCustomerTransactions();
@@ -143,6 +205,10 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles viewing transactions for a specific date.
+     * Delegates to the controller to retrieve date-specific transactions.
+     */
     private void handleViewByDate() {
         try {
             controller.handleViewByDate();
@@ -151,6 +217,10 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles viewing transactions within a date range.
+     * Delegates to the controller to retrieve transactions for a date range.
+     */
     private void handleViewByDateRange() {
         try {
             controller.handleViewByDateRange();
@@ -159,6 +229,10 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles calculating and displaying total sales across all transactions.
+     * Delegates to the controller to calculate total sales.
+     */
     private void handleViewTotalSales() {
         try {
             controller.handleViewTotalSales();
@@ -167,6 +241,10 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles calculating and displaying sales for a specific date.
+     * Delegates to the controller to calculate date-specific sales.
+     */
     private void handleViewSalesByDate() {
         try {
             controller.handleViewSalesByDate();
@@ -175,6 +253,10 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles calculating and displaying sales within a date range.
+     * Delegates to the controller to calculate sales for a date range.
+     */
     private void handleViewSalesByDateRange() {
         try {
             controller.handleViewSalesByDateRange();
@@ -185,6 +267,13 @@ public class TransactionPanel extends JPanel {
 
     // ==================== DISPLAY METHODS ====================
 
+    /**
+     * Displays a list of transactions in the table.
+     * Clears existing data and populates the table with the provided transaction list.
+     *
+     * @param transactions the list of TransactionDTO objects to display
+     * @throws IllegalArgumentException if the transaction list is null or contains invalid data
+     */
     public void displayTransactions(List<TransactionDTO> transactions) {
         try {
             validateTransactionList(transactions);
@@ -212,6 +301,13 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays detailed information for a single transaction in a dialog.
+     * Shows comprehensive transaction data including items, pricing, and payment information.
+     *
+     * @param transaction the TransactionDTO object containing transaction details to display
+     * @throws IllegalArgumentException if the transaction data is invalid
+     */
     public void displayTransaction(TransactionDTO transaction) {
         try {
             validateTransaction(transaction);
@@ -254,6 +350,13 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays total sales amount across all transactions.
+     * Updates both the sales summary label and shows a dialog with the total.
+     *
+     * @param totalSales the total sales amount to display
+     * @throws IllegalArgumentException if the sales amount is invalid
+     */
     public void displayTotalSales(double totalSales) {
         try {
             validateSalesAmount(totalSales);
@@ -273,6 +376,14 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays total sales amount for a specific date.
+     * Updates both the sales summary label and shows a dialog with the date-specific total.
+     *
+     * @param date the date for which sales are being displayed
+     * @param totalSales the total sales amount for the specified date
+     * @throws IllegalArgumentException if the date or sales amount is invalid
+     */
     public void displayTotalSalesByDate(java.time.LocalDate date, double totalSales) {
         try {
             validateDate(date);
@@ -293,6 +404,15 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays total sales amount for a date range.
+     * Updates both the sales summary label and shows a dialog with the range total.
+     *
+     * @param start the start date of the range
+     * @param end the end date of the range
+     * @param totalSales the total sales amount for the specified date range
+     * @throws IllegalArgumentException if the date range or sales amount is invalid
+     */
     public void displayTotalSalesByDateRange(java.time.LocalDate start, java.time.LocalDate end, double totalSales) {
         try {
             validateDateRange(start, end);
@@ -315,6 +435,13 @@ public class TransactionPanel extends JPanel {
 
     // ==================== UTILITY METHODS ====================
 
+    /**
+     * Creates a standardized button with consistent styling and error handling.
+     *
+     * @param text the text to display on the button
+     * @param action the Runnable to execute when the button is clicked
+     * @return a configured JButton with the specified text and action
+     */
     private JButton createButton(String text, Runnable action) {
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(110, 40));
@@ -328,6 +455,13 @@ public class TransactionPanel extends JPanel {
         return btn;
     }
 
+    /**
+     * Creates a table row from a TransactionDTO object.
+     * Formats the data for display in the transaction table.
+     *
+     * @param transaction the TransactionDTO object to convert to a table row
+     * @return an array of objects representing the table row data
+     */
     private Object[] createTableRow(TransactionDTO transaction) {
         return new Object[]{
                 transaction.getId(),
@@ -340,6 +474,11 @@ public class TransactionPanel extends JPanel {
         };
     }
 
+    /**
+     * Updates the status label with the specified message.
+     *
+     * @param message the message to display in the status label
+     */
     private void updateStatus(String message) {
         if (statusLabel != null) {
             statusLabel.setText(message);
@@ -348,6 +487,13 @@ public class TransactionPanel extends JPanel {
 
     // ==================== VALIDATION METHODS ====================
 
+    /**
+     * Validates constructor arguments to ensure they are not null.
+     *
+     * @param controller the TransactionManagementController to validate
+     * @param backCallback the back callback to validate
+     * @throws IllegalArgumentException if any argument is null
+     */
     private void validateConstructorArgs(TransactionManagementController controller, Runnable backCallback) {
         if (controller == null) {
             throw new IllegalArgumentException("TransactionManagementController cannot be null");
@@ -357,18 +503,36 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Validates that the transaction list is not null.
+     *
+     * @param transactions the list of transactions to validate
+     * @throws IllegalArgumentException if the transaction list is null
+     */
     private void validateTransactionList(List<TransactionDTO> transactions) {
         if (transactions == null) {
             throw new IllegalArgumentException("Transaction list cannot be null");
         }
     }
 
+    /**
+     * Validates that a transaction object contains required data.
+     *
+     * @param transaction the TransactionDTO object to validate
+     * @return true if the transaction is valid, false otherwise
+     */
     private boolean isValidTransaction(TransactionDTO transaction) {
         return transaction != null &&
                 transaction.getId() != null &&
                 !transaction.getId().trim().isEmpty();
     }
 
+    /**
+     * Validates that a transaction object contains required data.
+     *
+     * @param transaction the TransactionDTO object to validate
+     * @throws IllegalArgumentException if the transaction is null or has invalid data
+     */
     private void validateTransaction(TransactionDTO transaction) {
         if (transaction == null) {
             throw new IllegalArgumentException("Transaction cannot be null");
@@ -378,12 +542,24 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Validates that a transaction item object contains required data.
+     *
+     * @param item the TransactionItemDTO object to validate
+     * @return true if the transaction item is valid, false otherwise
+     */
     private boolean isValidTransactionItem(TransactionItemDTO item) {
         return item != null &&
                 item.getProductName() != null &&
                 !item.getProductName().trim().isEmpty();
     }
 
+    /**
+     * Validates that a sales amount is a valid positive number.
+     *
+     * @param salesAmount the sales amount to validate
+     * @throws IllegalArgumentException if the sales amount is invalid
+     */
     private void validateSalesAmount(double salesAmount) {
         if (salesAmount < 0) {
             throw new IllegalArgumentException("Sales amount cannot be negative");
@@ -393,12 +569,25 @@ public class TransactionPanel extends JPanel {
         }
     }
 
+    /**
+     * Validates that a date is not null.
+     *
+     * @param date the date to validate
+     * @throws IllegalArgumentException if the date is null
+     */
     private void validateDate(java.time.LocalDate date) {
         if (date == null) {
             throw new IllegalArgumentException("Date cannot be null");
         }
     }
 
+    /**
+     * Validates that a date range is valid.
+     *
+     * @param start the start date of the range
+     * @param end the end date of the range
+     * @throws IllegalArgumentException if the date range is invalid
+     */
     private void validateDateRange(java.time.LocalDate start, java.time.LocalDate end) {
         if (start == null || end == null) {
             throw new IllegalArgumentException("Both start and end dates must be provided");
@@ -410,6 +599,13 @@ public class TransactionPanel extends JPanel {
 
     // ==================== ERROR HANDLING ====================
 
+    /**
+     * Handles UI exceptions by logging the error and displaying a user-friendly message.
+     *
+     * @param e the exception that occurred
+     * @param context a description of where the error occurred
+     * @param userMessage the user-friendly message to display
+     */
     private void handleUIException(Exception e, String context, String userMessage) {
         System.err.println("TransactionPanel Error " + context + ": " + e.getMessage());
         updateStatus("Error: " + userMessage);

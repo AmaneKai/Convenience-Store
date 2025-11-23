@@ -8,10 +8,14 @@ import com.konbini.dto.*;
 import com.konbini.model.*;
 import com.konbini.service.*;
 import com.konbini.util.FileUtil;
-import com.konbini.view.StoreView;
+import com.konbini.view.swing.*;
 
+/**
+ * Controller for managing shopping cart operations including cart creation, item management,
+ * and checkout process. Coordinates between view, cart, product, and transaction controllers.
+ */
 public class CartManagementController {
-    private final StoreView view;
+    private final SwingStoreView view;
     private final ProductController productController;
     private final CustomerController customerController;
     private final CartController cartController;
@@ -20,8 +24,19 @@ public class CartManagementController {
 
     private Cart currentCart;
 
+    /**
+     * Constructs a CartManagementController with all required dependencies.
+     *
+     * @param view the store view for user interface interactions
+     * @param productController controller for product operations
+     * @param customerController controller for customer operations
+     * @param cartController controller for cart operations
+     * @param transactionController controller for transaction operations
+     * @param cartService service for cart calculations and validations
+     * @throws IllegalArgumentException if any dependency is null
+     */
     public CartManagementController(
-            StoreView view,
+            SwingStoreView view,
             ProductController productController,
             CustomerController customerController,
             CartController cartController,
@@ -41,6 +56,10 @@ public class CartManagementController {
 
     // ==================== PUBLIC HANDLERS ====================
 
+    /**
+     * Handles the creation of a new shopping cart for a customer.
+     * Displays available customers and prompts for customer selection.
+     */
     public void handleCreateCart() {
         try {
             List<CustomerDTO> customers = customerController.getAllCustomers().stream()
@@ -60,6 +79,10 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Handles displaying the current cart contents.
+     * Requires an active cart to be present.
+     */
     public void handleViewCart() {
         try {
             if (ensureCartExists()) {
@@ -72,6 +95,10 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Handles adding an item to the current cart.
+     * Displays available products and prompts for product selection and quantity.
+     */
     public void handleAddItem() {
         try {
             if (ensureCartExists()) {
@@ -89,6 +116,10 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Handles removing an item from the current cart.
+     * Requires the cart to not be empty.
+     */
     public void handleRemoveItem() {
         try {
             if (ensureCartNotEmpty()) {
@@ -106,6 +137,10 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Handles updating the quantity of an item in the current cart.
+     * Requires the cart to not be empty.
+     */
     public void handleUpdateQuantity() {
         try {
             if (ensureCartNotEmpty()) {
@@ -123,6 +158,10 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Handles clearing all items from the current cart.
+     * Requires an active cart to be present.
+     */
     public void handleClearCart() {
         try {
             if (ensureCartExists()) {
@@ -134,6 +173,11 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Handles the checkout process including payment and transaction finalization.
+     *
+     * @return true if checkout was successful and cart was cleared, false otherwise
+     */
     public boolean handleCheckout() {
         try {
             if (ensureCartNotEmpty()) {
@@ -152,6 +196,12 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Handles adding a specific product to the cart with a given quantity.
+     *
+     * @param product the product to add to the cart
+     * @param quantity the quantity of the product to add
+     */
     public void handleAddItem(ProductDTO product, int quantity) {
         try {
             if (ensureCartExists()) {
@@ -164,6 +214,9 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Loads and displays all available products.
+     */
     public void loadAvailableProducts() {
         try {
             List<Product> allProducts = productController.getAllProducts();
@@ -180,6 +233,11 @@ public class CartManagementController {
 
     // ==================== PRIVATE HELPER METHODS ====================
 
+    /**
+     * Creates a cart for the specified customer.
+     *
+     * @param customerId the ID of the customer to create the cart for
+     */
     private void createCartForCustomer(String customerId) {
         Optional<Customer> customer = customerController.getCustomerById(customerId);
 
@@ -191,6 +249,11 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Adds an item to the cart with the specified quantity.
+     *
+     * @param productId the ID of the product to add
+     */
     private void addItemToCart(String productId) {
         int quantity = view.getIntInput("Enter quantity: ");
 
@@ -201,12 +264,22 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Removes an item from the cart.
+     *
+     * @param productId the ID of the product to remove
+     */
     private void removeItemFromCart(String productId) {
         cartController.removeFromCart(currentCart, productId);
         view.displaySuccessMessage("Item removed.");
         view.displayCart(CartDTO.fromModel(currentCart));
     }
 
+    /**
+     * Updates the quantity of an item in the cart.
+     *
+     * @param productId the ID of the product to update
+     */
     private void updateItemQuantity(String productId) {
         int newQuantity = view.getIntInput("Enter new quantity: ");
 
@@ -217,6 +290,9 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Processes the checkout workflow including validation and user confirmation.
+     */
     private void processCheckout() {
         boolean inventoryValid = true;
 
@@ -237,6 +313,9 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Completes the checkout process including points redemption and payment.
+     */
     private void completeCheckout() {
         Customer customer = currentCart.getCustomer();
         boolean pointsValid = true;
@@ -255,6 +334,12 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Processes payment and finalizes the transaction.
+     *
+     * @param customer the customer making the purchase
+     * @param pointsToRedeem the number of points being redeemed
+     */
     private void processPaymentAndFinalize(Customer customer, int pointsToRedeem) {
         try {
             double total = cartService.calculateTotal(currentCart, customer);
@@ -275,6 +360,12 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Finalizes the transaction, generates receipt, and clears the cart.
+     *
+     * @param payment the payment amount received
+     * @param pointsToRedeem the number of points redeemed
+     */
     private void finalizeTransaction(double payment, int pointsToRedeem) {
         Transaction transaction = transactionController.processTransaction(currentCart, payment, pointsToRedeem);
         String receipt = transactionController.generateReceipt(transaction);
@@ -286,6 +377,11 @@ public class CartManagementController {
         currentCart = null;
     }
 
+    /**
+     * Saves the transaction receipt to a file.
+     *
+     * @param transaction the transaction to save
+     */
     private void saveReceiptFile(Transaction transaction) {
         try {
             String receiptPath = FileUtil.ensureReceiptsDirectory() + "/receipt_" + transaction.getId() + ".txt";
@@ -297,12 +393,21 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Refreshes the product display with updated inventory.
+     */
     private void refreshProductDisplay() {
         List<ProductDTO> updatedProducts = productController.getAllProducts().stream()
                 .map(ProductDTO::fromModel).collect(Collectors.toList());
         view.displayProducts(updatedProducts);
     }
 
+    /**
+     * Adds a validated product to the cart.
+     *
+     * @param product the product to add
+     * @param quantity the quantity to add
+     */
     private void addProductToCart(ProductDTO product, int quantity) {
         String errorMessage = validateProductAndQuantity(product, quantity);
 
@@ -319,6 +424,13 @@ public class CartManagementController {
         }
     }
 
+    /**
+     * Validates that a product and quantity are acceptable for adding to cart.
+     *
+     * @param product the product to validate
+     * @param quantity the quantity to validate
+     * @return error message if validation fails, null if validation passes
+     */
     private String validateProductAndQuantity(ProductDTO product, int quantity) {
         String temp;
 
@@ -335,12 +447,23 @@ public class CartManagementController {
         return temp;
     }
 
+    /**
+     * Adds a validated product to the cart and updates the display.
+     *
+     * @param product the product to add
+     * @param quantity the quantity to add
+     */
     private void addValidatedProduct(Product product, int quantity) {
         cartController.addToCart(currentCart, product.getId(), quantity);
         view.displaySuccessMessage("Item added to cart!");
         view.displayCart(CartDTO.fromModel(currentCart));
     }
 
+    /**
+     * Converts and displays a list of products.
+     *
+     * @param products the list of products to display
+     */
     private void displayProductList(List<Product> products) {
         List<ProductDTO> productDTOs = products.stream()
                 .map(ProductDTO::fromModel).collect(Collectors.toList());
@@ -349,6 +472,13 @@ public class CartManagementController {
 
     // ==================== VALIDATION & UTILITY METHODS ====================
 
+    /**
+     * Handles points redemption for membership customers.
+     *
+     * @param customer the customer attempting to redeem points
+     * @return the number of points to redeem
+     * @throws IllegalArgumentException if points amount is invalid
+     */
     private int handlePointsRedemption(Customer customer) {
         int temp = 0;
 
@@ -371,6 +501,11 @@ public class CartManagementController {
         return temp;
     }
 
+    /**
+     * Ensures that a cart exists for operations that require one.
+     *
+     * @return true if cart exists, false otherwise
+     */
     private boolean ensureCartExists() {
         boolean temp;
 
@@ -384,6 +519,11 @@ public class CartManagementController {
         return temp;
     }
 
+    /**
+     * Ensures that the cart is not empty for operations that require items.
+     *
+     * @return true if cart is not empty, false otherwise
+     */
     private boolean ensureCartNotEmpty() {
         boolean temp;
 
@@ -399,6 +539,12 @@ public class CartManagementController {
 
     // ==================== ERROR HANDLING HELPERS ====================
 
+    /**
+     * Handles IllegalArgumentException by logging and displaying user-friendly error message.
+     *
+     * @param e the exception that occurred
+     * @param context the context where the exception occurred
+     */
     private void handleArgumentException(IllegalArgumentException e, String context) {
         System.err.println("Invalid argument " + context + ": " +
                 (e.getMessage() != null ? e.getMessage() : "Unknown"));
@@ -406,6 +552,13 @@ public class CartManagementController {
                 (e.getMessage() != null ? e.getMessage() : "Unknown error"));
     }
 
+    /**
+     * Handles generic exceptions by logging and displaying user-friendly error message.
+     *
+     * @param e the exception that occurred
+     * @param context the context where the exception occurred
+     * @param userMessage the message to display to the user
+     */
     private void handleGenericException(Exception e, String context, String userMessage) {
         System.err.println("Error " + context + ": " + e.getMessage());
         view.displayErrorMessage(userMessage);

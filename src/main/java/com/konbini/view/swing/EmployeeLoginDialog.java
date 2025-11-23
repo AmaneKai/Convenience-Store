@@ -5,14 +5,39 @@ import com.konbini.controller.EmployeeController;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * EmployeeLoginDialog provides a modal dialog for employee authentication.
+ * This dialog collects employee ID and password credentials and validates them
+ * against the employee controller. It returns the authentication result through
+ * a LoginResult object.
+ *
+ * The dialog features a clean layout with input fields for credentials,
+ * login/cancel buttons, and includes debug capabilities for troubleshooting
+ * authentication issues.
+ */
 public class EmployeeLoginDialog extends JDialog {
+    /** Text field for entering employee ID */
     private JTextField idField;
+
+    /** Password field for entering employee password */
     private JPasswordField passwordField;
+
+    /** Flag indicating whether authentication was successful */
     private boolean authenticated = false;
+
+    /** The authenticated employee ID if login was successful */
     private String employeeId = null;
 
+    /** Controller responsible for employee authentication logic */
     private final EmployeeController employeeController;
 
+    /**
+     * Constructs a new EmployeeLoginDialog with the specified parent frame and controller.
+     * Initializes the UI components and sets up the dialog properties.
+     *
+     * @param parent the parent frame for this dialog, used for positioning
+     * @param employeeController the EmployeeController that handles authentication logic
+     */
     public EmployeeLoginDialog(Frame parent, EmployeeController employeeController) {
         super(parent, "Employee Login", true);
         this.employeeController = employeeController;
@@ -21,6 +46,18 @@ public class EmployeeLoginDialog extends JDialog {
         setLocationRelativeTo(parent);
     }
 
+    /**
+     * Initializes the user interface components of the dialog.
+     * Creates and arranges the title, input fields, and buttons in a organized layout.
+     *
+     * <p>The UI consists of:
+     * <ul>
+     *   <li>A title panel with the dialog title</li>
+     *   <li>An input panel with employee ID and password fields</li>
+     *   <li>A button panel with login and cancel actions</li>
+     * </ul>
+     * </p>
+     */
     private void initializeUI() {
         setLayout(new BorderLayout(10, 10));
 
@@ -107,6 +144,13 @@ public class EmployeeLoginDialog extends JDialog {
         setResizable(false);
     }
 
+    /**
+     * Handles the login process by validating input and authenticating credentials.
+     * Validates that both fields are filled, then delegates authentication to the controller.
+     * Shows appropriate error messages for invalid input or failed authentication.
+     *
+     * <p>Includes debug output for troubleshooting authentication issues.</p>
+     */
     private void handleLogin() {
         String id = idField.getText().trim();
         String password = new String(passwordField.getPassword());
@@ -138,22 +182,43 @@ public class EmployeeLoginDialog extends JDialog {
             }
         }
     }
+
+    /**
+     * Clears the input fields and resets focus to the ID field.
+     * Used after failed login attempts to allow quick retry.
+     */
     private void clearFields() {
         passwordField.setText("");
         idField.selectAll();
         idField.requestFocus();
     }
 
+    /**
+     * Returns whether the user was successfully authenticated.
+     *
+     * @return true if authentication was successful, false otherwise
+     */
     public boolean isAuthenticated() {
         return authenticated;
     }
 
+    /**
+     * Returns the employee ID of the authenticated user.
+     *
+     * @return the employee ID if authenticated, null otherwise
+     */
     public String getEmployeeId() {
         return employeeId;
     }
 
     /**
-     * Shows the login dialog and returns result
+     * Shows the login dialog and returns the authentication result.
+     * This is a convenience static method that creates, displays, and processes
+     * the login dialog in one call.
+     *
+     * @param parent the parent frame for the dialog
+     * @param employeeController the EmployeeController for authentication
+     * @return LoginResult containing authentication status and employee ID
      */
     public static LoginResult showLoginDialog(Frame parent, EmployeeController employeeController) {
         EmployeeLoginDialog dialog = new EmployeeLoginDialog(parent, employeeController);
@@ -162,21 +227,41 @@ public class EmployeeLoginDialog extends JDialog {
     }
 
     /**
-     * Result object from login dialog
+     * LoginResult represents the outcome of an authentication attempt.
+     * Contains both the authentication status and the authenticated employee ID.
      */
     public static class LoginResult {
+        /** Flag indicating successful authentication */
         private final boolean authenticated;
+
+        /** The authenticated employee ID */
         private final String employeeId;
 
+        /**
+         * Constructs a new LoginResult with the specified authentication data.
+         *
+         * @param authenticated whether authentication was successful
+         * @param employeeId the employee ID if authenticated
+         */
         public LoginResult(boolean authenticated, String employeeId) {
             this.authenticated = authenticated;
             this.employeeId = employeeId;
         }
 
+        /**
+         * Returns whether authentication was successful.
+         *
+         * @return true if authenticated, false otherwise
+         */
         public boolean isAuthenticated() {
             return authenticated;
         }
 
+        /**
+         * Returns the authenticated employee ID.
+         *
+         * @return the employee ID if authenticated, null otherwise
+         */
         public String getEmployeeId() {
             return employeeId;
         }

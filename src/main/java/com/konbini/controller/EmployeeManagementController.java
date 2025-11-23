@@ -7,15 +7,28 @@ import java.util.stream.Collectors;
 import com.konbini.dto.EmployeeDTO;
 import com.konbini.model.Employee;
 import com.konbini.service.EmployeeService;
-import com.konbini.view.StoreView;
+import com.konbini.view.EmployeeView;
 
+/**
+ * Controller for managing employee operations including viewing, adding, updating,
+ * removing employees, and password management. Coordinates between the view
+ * and employee service layer.
+ */
 public class EmployeeManagementController {
-    private final StoreView view;
+    private final EmployeeView view;
     private final EmployeeController employeeController;
     private final EmployeeService employeeService;
 
+    /**
+     * Constructs an EmployeeManagementController with all required dependencies.
+     *
+     * @param view the store view for user interface interactions
+     * @param employeeController controller for employee operations
+     * @param employeeService service for employee validation and business logic
+     * @throws IllegalArgumentException if any dependency is null
+     */
     public EmployeeManagementController(
-            StoreView view,
+            EmployeeView view,
             EmployeeController employeeController,
             EmployeeService employeeService) {
         if (view == null || employeeController == null || employeeService == null) {
@@ -28,6 +41,10 @@ public class EmployeeManagementController {
 
     // ==================== PUBLIC HANDLERS ====================
 
+    /**
+     * Handles displaying all employees in the system.
+     * Catches and handles any exceptions during the loading process.
+     */
     public void handleViewAllEmployees() {
         try {
             List<Employee> employees = employeeController.getAllEmployees();
@@ -37,6 +54,10 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Handles viewing detailed information for a specific employee.
+     * Prompts for employee ID and displays employee details if found.
+     */
     public void handleViewEmployeeDetails() {
         try {
             Optional<String> employeeId = promptForEmployeeId("view details");
@@ -48,6 +69,10 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Handles adding a new employee to the system.
+     * Prompts for employee name and password.
+     */
     public void handleAddEmployee() {
         try {
             String name = view.getStringInput("Enter employee name: ");
@@ -64,6 +89,10 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Handles updating an existing employee's information.
+     * Prompts for employee ID and allows updating the name.
+     */
     public void handleUpdateEmployee() {
         try {
             Optional<String> employeeId = promptForEmployeeId("update");
@@ -75,6 +104,10 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Handles removing an employee from the system.
+     * Prompts for employee ID and requires confirmation before removal.
+     */
     public void handleRemoveEmployee() {
         try {
             Optional<String> employeeId = promptForEmployeeId("remove");
@@ -86,6 +119,10 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Handles changing an employee's password.
+     * Prompts for employee ID and new password.
+     */
     public void handleChangePassword() {
         try {
             Optional<String> employeeId = promptForEmployeeId("change password");
@@ -99,6 +136,11 @@ public class EmployeeManagementController {
 
     // ==================== PRIVATE HELPER METHODS ====================
 
+    /**
+     * Displays a list of employees in the view.
+     *
+     * @param employees the list of employees to display
+     */
     private void displayEmployeeList(List<Employee> employees) {
         try {
             List<EmployeeDTO> employeeDTOs = employees.stream()
@@ -110,6 +152,11 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Shows detailed information for a specific employee.
+     *
+     * @param employeeId the ID of the employee to display
+     */
     private void showEmployeeDetails(String employeeId) {
         try {
             validateEmployeeId(employeeId);
@@ -127,6 +174,11 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Adds a new employee with the specified name and password.
+     *
+     * @param name the name of the employee to add
+     */
     private void addNewEmployee(String name) {
         try {
             validateEmployeeName(name);
@@ -148,6 +200,11 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Updates an existing employee's information.
+     *
+     * @param employeeId the ID of the employee to update
+     */
     private void updateExistingEmployee(String employeeId) {
         try {
             validateEmployeeId(employeeId);
@@ -174,6 +231,11 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Confirms and removes an employee from the system.
+     *
+     * @param employeeId the ID of the employee to remove
+     */
     private void confirmAndRemoveEmployee(String employeeId) {
         try {
             validateEmployeeId(employeeId);
@@ -193,6 +255,11 @@ public class EmployeeManagementController {
         }
     }
 
+    /**
+     * Changes an employee's password.
+     *
+     * @param employeeId the ID of the employee whose password to change
+     */
     private void changeEmployeePassword(String employeeId) {
         try {
             validateEmployeeId(employeeId);
@@ -225,6 +292,12 @@ public class EmployeeManagementController {
 
     // ==================== VALIDATION & UTILITY METHODS ====================
 
+    /**
+     * Prompts the user to select an employee ID for an operation.
+     *
+     * @param operation the operation being performed (for context in messages)
+     * @return an Optional containing the employee ID if provided, empty otherwise
+     */
     private Optional<String> promptForEmployeeId(String operation) {
         Optional<String> temp = Optional.empty();
 
@@ -249,12 +322,25 @@ public class EmployeeManagementController {
 
         return temp;
     }
+
+    /**
+     * Validates that an employee ID is not null or empty.
+     *
+     * @param employeeId the employee ID to validate
+     * @throws IllegalArgumentException if the employee ID is invalid
+     */
     private void validateEmployeeId(String employeeId) {
         if (employeeId == null || employeeId.trim().isEmpty()) {
             throw new IllegalArgumentException("Employee ID cannot be null or empty");
         }
     }
 
+    /**
+     * Validates that an employee name is not null or empty.
+     *
+     * @param name the employee name to validate
+     * @throws IllegalArgumentException if the employee name is invalid
+     */
     private void validateEmployeeName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Employee name cannot be null or empty");
@@ -263,6 +349,12 @@ public class EmployeeManagementController {
 
     // ==================== ERROR HANDLING HELPERS ====================
 
+    /**
+     * Handles IllegalArgumentException by logging and displaying user-friendly error message.
+     *
+     * @param e the exception that occurred
+     * @param context the context where the exception occurred
+     */
     private void handleArgumentException(IllegalArgumentException e, String context) {
         System.err.println("Invalid argument " + context + ": " +
                 (e.getMessage() != null ? e.getMessage() : "Unknown"));
@@ -270,6 +362,13 @@ public class EmployeeManagementController {
                 (e.getMessage() != null ? e.getMessage() : "Please check your input and try again."));
     }
 
+    /**
+     * Handles generic exceptions by logging and displaying user-friendly error message.
+     *
+     * @param e the exception that occurred
+     * @param context the context where the exception occurred
+     * @param userMessage the message to display to the user
+     */
     private void handleGenericException(Exception e, String context, String userMessage) {
         System.err.println("Error " + context + ": " + e.getMessage());
         view.displayErrorMessage(userMessage);

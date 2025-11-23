@@ -24,18 +24,41 @@ import javax.swing.table.TableColumnModel;
 import com.konbini.controller.ProductManagementController;
 import com.konbini.dto.ProductDTO;
 
+/**
+ * ProductPanel provides a graphical user interface for product management operations.
+ * This panel displays a table of products and provides buttons for various product-related
+ * actions such as viewing, adding, updating, removing, and searching products.
+ * It also includes specialized views for low stock and expired products.
+ */
 public class ProductPanel extends JPanel {
+    /** Callback function to navigate back to the previous screen */
     private Runnable backCallback;
+
+    /** Controller responsible for handling product management business logic */
     private ProductManagementController controller;
 
+    /** Table component for displaying product data */
     private JTable productTable;
+
+    /** Table model managing the data for the product table */
     private DefaultTableModel tableModel;
+
+    /** Label for displaying status messages and operation results */
     private JLabel statusLabel;
 
+    /** Column names for the product table */
     private static final String[] COLUMN_NAMES = {
             "ID", "Name", "Price", "Quantity", "Category", "Brand", "Variant", "Expiration", "Status"
     };
 
+    /**
+     * Constructs a new ProductPanel with the specified controller and navigation callback.
+     * Initializes the UI components and sets up the panel layout.
+     *
+     * @param controller the ProductManagementController that handles business logic operations
+     * @param backCallback a Runnable that executes when navigating back to the previous screen
+     * @throws IllegalArgumentException if controller or backCallback parameters are null
+     */
     public ProductPanel(ProductManagementController controller, Runnable backCallback) {
         validateConstructorArgs(controller, backCallback);
         this.controller = controller;
@@ -43,6 +66,10 @@ public class ProductPanel extends JPanel {
         initializeUI();
     }
 
+    /**
+     * Initializes the user interface components of the panel.
+     * Sets up the main layout and creates the header, center, and button panels.
+     */
     private void initializeUI() {
         setLayout(new BorderLayout());
 
@@ -59,6 +86,11 @@ public class ProductPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Creates the header panel containing the title and back button.
+     *
+     * @return JPanel containing the header components
+     */
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(41, 128, 185));
@@ -76,10 +108,23 @@ public class ProductPanel extends JPanel {
         return headerPanel;
     }
 
+    /**
+     * Creates the center panel containing the product table and status label.
+     * The table displays product information with automatic column resizing for better readability.
+     *
+     * @return JPanel containing the table and status components
+     */
     private JPanel createCenterPanel() {
         JPanel centerPanel = new JPanel(new BorderLayout());
 
         tableModel = new DefaultTableModel(COLUMN_NAMES, 0) {
+            /**
+             * Prevents table cells from being editable by the user.
+             *
+             * @param row the row index of the cell
+             * @param col the column index of the cell
+             * @return false to make all cells non-editable
+             */
             public boolean isCellEditable(int row, int col) {
                 return false;
             }
@@ -101,6 +146,11 @@ public class ProductPanel extends JPanel {
         return centerPanel;
     }
 
+    /**
+     * Creates the button panel with all product management action buttons.
+     *
+     * @return JPanel containing the action buttons
+     */
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(236, 240, 241));
@@ -119,6 +169,10 @@ public class ProductPanel extends JPanel {
 
     // ==================== EVENT HANDLERS ====================
 
+    /**
+     * Handles the back navigation action.
+     * Executes the back callback with exception handling.
+     */
     private void handleBackAction() {
         try {
             backCallback.run();
@@ -127,6 +181,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the view all products action.
+     * Delegates to the controller to retrieve and display all products.
+     */
     private void handleViewAllProducts() {
         try {
             controller.handleViewAllProducts();
@@ -135,6 +193,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles adding a new product to the system.
+     * Delegates to the controller to add a new product.
+     */
     private void handleAddProduct() {
         try {
             controller.handleAddProduct();
@@ -143,6 +205,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles updating existing product information.
+     * Delegates to the controller to modify product data.
+     */
     private void handleUpdateProduct() {
         try {
             controller.handleUpdateProduct();
@@ -151,6 +217,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles product removal/deletion from the system.
+     * Delegates to the controller to remove a product.
+     */
     private void handleRemoveProduct() {
         try {
             controller.handleRemoveProduct();
@@ -159,6 +229,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles product restocking operations.
+     * Delegates to the controller to restock product inventory.
+     */
     private void handleRestockProduct() {
         try {
             controller.handleRestockProduct();
@@ -167,6 +241,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles viewing low stock products.
+     * Delegates to the controller to retrieve products with low inventory.
+     */
     private void handleViewLowStock() {
         try {
             controller.handleViewLowStock();
@@ -175,6 +253,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles viewing expired products.
+     * Delegates to the controller to retrieve expired products.
+     */
     private void handleViewExpired() {
         try {
             controller.handleViewExpired();
@@ -183,6 +265,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles product search operations.
+     * Delegates to the controller to search for products.
+     */
     private void handleSearchProducts() {
         try {
             controller.handleSearchProducts();
@@ -193,6 +279,13 @@ public class ProductPanel extends JPanel {
 
     // ==================== DISPLAY METHODS ====================
 
+    /**
+     * Displays a list of products in the table.
+     * Clears existing data and populates the table with the provided product list.
+     * Automatically resizes columns to fit content and validates product data.
+     *
+     * @param products the list of ProductDTO objects to display
+     */
     public void displayProducts(List<ProductDTO> products) {
         try {
             if (products == null || products.isEmpty()) {
@@ -226,6 +319,12 @@ public class ProductPanel extends JPanel {
 
     }
 
+    /**
+     * Displays detailed information for a single product in a dialog.
+     * Shows comprehensive product data including pricing, quantity, and status.
+     *
+     * @param product the ProductDTO object containing product details to display
+     */
     public void displayProduct(ProductDTO product) {
         try {
             if (!isValidProduct(product)) {
@@ -256,6 +355,12 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays low stock products with a warning alert.
+     * Shows products with low inventory levels and displays a warning message.
+     *
+     * @param products the list of low stock ProductDTO objects to display
+     */
     public void displayLowStockProducts(List<ProductDTO> products) {
         try {
             if (products == null || products.isEmpty()) {
@@ -277,6 +382,12 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Displays expired products with an error alert.
+     * Shows products that have expired and displays an error message.
+     *
+     * @param products the list of expired ProductDTO objects to display
+     */
     public void displayExpiredProducts(List<ProductDTO> products) {
         try {
             if (products == null || products.isEmpty()) {
@@ -300,6 +411,13 @@ public class ProductPanel extends JPanel {
 
     // ==================== UTILITY METHODS ====================
 
+    /**
+     * Creates a standardized button with consistent styling and error handling.
+     *
+     * @param text the text to display on the button
+     * @param action the Runnable to execute when the button is clicked
+     * @return a configured JButton with the specified text and action
+     */
     private JButton createActionButton(String text, Runnable action) {
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(120, 40));
@@ -313,6 +431,13 @@ public class ProductPanel extends JPanel {
         return btn;
     }
 
+    /**
+     * Creates a table row from a ProductDTO object.
+     * Formats the data for display in the product table.
+     *
+     * @param product the ProductDTO object to convert to a table row
+     * @return an array of objects representing the table row data
+     */
     private Object[] createTableRow(ProductDTO product) {
         return new Object[] {
                 product.getId(),
@@ -327,6 +452,12 @@ public class ProductPanel extends JPanel {
         };
     }
 
+    /**
+     * Determines the status of a product based on expiration and stock levels.
+     *
+     * @param product the ProductDTO object to check
+     * @return a string representing the product status: "EXPIRED", "LOW STOCK", or "OK"
+     */
     private String getProductStatus(ProductDTO product) {
         if (product.isExpired()) {
             return "EXPIRED";
@@ -337,12 +468,23 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Updates the status label with the specified message.
+     *
+     * @param message the message to display in the status label
+     */
     private void updateStatus(String message) {
         if (statusLabel != null) {
             statusLabel.setText(message);
         }
     }
 
+    /**
+     * Automatically resizes table columns to fit their content.
+     * Calculates the optimal width for each column based on both header and cell content.
+     *
+     * @param table the JTable to resize columns for
+     */
     private void resizeColumnWidth(JTable table) {
         final TableColumnModel columnModel = table.getColumnModel();
         for (int column = 0; column < table.getColumnCount(); column++) {
@@ -366,6 +508,13 @@ public class ProductPanel extends JPanel {
 
     // ==================== VALIDATION METHODS ====================
 
+    /**
+     * Validates constructor arguments to ensure they are not null.
+     *
+     * @param controller the ProductManagementController to validate
+     * @param backCallback the back callback to validate
+     * @throws IllegalArgumentException if any argument is null
+     */
     private void validateConstructorArgs(ProductManagementController controller, Runnable backCallback) {
         if (controller == null) {
             throw new IllegalArgumentException("ProductManagementController cannot be null");
@@ -375,6 +524,12 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Validates that a product object contains required data.
+     *
+     * @param product the ProductDTO object to validate
+     * @return true if the product is valid, false otherwise
+     */
     private boolean isValidProduct(ProductDTO product) {
         return product != null &&
                 product.getId() != null &&
@@ -387,6 +542,13 @@ public class ProductPanel extends JPanel {
 
     // ==================== ERROR HANDLING ====================
 
+    /**
+     * Handles UI exceptions by logging the error and displaying a user-friendly message.
+     *
+     * @param e the exception that occurred
+     * @param context a description of where the error occurred
+     * @param userMessage the user-friendly message to display
+     */
     private void handleUIException(Exception e, String context, String userMessage) {
         System.err.println("ProductPanel Error " + context + ": " + e.getMessage());
         updateStatus("Error: " + userMessage);

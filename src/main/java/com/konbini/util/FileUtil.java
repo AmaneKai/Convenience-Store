@@ -11,7 +11,19 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Utility class for file and directory operations.
+ * Provides common file system operations including directory creation,
+ * file copying, backup creation, and path manipulation.
+ */
 public class FileUtil {
+
+    /**
+     * Creates a directory if it doesn't already exist.
+     *
+     * @param directoryPath the path of the directory to create
+     * @return true if the directory exists or was successfully created, false otherwise
+     */
     public static boolean createDirectoryIfNotExists(String directoryPath) {
         File directory = new File(directoryPath);
         boolean temp = true;
@@ -23,6 +35,14 @@ public class FileUtil {
         return temp;
     }
 
+    /**
+     * Copies a file from source to destination.
+     * Creates destination directory if it doesn't exist and replaces existing files.
+     *
+     * @param sourceFile the source file to copy
+     * @param destFile the destination file
+     * @return true if the copy was successful, false otherwise
+     */
     public static boolean copyFile(File sourceFile, File destFile) {
         boolean temp = false;
 
@@ -46,16 +66,35 @@ public class FileUtil {
         return temp;
     }
 
+    /**
+     * Deletes a file from the file system.
+     *
+     * @param filePath the path of the file to delete
+     * @return true if the file was successfully deleted, false otherwise
+     */
     public static boolean deleteFile(String filePath) {
         File file = new File(filePath);
         return file.delete();
     }
 
+    /**
+     * Checks if a file exists at the specified path.
+     *
+     * @param filePath the path to check
+     * @return true if the file exists, false otherwise
+     */
     public static boolean fileExists(String filePath) {
         File file = new File(filePath);
         return file.exists();
     }
 
+    /**
+     * Creates a backup of a file with today's date as suffix.
+     * Backup files are named with the pattern: originalname.YYYY-MM-DD.bak
+     *
+     * @param filePath the path of the file to backup
+     * @return true if the backup was successfully created, false otherwise
+     */
     public static boolean createBackup(String filePath) {
         boolean temp = false;
 
@@ -74,6 +113,12 @@ public class FileUtil {
         return temp;
     }
 
+    /**
+     * Extracts the file extension from a filename.
+     *
+     * @param fileName the filename to extract extension from
+     * @return the file extension, or empty string if no extension exists
+     */
     public static String getFileExtension(String fileName) {
         String temp = "";
         int lastIndexOf = fileName.lastIndexOf(".");
@@ -85,6 +130,12 @@ public class FileUtil {
         return temp;
     }
 
+    /**
+     * Gets the filename without its extension.
+     *
+     * @param fileName the filename to process
+     * @return the filename without extension
+     */
     public static String getFileNameWithoutExtension(String fileName) {
         String temp = fileName;
         int lastIndexOf = fileName.lastIndexOf(".");
@@ -95,6 +146,13 @@ public class FileUtil {
 
         return temp;
     }
+
+    /**
+     * Ensures the receipts directory exists in the application's working directory.
+     * Creates the directory if it doesn't exist.
+     *
+     * @return the absolute path to the receipts directory
+     */
     public static String ensureReceiptsDirectory() {
         String directoryPath = System.getProperty("user.dir")
                 + File.separator + "receipts";
@@ -102,6 +160,12 @@ public class FileUtil {
         return directoryPath;
     }
 
+    /**
+     * Ensures the data directory exists in the application's working directory.
+     * Creates the directory if it doesn't exist.
+     *
+     * @return the absolute path to the data directory
+     */
     public static String ensureDataDirectory() {
         String directoryPath = System.getProperty("user.dir")
                 + File.separator + "data";
@@ -109,10 +173,23 @@ public class FileUtil {
         return directoryPath;
     }
 
+    /**
+     * Converts a relative path to an absolute path based on the working directory.
+     *
+     * @param relativePath the relative path to convert
+     * @return the absolute path
+     */
     public static String getAbsolutePath(String relativePath) {
         return System.getProperty("user.dir") + File.separator + relativePath;
     }
 
+    /**
+     * Combines multiple path elements into a single path string.
+     * Handles proper separator placement between elements.
+     *
+     * @param elements the path elements to combine
+     * @return the combined path string
+     */
     public static String combinePath(String... elements) {
         StringBuilder path = new StringBuilder();
         int j = 0;
