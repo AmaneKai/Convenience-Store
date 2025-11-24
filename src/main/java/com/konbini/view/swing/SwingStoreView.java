@@ -1,5 +1,6 @@
 package com.konbini.view.swing;
 
+import java.awt.event.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
@@ -115,13 +116,7 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
 
         try {
             mainFrame = new JFrame("コンビニ");
-            mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-            mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                    handleExit();
-                }
-            });
+            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             mainFrame.setSize(1024, 768);
 
             cardLayout = new java.awt.CardLayout();
@@ -237,16 +232,19 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
 
                 if (dataManagementController != null) {
                     dataManagementController.handleSaveData();
-                    displayInfoMessage("Data saved successfully.");
+                    // Show success message synchronously before exiting
+                    JOptionPane.showMessageDialog(mainFrame, "Data saved successfully.", "Info", JOptionPane.INFORMATION_MESSAGE);
                 }
 
                 applicationRunning = false;
-                mainFrame.dispose();
+
+                // Dispatch a WINDOW_CLOSING event to trigger EXIT_ON_CLOSE behavior
+                mainFrame.dispatchEvent(new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING));
             }
         } catch (Exception e) {
             handleUIException(e, "exiting application", "Failed to exit properly.");
             applicationRunning = false;
-            mainFrame.dispose();
+            mainFrame.dispatchEvent(new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING));
         }
     }
 
