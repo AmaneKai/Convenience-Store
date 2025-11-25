@@ -116,7 +116,7 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
 
         try {
             mainFrame = new JFrame("コンビニ");
-            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             mainFrame.setSize(1024, 768);
 
             cardLayout = new java.awt.CardLayout();
@@ -124,6 +124,14 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
 
             mainFrame.add(mainPanel);
             mainFrame.setLocationRelativeTo(null);
+
+            // Add window listener to handle exit confirmation
+            mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                    handleExit();
+                }
+            });
 
         } catch (Exception e) {
             handleUIException(e, "initializing main window", "Failed to initialize application window.");
@@ -222,8 +230,9 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
 
     /**
      * Handles application exit with confirmation dialog.
+     * @return true if user confirmed exit, false otherwise
      */
-    private void handleExit() {
+    private boolean handleExit() {
         try {
             int confirm = JOptionPane.showConfirmDialog(mainFrame,
                     "Are you sure you want to exit?", "Confirm Exit", JOptionPane.YES_NO_OPTION);
@@ -237,14 +246,15 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
                 }
 
                 applicationRunning = false;
-
-                // Dispatch a WINDOW_CLOSING event to trigger EXIT_ON_CLOSE behavior
-                mainFrame.dispatchEvent(new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING));
+                mainFrame.dispose();  // Close the frame gracefully
+                return true;  // User confirmed exit
             }
+            return false;  // User cancelled exit
         } catch (Exception e) {
             handleUIException(e, "exiting application", "Failed to exit properly.");
             applicationRunning = false;
-            mainFrame.dispatchEvent(new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING));
+            mainFrame.dispose();  // Close the frame gracefully
+            return true;  // Exit on error
         }
     }
 
@@ -270,8 +280,7 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
             String userType = UserTypeSelectionDialog.showDialog(mainFrame);
 
             if (userType == null) {
-                handleExit();
-                exit = true;
+                exit = handleExit();  // Only exit if user confirms
             } else if (attemptLogin(userType))
                 exit = true;
         }
