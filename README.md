@@ -248,7 +248,6 @@ Convenience-Store/
     │                   ├── EmployeeView.java
     │                   ├── MainView.java
     │                   ├── ProductView.java
-    │                   ├── StoreView.java
     │                   ├── TransactionView.java
     │                   └── swing/        # Swing implementations
     │                       ├── CartPanel.java
@@ -564,13 +563,18 @@ Categories:
 
 ---
 
+## Guidelines for testing
+**Default Employee for Testing:**
+-  Employee ID: EMP0001
+-  Passcode: password
+---
+
 **Important Notes:**
 - Programs must compile and run successfully during demonstration
 - Non-functional programs receive 0 grade regardless of code quality  
 - Individual explanations required during live demos
 - Version control usage earns bonus points for MCO2
 - All external resources must be properly cited using APA format
-
 ---
 
 **Project Status:** Complete - All features implemented and tested
