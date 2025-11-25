@@ -342,8 +342,32 @@ public class CartManagementController {
      */
     private void processPaymentAndFinalize(Customer customer, int pointsToRedeem) {
         try {
+            // Calculate billing breakdown
+            double subtotal = currentCart.getSubtotal();
+            double vat = subtotal * 0.12; // 12% VAT on original subtotal
+            double discountAmount = 0;
+            if (customer.isSeniorCitizen()) {
+                discountAmount = subtotal * 0.20; // 20% senior discount
+            }
             double total = cartService.calculateTotal(currentCart, customer);
-            double payment = view.getDoubleInput("Enter payment amount: ");
+
+            // Build payment prompt with billing summary using HTML for better formatting
+            StringBuilder prompt = new StringBuilder();
+            prompt.append("<html><body style='font-family: monospace;'>");
+            prompt.append("<b style='font-size: 11px;'>BILLING SUMMARY</b><br>");
+            prompt.append("─────────────────────<br>");
+            prompt.append(String.format("Subtotal: ₱%.2f<br>", subtotal));
+            prompt.append(String.format("VAT (12%%): ₱%.2f<br>", vat));
+            if (discountAmount > 0) {
+                prompt.append(String.format("Discount (Senior): -₱%.2f<br>", discountAmount));
+            }
+            prompt.append("─────────────────────<br>");
+            prompt.append(String.format("<b style='font-size: 12px; color: #0066cc;'>Total: ₱%.2f</b><br>", total));
+            prompt.append("─────────────────────<br><br>");
+            prompt.append("Enter payment amount:");
+            prompt.append("</body></html>");
+
+            double payment = view.getDoubleInput(prompt.toString());
 
             if (payment >= total) {
                 finalizeTransaction(payment, pointsToRedeem);

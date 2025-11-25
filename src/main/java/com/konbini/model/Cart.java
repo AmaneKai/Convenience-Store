@@ -13,7 +13,6 @@ import java.util.Optional;
  * Implements Serializable to support persistence.
  */
 public class Cart {
-
     private final List<CartItem> items;
     private final Customer customer;
 

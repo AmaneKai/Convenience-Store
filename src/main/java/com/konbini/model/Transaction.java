@@ -55,6 +55,7 @@ public class Transaction implements Serializable {
         private String taxName = "Tax";
         private List<DiscountStrategy> discountStrategies = new ArrayList<>();
         private boolean inventoryDecremented = false;
+        private TaxStrategy taxStrategy;
 
         /**
          * Constructs a new Builder for creating a Transaction.
@@ -99,10 +100,21 @@ public class Transaction implements Serializable {
             if (taxStrategy == null) {
                 throw new IllegalArgumentException("Tax strategy cannot be null");
             }
-            this.tax = taxStrategy.calculateTax(subtotal);
+            this.taxStrategy = taxStrategy;
             this.taxName = taxStrategy.getName();
-            this.total = subtotal + tax - discount;
+            recalculateTaxAndTotal();
             return this;
+        }
+
+        /**
+         * Recalculates tax and total.
+         * Tax is calculated on the original subtotal, then discounts are deducted from the total.
+         */
+        private void recalculateTaxAndTotal() {
+            if (taxStrategy != null) {
+                this.tax = taxStrategy.calculateTax(subtotal);
+            }
+            this.total = subtotal + tax - discount;
         }
 
         /**
@@ -132,7 +144,7 @@ public class Transaction implements Serializable {
                 prs.processRedemption(customer);
             }
 
-            this.total = subtotal + tax - discount;
+            recalculateTaxAndTotal();
             return this;
         }
 
@@ -163,7 +175,7 @@ public class Transaction implements Serializable {
                 double seniorDiscount = subtotal * discountRate;
                 this.discount += seniorDiscount;
                 this.appliedDiscounts.add("Senior Citizen Discount");
-                this.total = subtotal + tax - discount;
+                recalculateTaxAndTotal();
             }
             return this;
         }
@@ -182,7 +194,7 @@ public class Transaction implements Serializable {
                 this.pointsRedeemed = points;
                 this.discount += points;
                 this.appliedDiscounts.add("Points Redemption");
-                this.total = subtotal + tax - discount;
+                recalculateTaxAndTotal();
                 customer.getMembershipCard().deductPoints(points);
             }
             return this;
@@ -241,6 +253,9 @@ public class Transaction implements Serializable {
          * @throws IllegalArgumentException if payment amount is insufficient or invalid
          */
         public Transaction build() {
+            // Ensure tax and total are correctly calculated with all discounts applied
+            recalculateTaxAndTotal();
+
             if (amountPaid < total) {
                 throw new IllegalArgumentException("Payment amount is less than total");
             }

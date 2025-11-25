@@ -1,0 +1,31 @@
+===================================
+          KONBINI STORE           
+===================================
+
+Receipt #: TRA0027
+Date: 2025-11-25 17:32:30
+Customer: Ana Gonzales
+
+Items:
+-----------------------------------
+Hand Lotion          x6
+  ₱90.00 x 6 = ₱540.00
+-----------------------------------
+
+Subtotal: ₱540.00
+Value Added Tax (VAT): ₱64.80
+Discount: ₱112.00
+  - Senior Citizen Discount
+  - Points Redemption
+Total: ₱492.80
+
+Amount Paid: ₱540.00
+Change: ₱47.20
+
+Points Redeemed: 4
+Points Earned: 9
+Current Points Balance: 9
+
+===================================
+         Thank You! Come Again!    
+===================================

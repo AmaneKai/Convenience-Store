@@ -1,0 +1,29 @@
+===================================
+          KONBINI STORE           
+===================================
+
+Receipt #: TRA0031
+Date: 2025-11-25 17:39:37
+Customer: Ana Gonzales
+
+Items:
+-----------------------------------
+Facial Wash          x5
+  ₱150.00 x 5 = ₱750.00
+-----------------------------------
+
+Subtotal: ₱750.00
+Value Added Tax (VAT): ₱90.00
+Discount: ₱150.00
+  - Senior Citizen Discount
+Total: ₱690.00
+
+Amount Paid: ₱1000.00
+Change: ₱310.00
+
+Points Earned: 13
+Current Points Balance: 19
+
+===================================
+         Thank You! Come Again!    
+===================================

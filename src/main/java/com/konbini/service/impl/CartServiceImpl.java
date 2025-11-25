@@ -15,7 +15,7 @@ public class CartServiceImpl implements CartService {
 
     /**
      * Calculates the total amount for a cart including discounts and taxes.
-     * Applies a 20% discount for senior citizens and calculates 12% VAT tax on the discounted subtotal.
+     * Applies 12% VAT tax on the original subtotal, then applies a 20% discount for senior citizens.
      *
      * @param cart the Cart object containing items to calculate total for
      * @param customer the Customer object to check for senior citizen eligibility
@@ -33,16 +33,14 @@ public class CartServiceImpl implements CartService {
 
         double subtotal = cart.getSubtotal();
 
+        double tax = subtotal * 0.12;
+
         double discountAmount = 0;
         if (customer.isSeniorCitizen()) {
             discountAmount = subtotal * 0.20;
         }
 
-        double discountedSubtotal = subtotal - discountAmount;
-
-        double tax = discountedSubtotal * 0.12;
-
-        double total = discountedSubtotal + tax;
+        double total = subtotal + tax - discountAmount;
 
         if (total < 0) {
             throw new IllegalArgumentException("Invalid total calculation");
