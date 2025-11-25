@@ -12,8 +12,7 @@ import java.util.Optional;
  * as well as calculate totals and manage cart state.
  * Implements Serializable to support persistence.
  */
-public class Cart implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Cart {
 
     private final List<CartItem> items;
     private final Customer customer;

@@ -7,8 +7,7 @@ import java.io.Serializable;
  * Provides functionality to manage quantity and calculate pricing for individual cart items.
  * Implements Serializable to support persistence.
  */
-public class CartItem implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class CartItem  {
 
     private final Product product;
     private int quantity;
