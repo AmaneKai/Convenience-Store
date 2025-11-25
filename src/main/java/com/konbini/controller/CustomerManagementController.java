@@ -242,7 +242,7 @@ public class CustomerManagementController {
 
             if (shouldProceed) {
                 isSeniorCitizen = view.getBooleanInput("Is senior citizen?");
-                String cardInput = view.getStringInput("Enter card number: ");
+                String cardInput = view.getStringInput("Enter card ID: ");
 
                 if (cardInput == null) {
                     shouldProceed = false;
@@ -363,7 +363,7 @@ public class CustomerManagementController {
         String operation = "prompting for membership card details";
 
         try {
-            String cardNumber = view.getStringInput("Enter card number: ");
+            String cardNumber = view.getStringInput("Enter card ID: ");
             LocalDate expiryDate = null;
 
             // Validate card number
