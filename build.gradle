@@ -20,7 +20,7 @@ run {
 dependencies {
     // This dependency is used by the application.
     implementation libs.guava
-    
+
     // JUnit dependencies - fixed configuration
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
@@ -29,7 +29,7 @@ dependencies {
 // Configure the test task with more detailed logging
 test {
     useJUnitPlatform()
-    
+
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
@@ -45,4 +45,15 @@ java {
 application {
     // Define the main class for the application.
     mainClass = 'com.konbini.Main'
+}
+
+// Configure Javadoc task to exclude author tags
+javadoc {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    // Exclude the @author tag from generated documentation by only specifying custom tags
+    options.tags = [
+        'apiNote:a:API Note:',
+        'implSpec:a:Implementation Requirements:',
+        'implNote:a:Implementation Note:'
+    ]
 }
