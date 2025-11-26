@@ -5,8 +5,6 @@ import java.util.List;
 import com.konbini.dto.CategoryDTO;
 import com.konbini.dto.ProductDTO;
 import com.konbini.dto.SubcategoryDTO;
-import com.konbini.model.ProductCategory;
-import com.konbini.model.ProductSubcategory;
 
 /**
  * View interface for product inventory management operations and display.
@@ -65,18 +63,29 @@ public interface ProductView extends BaseView {
      */
     void displayExpiredProducts(List<ProductDTO> products);
 
+
     /**
-     * Prompts the user to select a product category.
+     * Prompts the user to select a product category from available options.
      *
-     * @return the selected ProductCategory
+     * This method should present all available product categories to the user
+     * and return the selected category as a DTO. The implementation should handle
+     * user cancellation gracefully, typically by returning a default category.
+     *
+     * @return the selected CategoryDTO, or a default category if user cancels
      */
     CategoryDTO getCategoryInput();
 
     /**
-     * Prompts the user to select a product subcategory based on the chosen category.
+     * Prompts the user to select a product subcategory based on the selected category.
      *
-     * @param category the parent category for which to select subcategories
-     * @return the selected ProductSubcategory
+     * This method presents only the subcategories that belong to the specified
+     * parent category. The implementation should filter subcategories appropriately
+     * and allow the user to select from the filtered list.
+     *
+     * @param category the parent CategoryDTO to filter subcategories by
+     * @return the selected SubcategoryDTO, or null if no subcategories exist
+     *         or user cancels selection
+     * @throws IllegalArgumentException if category is null
      */
     SubcategoryDTO getSubcategoryInput(CategoryDTO category);
 }

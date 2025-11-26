@@ -286,6 +286,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">View interface for shopping cart operations and display.</div>
 </dd>
+<dt><a href="com/konbini/dto/CategoryDTO.html" class="type-name-link" title="class in com.konbini.dto">CategoryDTO</a> - Class in <a href="com/konbini/dto/package-summary.html">com.konbini.dto</a></dt>
+<dd>
+<div class="block">Data Transfer Object for ProductCategory enum.</div>
+</dd>
+<dt><a href="com/konbini/dto/CategoryDTO.html#%3Cinit%3E(java.lang.String)" class="member-name-link">CategoryDTO(String)</a> - Constructor for class com.konbini.dto.<a href="com/konbini/dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a></dt>
+<dd>
+<div class="block">Constructs a CategoryDTO with the specified display name.</div>
+</dd>
 <dt><a href="com/konbini/model/ProductCategory.html#CLEANING" class="member-name-link">CLEANING</a> - Enum constant in enum class com.konbini.model.<a href="com/konbini/model/ProductCategory.html" title="enum class in com.konbini.model">ProductCategory</a></dt>
 <dd>
 <div class="block">Category for items used for cleaning and maintenance.</div>
@@ -1200,6 +1208,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Static factory method to create a ProductDTO from a Product domain model.</div>
 </dd>
+<dt><a href="com/konbini/dto/CategoryDTO.html#fromModel(com.konbini.model.ProductCategory)" class="member-name-link">fromModel(ProductCategory)</a> - Static method in class com.konbini.dto.<a href="com/konbini/dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a></dt>
+<dd>
+<div class="block">Converts a ProductCategory domain model to a CategoryDTO.</div>
+</dd>
+<dt><a href="com/konbini/dto/SubcategoryDTO.html#fromModel(com.konbini.model.ProductSubcategory)" class="member-name-link">fromModel(ProductSubcategory)</a> - Static method in class com.konbini.dto.<a href="com/konbini/dto/SubcategoryDTO.html" title="class in com.konbini.dto">SubcategoryDTO</a></dt>
+<dd>
+<div class="block">Converts a ProductSubcategory domain model to a SubcategoryDTO.</div>
+</dd>
 <dt><a href="com/konbini/dto/TransactionDTO.html#fromModel(com.konbini.model.Transaction)" class="member-name-link">fromModel(Transaction)</a> - Static method in class com.konbini.dto.<a href="com/konbini/dto/TransactionDTO.html" title="class in com.konbini.dto">TransactionDTO</a></dt>
 <dd>
 <div class="block">Static factory method to create a TransactionDTO from a Transaction domain model.</div>
@@ -1246,6 +1262,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="com/konbini/util/FileUtil.html#getAbsolutePath(java.lang.String)" class="member-name-link">getAbsolutePath(String)</a> - Static method in class com.konbini.util.<a href="com/konbini/util/FileUtil.html" title="class in com.konbini.util">FileUtil</a></dt>
 <dd>
 <div class="block">Converts a relative path to an absolute path based on the working directory.</div>
+</dd>
+<dt><a href="com/konbini/dto/CategoryDTO.html#getAllCategories()" class="member-name-link">getAllCategories()</a> - Static method in class com.konbini.dto.<a href="com/konbini/dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a></dt>
+<dd>
+<div class="block">Retrieves all available product categories as DTOs.</div>
 </dd>
 <dt><a href="com/konbini/controller/CustomerController.html#getAllCustomers()" class="member-name-link">getAllCustomers()</a> - Method in class com.konbini.controller.<a href="com/konbini/controller/CustomerController.html" title="class in com.konbini.controller">CustomerController</a></dt>
 <dd>
@@ -1337,11 +1357,11 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/konbini/view/ProductView.html#getCategoryInput()" class="member-name-link">getCategoryInput()</a> - Method in interface com.konbini.view.<a href="com/konbini/view/ProductView.html" title="interface in com.konbini.view">ProductView</a></dt>
 <dd>
-<div class="block">Prompts the user to select a product category.</div>
+<div class="block">Prompts the user to select a product category from available options.</div>
 </dd>
 <dt><a href="com/konbini/view/swing/SwingStoreView.html#getCategoryInput()" class="member-name-link">getCategoryInput()</a> - Method in class com.konbini.view.swing.<a href="com/konbini/view/swing/SwingStoreView.html" title="class in com.konbini.view.swing">SwingStoreView</a></dt>
 <dd>
-<div class="block">Prompts the user to select a product category.</div>
+<div class="block">Prompts the user to select a product category from available options.</div>
 </dd>
 <dt><a href="com/konbini/dto/TransactionDTO.html#getChange()" class="member-name-link">getChange()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/TransactionDTO.html" title="class in com.konbini.dto">TransactionDTO</a></dt>
 <dd>
@@ -1413,6 +1433,14 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/konbini/model/Transaction.html#getDiscount()" class="member-name-link">getDiscount()</a> - Method in class com.konbini.model.<a href="com/konbini/model/Transaction.html" title="class in com.konbini.model">Transaction</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/konbini/dto/CategoryDTO.html#getDisplayName()" class="member-name-link">getDisplayName()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a></dt>
+<dd>
+<div class="block">Gets the display name of this category.</div>
+</dd>
+<dt><a href="com/konbini/dto/SubcategoryDTO.html#getDisplayName()" class="member-name-link">getDisplayName()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/SubcategoryDTO.html" title="class in com.konbini.dto">SubcategoryDTO</a></dt>
+<dd>
+<div class="block">Gets the display name of this subcategory.</div>
+</dd>
 <dt><a href="com/konbini/model/ProductCategory.html#getDisplayName()" class="member-name-link">getDisplayName()</a> - Method in enum class com.konbini.model.<a href="com/konbini/model/ProductCategory.html" title="enum class in com.konbini.model">ProductCategory</a></dt>
 <dd>
 <div class="block">Retrieves the user-friendly display name of the product category.</div>
@@ -1729,17 +1757,21 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Prompts the user for string input.</div>
 </dd>
+<dt><a href="com/konbini/dto/SubcategoryDTO.html#getSubcategoriesFor(com.konbini.dto.CategoryDTO)" class="member-name-link">getSubcategoriesFor(CategoryDTO)</a> - Static method in class com.konbini.dto.<a href="com/konbini/dto/SubcategoryDTO.html" title="class in com.konbini.dto">SubcategoryDTO</a></dt>
+<dd>
+<div class="block">Retrieves all subcategories that belong to a specific category.</div>
+</dd>
 <dt><a href="com/konbini/model/ProductSubcategory.html#getSubcategoriesFor(com.konbini.model.ProductCategory)" class="member-name-link">getSubcategoriesFor(ProductCategory)</a> - Static method in enum class com.konbini.model.<a href="com/konbini/model/ProductSubcategory.html" title="enum class in com.konbini.model">ProductSubcategory</a></dt>
 <dd>
 <div class="block">Gets all subcategories belonging to a specific category.</div>
 </dd>
-<dt><a href="com/konbini/view/ProductView.html#getSubcategoryInput(com.konbini.model.ProductCategory)" class="member-name-link">getSubcategoryInput(ProductCategory)</a> - Method in interface com.konbini.view.<a href="com/konbini/view/ProductView.html" title="interface in com.konbini.view">ProductView</a></dt>
+<dt><a href="com/konbini/view/ProductView.html#getSubcategoryInput(com.konbini.dto.CategoryDTO)" class="member-name-link">getSubcategoryInput(CategoryDTO)</a> - Method in interface com.konbini.view.<a href="com/konbini/view/ProductView.html" title="interface in com.konbini.view">ProductView</a></dt>
 <dd>
-<div class="block">Prompts the user to select a product subcategory based on the chosen category.</div>
+<div class="block">Prompts the user to select a product subcategory based on the selected category.</div>
 </dd>
-<dt><a href="com/konbini/view/swing/SwingStoreView.html#getSubcategoryInput(com.konbini.model.ProductCategory)" class="member-name-link">getSubcategoryInput(ProductCategory)</a> - Method in class com.konbini.view.swing.<a href="com/konbini/view/swing/SwingStoreView.html" title="class in com.konbini.view.swing">SwingStoreView</a></dt>
+<dt><a href="com/konbini/view/swing/SwingStoreView.html#getSubcategoryInput(com.konbini.dto.CategoryDTO)" class="member-name-link">getSubcategoryInput(CategoryDTO)</a> - Method in class com.konbini.view.swing.<a href="com/konbini/view/swing/SwingStoreView.html" title="class in com.konbini.view.swing">SwingStoreView</a></dt>
 <dd>
-<div class="block">Prompts the user to select a product subcategory based on the chosen category.</div>
+<div class="block">Prompts the user to select a product subcategory based on the selected category.</div>
 </dd>
 <dt><a href="com/konbini/dto/CartDTO.html#getSubtotal()" class="member-name-link">getSubtotal()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/CartDTO.html" title="class in com.konbini.dto">CartDTO</a></dt>
 <dd>
@@ -2965,6 +2997,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Starts the application by displaying welcome message and main menu.</div>
 </dd>
+<dt><a href="com/konbini/dto/SubcategoryDTO.html" class="type-name-link" title="class in com.konbini.dto">SubcategoryDTO</a> - Class in <a href="com/konbini/dto/package-summary.html">com.konbini.dto</a></dt>
+<dd>
+<div class="block">Data Transfer Object for ProductSubcategory enum.</div>
+</dd>
+<dt><a href="com/konbini/dto/SubcategoryDTO.html#%3Cinit%3E(java.lang.String)" class="member-name-link">SubcategoryDTO(String)</a> - Constructor for class com.konbini.dto.<a href="com/konbini/dto/SubcategoryDTO.html" title="class in com.konbini.dto">SubcategoryDTO</a></dt>
+<dd>
+<div class="block">Constructs a SubcategoryDTO with the specified display name.</div>
+</dd>
 <dt><a href="com/konbini/view/swing/SwingStoreView.html" class="type-name-link" title="class in com.konbini.view.swing">SwingStoreView</a> - Class in <a href="com/konbini/view/swing/package-summary.html">com.konbini.view.swing</a></dt>
 <dd>
 <div class="block">Main Swing-based GUI implementation of the StoreView interface.</div>
@@ -2988,6 +3028,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Category for personal hygiene and care products.</div>
 </dd>
+<dt><a href="com/konbini/dto/CategoryDTO.html#toModel()" class="member-name-link">toModel()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a></dt>
+<dd>
+<div class="block">Converts this DTO back to the corresponding ProductCategory domain model.</div>
+</dd>
 <dt><a href="com/konbini/dto/CustomerDTO.html#toModel()" class="member-name-link">toModel()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/CustomerDTO.html" title="class in com.konbini.dto">CustomerDTO</a></dt>
 <dd>
 <div class="block">Converts this DTO back to a Customer domain model.</div>
@@ -3000,9 +3044,17 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Converts this DTO back to a Product domain model.</div>
 </dd>
+<dt><a href="com/konbini/dto/SubcategoryDTO.html#toModel()" class="member-name-link">toModel()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/SubcategoryDTO.html" title="class in com.konbini.dto">SubcategoryDTO</a></dt>
+<dd>
+<div class="block">Converts this DTO back to the corresponding ProductSubcategory domain model.</div>
+</dd>
 <dt><a href="com/konbini/dto/CartDTO.html#toString()" class="member-name-link">toString()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/CartDTO.html" title="class in com.konbini.dto">CartDTO</a></dt>
 <dd>
 <div class="block">Returns a string representation of the CartDTO.</div>
+</dd>
+<dt><a href="com/konbini/dto/CategoryDTO.html#toString()" class="member-name-link">toString()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a></dt>
+<dd>
+<div class="block">Returns the display name as the string representation of this DTO.</div>
 </dd>
 <dt><a href="com/konbini/dto/CustomerDTO.html#toString()" class="member-name-link">toString()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/CustomerDTO.html" title="class in com.konbini.dto">CustomerDTO</a></dt>
 <dd>
@@ -3015,6 +3067,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="com/konbini/dto/ProductDTO.html#toString()" class="member-name-link">toString()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/ProductDTO.html" title="class in com.konbini.dto">ProductDTO</a></dt>
 <dd>
 <div class="block">Returns a string representation of the ProductDTO.</div>
+</dd>
+<dt><a href="com/konbini/dto/SubcategoryDTO.html#toString()" class="member-name-link">toString()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/SubcategoryDTO.html" title="class in com.konbini.dto">SubcategoryDTO</a></dt>
+<dd>
+<div class="block">Returns the display name as the string representation of this DTO.</div>
 </dd>
 <dt><a href="com/konbini/dto/TransactionDTO.html#toString()" class="member-name-link">toString()</a> - Method in class com.konbini.dto.<a href="com/konbini/dto/TransactionDTO.html" title="class in com.konbini.dto">TransactionDTO</a></dt>
 <dd>

@@ -881,9 +881,17 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
 
     /**
      * {@inheritDoc}
-     * Gets product category input from the user via a selection dialog.
+     *
+     * Displays a selection dialog with all available product categories
+     * using JOptionPane. The categories are presented using their display names
+     * for user-friendly selection.
+     *
+     * If the user cancels the dialog or an error occurs, this method returns
+     * the first available category as a default.
+     *
+     * @return the selected CategoryDTO, or the first category if cancelled/error
      */
-    @Override
+   @Override
     public CategoryDTO getCategoryInput() {
         try {
             List<CategoryDTO> categories = CategoryDTO.getAllCategories();
@@ -901,7 +909,17 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
 
     /**
      * {@inheritDoc}
-     * Gets product subcategory input from the user based on the selected category.
+     *
+     * Displays a selection dialog with subcategories filtered by the specified
+     * parent category. If the category has no subcategories, returns null.
+     *
+     * The subcategories are presented using their display names for
+     * user-friendly selection via JOptionPane.
+     *
+     * @param category the parent CategoryDTO to filter subcategories by
+     * @return the selected SubcategoryDTO, or null if no subcategories available
+     *         or user cancels
+     * @throws IllegalArgumentException if category is null
      */
     @Override
     public SubcategoryDTO getSubcategoryInput(CategoryDTO category) {

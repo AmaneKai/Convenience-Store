@@ -108,7 +108,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#getBooleanInput(java.lang.String)" tabindex="0">getBooleanInput(String)</a></li>
 <li><a href="#getDateInput(java.lang.String)" tabindex="0">getDateInput(String)</a></li>
 <li><a href="#getCategoryInput()" tabindex="0">getCategoryInput()</a></li>
-<li><a href="#getSubcategoryInput(com.konbini.model.ProductCategory)" tabindex="0">getSubcategoryInput(ProductCategory)</a></li>
+<li><a href="#getSubcategoryInput(com.konbini.dto.CategoryDTO)" tabindex="0">getSubcategoryInput(CategoryDTO)</a></li>
 <li><a href="#getMainFrame()" tabindex="0">getMainFrame()</a></li>
 <li><a href="#isApplicationRunning()" tabindex="0">isApplicationRunning()</a></li>
 </ol>
@@ -311,10 +311,10 @@ implements <a href="../MainView.html" title="interface in com.konbini.view">Main
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the user's selection from the cart menu.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../model/ProductCategory.html" title="enum class in com.konbini.model">ProductCategory</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCategoryInput()" class="member-name-link">getCategoryInput</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Prompts the user to select a product category.</div>
+<div class="block">Prompts the user to select a product category from available options.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCustomerMenuChoice()" class="member-name-link">getCustomerMenuChoice</a>()</code></div>
@@ -361,10 +361,10 @@ implements <a href="../MainView.html" title="interface in com.konbini.view">Main
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Prompts the user for string input.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../model/ProductSubcategory.html" title="enum class in com.konbini.model">ProductSubcategory</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSubcategoryInput(com.konbini.model.ProductCategory)" class="member-name-link">getSubcategoryInput</a><wbr>(<a href="../../model/ProductCategory.html" title="enum class in com.konbini.model">ProductCategory</a>&nbsp;category)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../dto/SubcategoryDTO.html" title="class in com.konbini.dto">SubcategoryDTO</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSubcategoryInput(com.konbini.dto.CategoryDTO)" class="member-name-link">getSubcategoryInput</a><wbr>(<a href="../../dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a>&nbsp;category)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Prompts the user to select a product subcategory based on the chosen category.</div>
+<div class="block">Prompts the user to select a product subcategory based on the selected category.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTransactionMenuChoice()" class="member-name-link">getTransactionMenuChoice</a>()</code></div>
@@ -1068,32 +1068,54 @@ implements <a href="../MainView.html" title="interface in com.konbini.view">Main
 <section class="detail" id="getCategoryInput()">
 <h3>getCategoryInput</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../model/ProductCategory.html" title="enum class in com.konbini.model">ProductCategory</a></span>&nbsp;<span class="element-name">getCategoryInput</span>()</div>
-<div class="block">Prompts the user to select a product category.
- Gets product category input from the user via a selection dialog.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a></span>&nbsp;<span class="element-name">getCategoryInput</span>()</div>
+<div class="block">Prompts the user to select a product category from available options.
+
+ This method should present all available product categories to the user
+ and return the selected category as a DTO. The implementation should handle
+ user cancellation gracefully, typically by returning a default category.
+
+ Displays a selection dialog with all available product categories
+ using JOptionPane. The categories are presented using their display names
+ for user-friendly selection.
+
+ If the user cancels the dialog or an error occurs, this method returns
+ the first available category as a default.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../ProductView.html#getCategoryInput()">getCategoryInput</a></code>&nbsp;in interface&nbsp;<code><a href="../ProductView.html" title="interface in com.konbini.view">ProductView</a></code></dd>
 <dt>Returns:</dt>
-<dd>the selected ProductCategory</dd>
+<dd>the selected CategoryDTO, or the first category if cancelled/error</dd>
 </dl>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="getSubcategoryInput(com.konbini.model.ProductCategory)">
+<section class="detail" id="getSubcategoryInput(com.konbini.dto.CategoryDTO)">
 <h3>getSubcategoryInput</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../model/ProductSubcategory.html" title="enum class in com.konbini.model">ProductSubcategory</a></span>&nbsp;<span class="element-name">getSubcategoryInput</span><wbr><span class="parameters">(<a href="../../model/ProductCategory.html" title="enum class in com.konbini.model">ProductCategory</a>&nbsp;category)</span></div>
-<div class="block">Prompts the user to select a product subcategory based on the chosen category.
- Gets product subcategory input from the user based on the selected category.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../dto/SubcategoryDTO.html" title="class in com.konbini.dto">SubcategoryDTO</a></span>&nbsp;<span class="element-name">getSubcategoryInput</span><wbr><span class="parameters">(<a href="../../dto/CategoryDTO.html" title="class in com.konbini.dto">CategoryDTO</a>&nbsp;category)</span></div>
+<div class="block">Prompts the user to select a product subcategory based on the selected category.
+
+ This method presents only the subcategories that belong to the specified
+ parent category. The implementation should filter subcategories appropriately
+ and allow the user to select from the filtered list.
+
+ Displays a selection dialog with subcategories filtered by the specified
+ parent category. If the category has no subcategories, returns null.
+
+ The subcategories are presented using their display names for
+ user-friendly selection via JOptionPane.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ProductView.html#getSubcategoryInput(com.konbini.model.ProductCategory)">getSubcategoryInput</a></code>&nbsp;in interface&nbsp;<code><a href="../ProductView.html" title="interface in com.konbini.view">ProductView</a></code></dd>
+<dd><code><a href="../ProductView.html#getSubcategoryInput(com.konbini.dto.CategoryDTO)">getSubcategoryInput</a></code>&nbsp;in interface&nbsp;<code><a href="../ProductView.html" title="interface in com.konbini.view">ProductView</a></code></dd>
 <dt>Parameters:</dt>
-<dd><code>category</code> - the parent category for which to select subcategories</dd>
+<dd><code>category</code> - the parent CategoryDTO to filter subcategories by</dd>
 <dt>Returns:</dt>
-<dd>the selected ProductSubcategory</dd>
+<dd>the selected SubcategoryDTO, or null if no subcategories available
+         or user cancels</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/IllegalArgumentException.html" title="class or interface in java.lang" class="external-link">IllegalArgumentException</a></code> - if category is null</dd>
 </dl>
 </div>
 </section>
