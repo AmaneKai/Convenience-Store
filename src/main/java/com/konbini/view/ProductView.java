@@ -2,7 +2,9 @@ package com.konbini.view;
 
 import java.util.List;
 
+import com.konbini.dto.CategoryDTO;
 import com.konbini.dto.ProductDTO;
+import com.konbini.dto.SubcategoryDTO;
 import com.konbini.model.ProductCategory;
 import com.konbini.model.ProductSubcategory;
 
@@ -68,7 +70,7 @@ public interface ProductView extends BaseView {
      *
      * @return the selected ProductCategory
      */
-    ProductCategory getCategoryInput();
+    CategoryDTO getCategoryInput();
 
     /**
      * Prompts the user to select a product subcategory based on the chosen category.
@@ -76,5 +78,5 @@ public interface ProductView extends BaseView {
      * @param category the parent category for which to select subcategories
      * @return the selected ProductSubcategory
      */
-    ProductSubcategory getSubcategoryInput(ProductCategory category);
+    SubcategoryDTO getSubcategoryInput(CategoryDTO category);
 }

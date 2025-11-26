@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.konbini.dto.CategoryDTO;
 import com.konbini.dto.ProductDTO;
+import com.konbini.dto.SubcategoryDTO;
 import com.konbini.model.Product;
 import com.konbini.model.ProductCategory;
 import com.konbini.model.ProductSubcategory;
@@ -65,7 +67,8 @@ public class ProductManagementController {
     public void handleViewByCategory() {
         try {
             view.displayInfoMessage("Select a product category:");
-            ProductCategory category = view.getCategoryInput();
+            CategoryDTO categoryDTO = view.getCategoryInput();
+            ProductCategory category = categoryDTO.toModel();
             List<Product> products = productController.getProductsByCategory(category);
             view.displayProducts(ProductDTO.fromModelList(products));
         } catch (IllegalArgumentException e) {
@@ -82,8 +85,10 @@ public class ProductManagementController {
     public void handleViewBySubcategory() {
         try {
             view.displayInfoMessage("Select a product category first:");
-            ProductCategory category = view.getCategoryInput();
-            ProductSubcategory subcategory = view.getSubcategoryInput(category);
+            CategoryDTO categoryDTO = view.getCategoryInput();
+            ProductCategory category = categoryDTO.toModel();
+            SubcategoryDTO subcategoryDTO = view.getSubcategoryInput(categoryDTO);
+            ProductSubcategory subcategory = subcategoryDTO != null ? subcategoryDTO.toModel() : null;
             List<Product> products = productController.getProductsBySubcategory(subcategory);
             view.displayProducts(ProductDTO.fromModelList(products));
         } catch (IllegalArgumentException e) {
@@ -258,7 +263,8 @@ public class ProductManagementController {
         productService.validateQuantity(quantity);
 
         view.displayInfoMessage("Select a product category:");
-        ProductCategory category = view.getCategoryInput();
+        CategoryDTO categoryDTO = view.getCategoryInput();
+        ProductCategory category = categoryDTO.toModel();
 
         String brand = view.getStringInput("Enter product brand: ");
         if (brand == null || brand.trim().isEmpty()) {
@@ -266,7 +272,8 @@ public class ProductManagementController {
         }
 
         view.displayInfoMessage("Select a product subcategory:");
-        ProductSubcategory subcategory = view.getSubcategoryInput(category);
+        SubcategoryDTO subcategoryDTO = view.getSubcategoryInput(categoryDTO);
+        ProductSubcategory subcategory = subcategoryDTO != null ? subcategoryDTO.toModel() : null;
 
         LocalDate expirationDate = view.getDateInput("Enter product expiration date (leave empty if not applicable): ");
 
@@ -297,13 +304,15 @@ public class ProductManagementController {
             productService.validateQuantity(quantity);
 
             view.displayInfoMessage("Select a new product category (current: " + product.getCategory() + "):");
-            ProductCategory category = view.getCategoryInput();
+            CategoryDTO categoryDTO = view.getCategoryInput();
+            ProductCategory category = categoryDTO.toModel();
 
             String brand = view.getStringInput("Enter new product brand (leave empty to keep current): ");
             brand = (brand == null || brand.isEmpty()) ? product.getBrand() : brand.trim();
 
             view.displayInfoMessage("Select a new product subcategory (current: " + product.getVariant() + "):");
-            ProductSubcategory subcategory = view.getSubcategoryInput(category);
+            SubcategoryDTO subcategoryDTO = view.getSubcategoryInput(categoryDTO);
+            ProductSubcategory subcategory = subcategoryDTO != null ? subcategoryDTO.toModel() : null;
 
             LocalDate expirationDate = view.getDateInput("Enter new expiration date (leave empty to keep current): ");
 

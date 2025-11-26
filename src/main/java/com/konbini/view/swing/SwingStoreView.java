@@ -8,7 +8,6 @@ import javax.swing.*;
 
 import com.konbini.controller.*;
 import com.konbini.dto.*;
-import com.konbini.model.*;
 import com.konbini.util.UserSession;
 import com.konbini.view.*;
 
@@ -885,16 +884,18 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
      * Gets product category input from the user via a selection dialog.
      */
     @Override
-    public ProductCategory getCategoryInput() {
+    public CategoryDTO getCategoryInput() {
         try {
-            ProductCategory[] categories = ProductCategory.values();
-            ProductCategory selected = (ProductCategory) JOptionPane.showInputDialog(
-                    mainFrame, "Select category:", "Category", JOptionPane.QUESTION_MESSAGE, null, categories, categories[0]
+            List<CategoryDTO> categories = CategoryDTO.getAllCategories();
+            CategoryDTO selected = (CategoryDTO) JOptionPane.showInputDialog(
+                    mainFrame, "Select category:", "Category",
+                    JOptionPane.QUESTION_MESSAGE, null,
+                    categories.toArray(), categories.get(0)
             );
-            return selected != null ? selected : categories[0];
+            return selected != null ? selected : categories.get(0);
         } catch (Exception e) {
             handleUIException(e, "getting category input", "Category selection failed.");
-            return ProductCategory.values()[0];
+            return CategoryDTO.getAllCategories().get(0);
         }
     }
 
@@ -903,25 +904,22 @@ public class SwingStoreView implements MainView, ProductView, CustomerView, Cart
      * Gets product subcategory input from the user based on the selected category.
      */
     @Override
-    public ProductSubcategory getSubcategoryInput(ProductCategory category) {
-        ProductSubcategory temp = null;
-
+    public SubcategoryDTO getSubcategoryInput(CategoryDTO category) {
         try {
-            if (category != null) {
-                ProductSubcategory[] subcategories = ProductSubcategory.getSubcategoriesFor(category);
-                if (subcategories.length > 0) {
-                    temp = (ProductSubcategory) JOptionPane.showInputDialog(
-                            mainFrame, "Select subcategory:", "Subcategory", JOptionPane.QUESTION_MESSAGE, null, subcategories, subcategories[0]
-                    );
-                }
-            } else {
-                throw new IllegalArgumentException("Category cannot be null");
+            List<SubcategoryDTO> subcategories = SubcategoryDTO.getSubcategoriesFor(category);
+            if (!subcategories.isEmpty()) {
+                SubcategoryDTO selected = (SubcategoryDTO) JOptionPane.showInputDialog(
+                        mainFrame, "Select subcategory:", "Subcategory",
+                        JOptionPane.QUESTION_MESSAGE, null,
+                        subcategories.toArray(), subcategories.get(0)
+                );
+                return selected;
             }
+            return null;
         } catch (Exception e) {
             handleUIException(e, "getting subcategory input", "Subcategory selection failed.");
+            return null;
         }
-
-        return temp;
     }
 
     // ==================== VALIDATION METHODS ====================
