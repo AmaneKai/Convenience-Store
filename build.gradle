@@ -1,0 +1,73 @@
+plugins {
+    id 'application'
+    alias(libs.plugins.javafx)
+}
+
+repositories {
+    mavenCentral()
+}
+
+run {
+    standardInput = System.in
+    jvmArgs = ['-Djava.awt.headless=false']
+}
+
+dependencies {
+    implementation libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
+
+    implementation "com.google.inject:guice:${libs.versions.guice.get()}:classes"
+    implementation libs.asm
+    implementation libs.vavr
+    implementation libs.bcrypt
+    implementation libs.jackson.databind
+    implementation libs.jackson.jsr310
+    implementation libs.jackson.csv
+    implementation libs.javafx.controls
+    implementation libs.javafx.fxml
+    implementation libs.controlsfx
+    implementation libs.ikonli.core
+    implementation libs.ikonli.fontawesome5
+    implementation libs.logback
+
+    testImplementation libs.junit.api
+    testImplementation libs.junit.engine
+    testRuntimeOnly libs.junit.launcher
+}
+
+javafx {
+    version = "26.0.2"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(26)
+    }
+}
+
+application {
+    mainClass = providers.gradleProperty('mainClass')
+            .orElse('com.konbini.view.KonbiniApplication')
+            .get()
+}
+
+javadoc {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.tags = [
+        'apiNote:a:API Note:',
+        'implSpec:a:Implementation Requirements:',
+        'implNote:a:Implementation Note:'
+    ]
+}

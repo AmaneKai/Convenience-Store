@@ -1,0 +1,28 @@
+id,name,price,quantity,category,brand,variant,expirationDate,lowStockThreshold
+PRO0002,"Potato Chips",45.0,20,Food,Lays,Snack,2026-05-25,5
+PRO0024,Antacid,60.0,25,Medications,Kremil-S,"Pain Relief",2027-11-25,5
+PRO0001,Sandwich,75.0,10,Food,Konbini,"Ready to Eat",2025-11-27,5
+PRO0023,"Cold Medicine",120.0,20,Medications,Neozep,"Cold & Flu",2026-11-25,5
+PRO0022,Ibuprofen,75.0,30,Medications,Advil,"Pain Relief",2028-11-25,5
+PRO0021,Paracetamol,50.0,40,Medications,Biogesic,"Pain Relief",2027-11-25,5
+PRO0020,"Floor Cleaner",100.0,10,"Cleaning Products","Mr. Clean",Detergent,2027-11-25,5
+PRO0009,Beer,60.0,15,Beverage,"San Miguel",Alcoholic,2026-11-25,5
+PRO0008,Soda,35.0,25,Beverage,Coca-Cola,Cold,2026-05-25,5
+PRO0007,"Bottled Water",20.0,50,Beverage,"Nature's Spring",Cold,2027-11-25,5
+PRO0006,Coffee,30.0,10,Beverage,Nescafe,Hot,2026-11-25,5
+PRO0005,Cookies,40.0,15,Food,Oreo,Snack,2026-09-25,5
+PRO0004,"Instant Ramen",25.0,19,Food,Nissin,"Ready to Eat",2026-11-25,5
+PRO0003,"Chocolate Bar",35.0,15,Food,"Hershey's",Snack,2026-07-25,5
+PRO0025,Antihistamine,80.0,15,Medications,Claritin,Allergy,2027-11-25,5
+PRO0013,Toothpaste,80.0,20,Toiletries,Colgate,"Beauty Products",2027-11-25,5
+PRO0012,Shampoo,120.0,7,Toiletries,Pantene,Shampoo,2028-11-25,5
+PRO0011,"Bath Soap",25.0,30,Toiletries,Dove,Soap,2027-11-25,5
+PRO0010,Tea,25.0,20,Beverage,Lipton,Hot,2027-05-25,5
+PRO0019,"Laundry Detergent",120.0,15,"Cleaning Products",Tide,Detergent,2027-11-25,5
+PRO0018,"Hand Sanitizer",45.0,25,"Cleaning Products",Safeguard,"Hand Sanitizers",2028-11-25,5
+PRO0017,"Bathroom Tissue",75.0,30,"Cleaning Products",Tissue,Tissue,2030-11-25,5
+PRO0016,"Dishwashing Liquid",50.0,20,"Cleaning Products",Joy,Detergent,2027-11-25,5
+PRO0015,"Hand Lotion",90.0,12,Toiletries,Jergens,"Beauty Products",2026-11-25,5
+PRO0499,Drink,100.0,10,Beverage,Drink.co,Cold,2025-12-25,5
+PRO0014,"Facial Wash",150.0,10,Toiletries,Nivea,"Beauty Products",2027-11-25,5
+PRO0498,FOod,100.0,100,Food,Food.co,"Ready to Eat",2029-10-29,5

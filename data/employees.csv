@@ -1,0 +1,4 @@
+id,name,passwordHash
+EMP0001,Manager,"$2a$12$gUoFOP35hAzHLni7iRl.UeaH11OWpA26piq8eAcfiaaaZeFN1lcua"
+EMP0002,Cashier,"$2a$12$RL/Rd61ptyfKs0gtIh9CT./eORJgrE7eJLnNX9PwuyNJe52QTcThK"
+EMP0003,Supervisor,"$2a$12$2/5hzB1tAUo43bbmXsUIROmpWuk8Vc7mdqREvXlgo0EacTVNw4u5q"

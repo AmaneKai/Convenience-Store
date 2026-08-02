@@ -1,0 +1,373 @@
+/* ============================================================
+   Konbini Store — plain Bootstrap-style theme
+   White surfaces, blue primary, gray-scale text, thin borders.
+   ============================================================ */
+
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f8f9fa;
+    -fx-text-fill: #212529;
+}
+
+/* ---------- Scroll panes / generic chrome ---------- */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10;
+}
+
+/* ---------- Cards ---------- */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-effect: none;
+    -fx-padding: 22;
+}
+
+.stat-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-padding: 16 18 16 18;
+}
+
+/* ---------- Typography ---------- */
+.title-label {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212529;
+}
+
+.subtitle-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #495057;
+}
+
+.stat-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212529;
+}
+
+.stat-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #495057;
+    -fx-font-weight: 600;
+}
+
+.form-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #212529;
+}
+
+/* ---------- Buttons ---------- */
+.button {
+    -fx-background-color: #0d6efd;
+    -fx-background-radius: 6;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 500;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+    -fx-effect: none;
+}
+
+.button:hover {
+    -fx-background-color: #0b5ed7;
+}
+
+.button:pressed {
+    -fx-background-color: #0a58ca;
+}
+
+.button:disabled {
+    -fx-background-color: #9ec5fe;
+    -fx-text-fill: #ffffff;
+}
+
+.secondary-button {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+    -fx-text-fill: #212529;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-font-weight: 500;
+    -fx-effect: none;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #f1f3f5;
+    -fx-border-color: #adb5bd;
+}
+
+.danger-button {
+    -fx-background-color: #dc3545;
+    -fx-background-radius: 6;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 500;
+    -fx-effect: none;
+}
+
+.danger-button:hover {
+    -fx-background-color: #bb2d3b;
+}
+
+/* ---------- Navigation ---------- */
+.nav-pane {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent #dee2e6 transparent transparent;
+    -fx-border-width: 0 1 0 0;
+    -fx-padding: 18 12 18 12;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6;
+    -fx-text-fill: #495057;
+    -fx-alignment: CENTER_LEFT;
+    -fx-graphic-text-gap: 12;
+    -fx-font-weight: 500;
+    -fx-padding: 10 14 10 14;
+    -fx-effect: none;
+}
+
+.nav-button:hover {
+    -fx-background-color: #f1f3f5;
+    -fx-text-fill: #212529;
+}
+
+.nav-button:selected, .nav-button:armed {
+    -fx-background-color: #0d6efd;
+    -fx-text-fill: #ffffff;
+}
+
+/* ---------- Text fields / inputs ---------- */
+.text-field, .password-field, .combo-box, .date-picker {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 6;
+    -fx-text-fill: #212529;
+    -fx-prompt-text-fill: #6c757d;
+    -fx-padding: 7 12 7 12;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused, .date-picker:focused {
+    -fx-border-color: #0d6efd;
+    -fx-border-width: 1.6;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #212529;
+    -fx-background-color: transparent;
+}
+
+.combo-box .combo-box-popup .list-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ced4da;
+}
+
+.combo-box .combo-box-popup .list-cell {
+    -fx-text-fill: #212529;
+}
+
+.combo-box .combo-box-popup .list-cell:hover {
+    -fx-background-color: #f1f3f5;
+}
+
+/* ---------- Tables ---------- */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 6;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 6 6 0 0;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-text-fill: #212529;
+    -fx-size: 36px;
+    -fx-border-color: transparent transparent #dee2e6 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #212529;
+    -fx-font-weight: 700;
+    -fx-font-size: 12px;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #212529;
+    -fx-border-color: transparent transparent #eeeff1 transparent;
+    -fx-cell-size: 36px;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #e9ecef;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #cfe2ff;
+    -fx-text-fill: #052c65;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #212529;
+    -fx-border-color: transparent;
+}
+
+/* ---------- List views ---------- */
+.list-view {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 6;
+}
+
+.list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #212529;
+}
+
+.list-view .list-cell:hover {
+    -fx-background-color: #f1f3f5;
+}
+
+.list-view .list-cell:selected {
+    -fx-background-color: #cfe2ff;
+    -fx-text-fill: #052c65;
+}
+
+/* ---------- Alert / status ---------- */
+.status-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #146c43;
+    -fx-font-weight: 600;
+}
+
+.error-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #b02a37;
+    -fx-font-weight: 600;
+}
+
+.badge-low-stock {
+    -fx-text-fill: #997404;
+    -fx-font-weight: 700;
+}
+
+.badge-expired {
+    -fx-text-fill: #b02a37;
+    -fx-font-weight: 700;
+}
+
+/* ---------- Split pane ---------- */
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: transparent;
+    -fx-padding: 0 1 0 1;
+}
+
+/* ---------- Charts ---------- */
+.chart {
+    -fx-padding: 8;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #eeeff1;
+}
+
+.chart-vertical-zero-line, .chart-horizontal-zero-line {
+    -fx-stroke: #dee2e6;
+}
+
+.axis {
+    -fx-tick-label-fill: #495057;
+}
+
+.axis-label {
+    -fx-text-fill: #495057;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #0d6efd;
+    -fx-stroke-width: 2px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: #0d6efd, white;
+}
+
+.default-color0.chart-bar {
+    -fx-bar-fill: #0d6efd;
+}
+
+/* ---------- Misc ---------- */
+.hbox-gap, .vbox-gap { }
+.bold { -fx-font-weight: bold; }
+.money { -fx-text-fill: #146c43; -fx-font-weight: 700; }
+.vertical-divider { -fx-background-color: #dee2e6; }
+
+/* ---------- Landing / role select ---------- */
+.role-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-padding: 28 24 28 24;
+    -fx-cursor: hand;
+    -fx-effect: none;
+}
+
+.role-card:hover {
+    -fx-border-color: #0d6efd;
+    -fx-background-color: #f8f9ff;
+}
+
+.link-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #0d6efd;
+    -fx-font-weight: 500;
+    -fx-padding: 4 0 4 0;
+    -fx-effect: none;
+    -fx-underline: true;
+}
+
+.link-button:hover {
+    -fx-text-fill: #0a58ca;
+}

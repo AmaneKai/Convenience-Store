@@ -1,0 +1,9 @@
+id,name,seniorCitizen,cardId,cardNumber,cardExpiryDate,cardPoints,passwordHash
+CUS0004,"Ana Gonzales",true,CAR0002,MEM-002,2026-11-25,0,
+CUS0003,"Pedro Reyes",false,CAR0001,MEM-001,2027-11-25,0,
+CUS0002,"Maria Santos",true,,,,,
+CUS0189,Xian,false,,,,,
+CUS0001,"Juan Dela Cruz",false,,,,,
+CUS0188,Callo,false,CAR0057,CARD123,2026-11-25,0,
+CUS0190,Test,false,,,,,"$2a$12$EVdWvjMgvrnQu4dKF9ZTmOiT9b4EqCTH5SxyKSV6Ic5OrFgHr4Qmm"
+CUS0191,Tester,false,,,,,"$2a$12$RhuASNEFqqSJNCioKPvUV.bKhCawySHpc2lnka381h3Kw5ILA0Gf6"
